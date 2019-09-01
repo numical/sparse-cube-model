@@ -1,44 +1,55 @@
 const { test } = require("tap");
 const Sparse3DArray = require('./Sparse3DArray');
 
-test("Model creation", t => {
-  const { element } = new Sparse3DArray();
-  t.type(element, 'function');
+test("Array creation", t => {
+  const { get, set, unset } = new Sparse3DArray();
+  t.type(get, 'function');
+  t.type(set, 'function');
+  t.type(unset, 'function');
   t.end();
 });
 
-test("Empty model", t => {
-  const { element } = new Sparse3DArray();
-  t.type(element(), 'undefined');
-  t.type(element({}), 'undefined');
-  t.type(element({x: 0}), 'undefined');
-  t.type(element({y: 0}), 'undefined');
-  t.type(element({z: 0}), 'undefined');
-  t.type(element({x: 0, y: 0}), 'undefined');
-  t.type(element({x: 0, y: 0, z: 0}), 'undefined');
-  t.type(element({x: 10, y: 10, z: 10}), 'undefined');
+test("Empty array", t => {
+  const { get } = new Sparse3DArray();
+  t.type(get(), 'undefined');
+  t.type(get(0), 'undefined');
+  t.type(get(0, 0), 'undefined');
+  t.type(get(0, 0, 0), 'undefined');
+  t.type(get(10, 10, 10), 'undefined');
   t.end();
 });
 
 test("Single value at (0,0,0)", t => {
-  const { element } = new Sparse3DArray();
+  const { get, set } = new Sparse3DArray();
   const value = {};
-  t.equal(element({x: 0, y:0}, value), value);
-  t.equal(element({x: 0, y:0}), value);
-  t.equal(element({x: 0, y:0, z:0 }), value);
-  t.type(element({x: 0, y: 0, z: 1}), 'undefined');
-  t.type(element({x: 0, y: 1, z: 0}), 'undefined');
-  t.type(element({x: 1, y: 0, z: 0}), 'undefined');
+  t.equal(set(0, 0, value), value);
+  t.equal(get(0, 0), value);
+  t.equal(get(0,0, 0), value);
+  t.type(get(0), 'undefined');
+  t.type(get(0, 1), 'undefined');
+  t.type(get(0, 0, 1), 'undefined');
   t.end();
 });
 
-test("Single value at (10,10,0)", t => {
-  const { element } = new Sparse3DArray();
+test("Single value at (10,10,10)", t => {
+  const { get, set } = new Sparse3DArray();
   const value = {};
-  t.equal(element({x: 10, y:10}, value), value);
-  t.equal(element({x: 10, y:10}), value);
-  t.equal(element({x: 10, y:10, z:0 }), value);
-  t.type(element({x: 0, y: 0, z: 0}), 'undefined');
+  t.equal(set(10, 10, 10, value), value);
+  t.equal(get(10, 10, 10), value);
+  t.type(get(10, 10, 0), 'undefined');
+  t.type(get(10, 0, 10), 'undefined');
+  t.type(get(10, 0, 0), 'undefined');
+  t.type(get(0, 0, 0), 'undefined');
+  t.end();
+});
+
+test("Unset", t => {
+  const { get, set, unset } = new Sparse3DArray();
+  const value = {};
+  set(5,5, value);
+  t.equal(get(5,5,0), value);
+  unset(5, 5);
+  t.type(get(5,5), 'undefined');
   t.end();
 });
 

@@ -1,5 +1,8 @@
 const { compose, curry } = require("ramda");
 
+const methods = ['get', 'set', 'unset'];
+const defaultZ = 0;
+
 const getOrCreateArrayAtIndex = (parentArray, index) => {
   if (!parentArray[index]) {
     parentArray[index] = [];
@@ -12,25 +15,33 @@ class Sparse3DArray {
 
   constructor() {
     this.#data = [];
-    this.element = this.element.bind(this);
+    methods.forEach(method => this[method] = this[method].bind(this));
   }
 
-  element(pos, value) {
-    if(pos == null) return undefined;
-    if(pos.x == null) return undefined;
-    if(pos.y == null) return undefined;
-    const { x, y, z = 0 } = pos;
+  get(x, y, z = defaultZ) {
     const d = this.#data;
-    if (value) {
-      const dx = getOrCreateArrayAtIndex(d, x);
-      const dy = getOrCreateArrayAtIndex(dx, y);
-      const dz = getOrCreateArrayAtIndex(dy, z);
-      dz[0] = value;
-      return value;
-    } else {
-      return d[x] && d[x][y] && d[x][y][z] ? d[x][y][z][0] : undefined;
+    return d[x] && d[x][y] && d[x][y][z] ? d[x][y][z][0] : undefined;
+  }
+
+  set(x, y, z, value) {
+    if (value == null) {
+      value = z;
+      z = defaultZ;
     }
-  };
+    const d = this.#data;
+    const dx = getOrCreateArrayAtIndex(d, x);
+    const dy = getOrCreateArrayAtIndex(dx, y);
+    const dz = getOrCreateArrayAtIndex(dy, z);
+    dz[0] = value;
+    return value;
+  }
+
+  unset(x, y, z = defaultZ) {
+    if (this.get(x, y, z) != null) {
+      const d = this.#data;
+      d[x][y][z] = [];
+    }
+  }
 }
 
 module.exports = Sparse3DArray;
