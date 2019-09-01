@@ -11,7 +11,8 @@
     "tap": "^14.6.1"
   },
   "scripts": {
-    "test": "tap src/**/*.test.js"
+    "test": "tap src/**/*.test.js",
+    "test:only": "tap --only --timeout=600 src/**/*.test.js"
   },
   "repository": {
     "type": "git",

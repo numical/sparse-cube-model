@@ -1,5 +1,3 @@
-const { compose, curry } = require("ramda");
-
 const methods = ['get', 'set', 'unset'];
 const defaultZ = 0;
 
@@ -11,6 +9,7 @@ const getOrCreateArrayAtIndex = (parentArray, index) => {
 };
 
 class Sparse3DArray {
+
   #data;
 
   constructor() {
@@ -43,5 +42,7 @@ class Sparse3DArray {
     }
   }
 }
+
+Sparse3DArray.defaultZ = defaultZ;
 
 module.exports = Sparse3DArray;
