@@ -28,7 +28,7 @@ class Sparse3DArray {
       value = z;
       z = defaultZ;
     }
-    debug('set: %d,%d,%d:%o', x, y, z, value);  
+    debug('set: %d,%d,%d:%o', x, y, z, value);
     const d = this.#data;
     const dx = getOrCreateArrayAtIndex(d, x);
     const dy = getOrCreateArrayAtIndex(dx, y);
