@@ -1,3 +1,4 @@
+const debug = require('debug')('sparse-cube-model:Sparse3DArray');
 const methods = ['get', 'set', 'unset'];
 const defaultZ = 0;
 
@@ -23,11 +24,11 @@ class Sparse3DArray {
   }
 
   set(x, y, z, value) {
-    // console.log(`set:${x},${y},${z}:${value}`);
     if (value == null) {
       value = z;
       z = defaultZ;
     }
+    debug('set: %d,%d,%d:%o', x, y, z, value);  
     const d = this.#data;
     const dx = getOrCreateArrayAtIndex(d, x);
     const dy = getOrCreateArrayAtIndex(dx, y);

@@ -9,7 +9,7 @@
   },
   "scripts": {
     "test": "tap src/**/*.test.js",
-    "test:debug": "tap  --timeout=600 src/**/*.test.js",
+    "test:debug": "DEBUG=sparse-cube-model:* tap --timeout=600 src/**/*.test.js",
     "test:only": "tap --only --timeout=600 src/**/*.test.js"
   },
   "repository": {
@@ -25,5 +25,8 @@
   "bugs": {
     "url": "https://github.com/numical/sparse-cube-model/issues"
   },
-  "homepage": "https://github.com/numical/sparse-cube-model#readme"
+  "homepage": "https://github.com/numical/sparse-cube-model#readme",
+  "dependencies": {
+    "debug": "^4.1.1"
+  }
 }
