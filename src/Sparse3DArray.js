@@ -23,6 +23,7 @@ class Sparse3DArray {
   }
 
   set(x, y, z, value) {
+    // console.log(`set:${x},${y},${z}:${value}`);
     if (value == null) {
       value = z;
       z = defaultZ;
