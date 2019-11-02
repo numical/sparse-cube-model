@@ -5,6 +5,7 @@
   "main": "index.js",
   "devDependencies": {
     "faucet": "0.0.1",
+    "prettier": "^1.18.2",
     "tap": "^14.6.1"
   },
   "scripts": {
