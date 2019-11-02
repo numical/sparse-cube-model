@@ -8,9 +8,9 @@
     "tap": "^14.6.1"
   },
   "scripts": {
-    "test": "tap src/**/*.test.js",
-    "test:debug": "DEBUG=sparse-cube-model:* tap --timeout=600 src/**/*.test.js",
-    "test:only": "tap --only --timeout=600 src/**/*.test.js"
+    "test": "tap src/**/*.test.js --100",
+    "test:debug": "DEBUG=sparse-cube-model:* tap --only --timeout=600 --no-coverage src/**/*.test.js",
+    "test:only": "tap --only --timeout=600 --no-coverage src/**/*.test.js"
   },
   "repository": {
     "type": "git",

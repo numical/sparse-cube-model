@@ -45,6 +45,4 @@ class Sparse3DArray {
   }
 }
 
-Sparse3DArray.defaultZ = defaultZ;
-
 module.exports = Sparse3DArray;
