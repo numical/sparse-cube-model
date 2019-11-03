@@ -1,7 +1,3 @@
-const debug = require("debug")("sparse-cube-model:Sparse3DArray");
-const methods = ["get", "set", "unset"];
-const defaultZ = 0;
-
 const getOrCreateArrayAtIndex = (parentArray, index) => {
   if (!parentArray[index]) {
     parentArray[index] = [];
@@ -14,20 +10,17 @@ class Sparse3DArray {
 
   constructor() {
     this.#data = [];
-    methods.forEach(method => (this[method] = this[method].bind(this)));
+    ["get", "set", "unset"].forEach(
+      method => (this[method] = this[method].bind(this))
+    );
   }
 
-  get(x, y, z = defaultZ) {
+  get(x, y, z) {
     const d = this.#data;
     return d[x] && d[x][y] && d[x][y][z] ? d[x][y][z][0] : undefined;
   }
 
   set(x, y, z, value) {
-    if (value == null) {
-      value = z;
-      z = defaultZ;
-    }
-    debug("set: %d,%d,%d:%o", x, y, z, value);
     const d = this.#data;
     const dx = getOrCreateArrayAtIndex(d, x);
     const dy = getOrCreateArrayAtIndex(dx, y);
@@ -36,7 +29,7 @@ class Sparse3DArray {
     return value;
   }
 
-  unset(x, y, z = defaultZ) {
+  unset(x, y, z) {
     if (this.get(x, y, z) != null) {
       const d = this.#data;
       d[x][y][z] = [];

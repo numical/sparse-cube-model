@@ -17,7 +17,7 @@ test("Empty array has zero lengths", t => {
 
 test("Empty array throws on a get", t => {
   const { get } = new Dense3DArray();
-  t.throws(get.bind(null, 0, 0), RangeError);
+  t.throws(get.bind(null, 0, 0, 0), RangeError);
   t.end();
 });
 
@@ -37,11 +37,11 @@ test("square of size 2 created by set using default z", t => {
   const defaultValue = 9;
   const d3a = new Dense3DArray(defaultValue);
   const { get, set, lengths } = d3a;
-  set(1, 1, value);
-  t.equals(get(0, 0), defaultValue);
-  t.equals(get(0, 1), defaultValue);
-  t.equals(get(1, 0), defaultValue);
-  t.equals(get(1, 1), value);
+  set(1, 1, 0, value);
+  t.equals(get(0, 0, 0), defaultValue);
+  t.equals(get(0, 1, 0), defaultValue);
+  t.equals(get(1, 0, 0), defaultValue);
+  t.equals(get(1, 1, 0), value);
   t.equals(d3a[0][0][0], defaultValue);
   t.equals(d3a[0][1][0], defaultValue);
   t.equals(d3a[1][0][0], defaultValue);

@@ -22,8 +22,7 @@ test("Empty array", t => {
 test("Single value at (0,0,0)", t => {
   const { get, set } = new Sparse3DArray();
   const value = {};
-  t.equal(set(0, 0, value), value);
-  t.equal(get(0, 0), value);
+  t.equal(set(0, 0, 0, value), value);
   t.equal(get(0, 0, 0), value);
   t.type(get(0), "undefined");
   t.type(get(0, 1), "undefined");
@@ -56,17 +55,17 @@ test("Reset single value)", t => {
 
 test("Unset undefined does nothing", t => {
   const { get, set, unset } = new Sparse3DArray();
-  unset(5, 5);
-  t.type(get(5, 5), "undefined");
+  unset(5, 5, 0);
+  t.type(get(5, 5, 0), "undefined");
   t.end();
 });
 
 test("Unset", t => {
   const { get, set, unset } = new Sparse3DArray();
   const value = {};
-  set(5, 5, value);
+  set(5, 5, 0, value);
   t.equal(get(5, 5, 0), value);
-  unset(5, 5);
-  t.type(get(5, 5), "undefined");
+  unset(5, 5, 0);
+  t.type(get(5, 5, 0), "undefined");
   t.end();
 });
