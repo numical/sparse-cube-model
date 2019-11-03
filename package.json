@@ -12,7 +12,7 @@
     "test": "tap src/**/*.test.js --100",
     "test:debug": "DEBUG=sparse-cube-model:* tap --only --timeout=600 --no-coverage src/**/*.test.js",
     "test:only": "tap --only --timeout=600 --no-coverage src/**/*.test.js",
-    "test:dense": "tap --timeout=600 --no-coverage src/**/Dense3DArray.test.js"
+    "test:sparse": "tap --timeout=600 --no-coverage src/**/Sparse3DArray.test.js"
   },
   "repository": {
     "type": "git",
