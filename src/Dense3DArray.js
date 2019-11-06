@@ -1,11 +1,10 @@
-const debug = require("debug")("sparse-cube-model:Dense3DArray");
 const methods = ["get", "set"];
 
 class Dense3DArray {
   lengths;
   #defaultValue;
 
-  constructor(defaultValue = 0) {
+  constructor({ defaultValue = 0 } = {}) {
     this.lengths = { x: 0, y: 0, z: 0 };
     this.#defaultValue = defaultValue;
     methods.forEach(method => (this[method] = this[method].bind(this)));

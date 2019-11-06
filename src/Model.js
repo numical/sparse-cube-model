@@ -1,63 +1,53 @@
-const Sparse3DArray = require("./Sparse3DArray");
-const identity = require("./fns/identity");
+const R = require("ramda");
 
-const { isArray } = Array;
-const methods = ["get", "set", "unset"];
+const Dense3DArray = require("./Dense3DArray");
+const Sparse3DArray = require("./Sparse3DArray");
+const modelDefaults = require("./modelDefaults");
 
 class Model {
+  meta;
   #constants;
-  #fns;
+  #values;
 
-  constructor() {
-    methods.forEach(method => (this[method] = this[method].bind(this)));
+  constructor(meta = {}) {
+    this.meta = R.mergeDeepLeft(meta, modelDefaults());
     this.#constants = new Sparse3DArray();
-    this.#fns = new Sparse3DArray();
+    this.#values = new Dense3DArray({ defaultValue: 0 });
+    [].forEach(method => (this[method] = this[method].bind(this)));
   }
 
-  get(x, y, z = 0) {
-    const fn = this.#fns.get(x, y, z);
-    return fn ? fn() : 0;
-  }
-
-  set(x, y, z, value) {
-    if (!value) {
-      value = z;
-      z = 0;
+  addRow({
+    initialValue,
+    subsequentValues,
+    initialInterval = 0,
+    scenario = "defaultScenario"
+  }) {
+    const { x, y } = this.#values.lengths;
+    if (initialInterval >= x) {
+      throw new Error(
+        `Invalid initial interval ${initialInterval}: max interval: ${x - 1}`
+      );
     }
-    if (isArray(x)) {
-      x.forEach(e => this.set(e, y, z, value));
-    } else if (isArray(y)) {
-      y.forEach(e => this.set(x, e, z, value));
-    } else if (isArray(z)) {
-      z.forEach(e => this.set(x, y, e, value));
-    } else {
-      switch (typeof value) {
-        case "function":
-          if (this.#constants.get(x, y, z) === undefined) {
-            this.#fns.set(x, y, z, value);
-            return true;
-          }
-          return false;
-        case "number":
-          this.#constants.set(x, y, z, value);
-          this.#fns.set(x, y, z, identity(value));
-          return true;
-        default:
-          throw new Error(`'${value}' is not a function or a number`);
-      }
+    const z = this.meta.scenarios[scenario];
+    setValue(initialInterval, y, z, initialValue);
+    for (let i = initialInterval + 1; i < x; i++) {
+      setValue(i, y, z, subsequentValues);
     }
   }
 
-  unset(x, y, z = 0) {
-    if (isArray(x)) {
-      x.forEach(e => this.unset(e, y, z));
-    } else if (isArray(y)) {
-      y.forEach(e => this.unset(x, e, z));
-    } else if (isArray(z)) {
-      z.forEach(e => this.unset(x, y, e));
-    } else {
-      this.#constants.unset(x, y, z);
-      this.#fns.unset(x, y, z);
+  setValue(x, y, z, value) {
+    switch (typeof value) {
+      case "function":
+        this.#values.set(x, y, z, value(x, y, z));
+        break;
+      case "number":
+        this.#constants.set(x, y, z, value);
+        this.#values.set(x, y, z, value);
+        break;
+      default:
+        throw new Error(
+          `Invalid type ${typeof value} for model value ${value}`
+        );
     }
   }
 }

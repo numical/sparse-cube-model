@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "description": "Experiment in scenario-based functional modellng",
   "main": "index.js",
+  "dependencies": {
+    "debug": "^4.1.1",
+    "ramda": "^0.26.1"
+  },
   "devDependencies": {
     "faucet": "0.0.1",
     "prettier": "^1.18.2",
@@ -12,7 +16,7 @@
     "test": "tap src/**/*.test.js --100",
     "test:debug": "DEBUG=sparse-cube-model:* tap --only --timeout=600 --no-coverage src/**/*.test.js",
     "test:only": "tap --only --timeout=600 --no-coverage src/**/*.test.js",
-    "test:sparse": "tap --timeout=600 --no-coverage src/**/Sparse3DArray.test.js"
+    "test:model": "tap --timeout=600 --no-coverage src/**/Model.test.js"
   },
   "repository": {
     "type": "git",
@@ -27,8 +31,5 @@
   "bugs": {
     "url": "https://github.com/numical/sparse-cube-model/issues"
   },
-  "homepage": "https://github.com/numical/sparse-cube-model#readme",
-  "dependencies": {
-    "debug": "^4.1.1"
-  }
+  "homepage": "https://github.com/numical/sparse-cube-model#readme"
 }

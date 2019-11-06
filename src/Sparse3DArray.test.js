@@ -98,9 +98,9 @@ test("Unset single value", t => {
 
 test("Unset from multiple values - metadata", t => {
   const { get, set, unset, meta } = new Sparse3DArray();
-  t.equal(set(1, 0, 0, 1), 1);
-  t.equal(set(0, 2, 0, 2), 2);
-  t.equal(set(0, 0, 3, 3), 3);
+  set(1, 0, 0, 1);
+  set(0, 2, 0, 2);
+  set(0, 0, 3, 3);
   t.same(meta, { objects: 5, values: 3, lengths: { x: 2, y: 3, z: 4 } });
   unset(1, 0, 0);
   t.same(meta, { objects: 3, values: 2, lengths: { x: 1, y: 3, z: 4 } });
@@ -113,12 +113,14 @@ test("Unset from multiple values - metadata", t => {
 
 test("Unset from multiple overlapping values - metadata", t => {
   const { get, set, unset, meta } = new Sparse3DArray();
-  t.equal(set(3, 5, 7, 1), 1);
-  t.equal(set(7, 5, 4, 2), 2);
-  t.equal(set(8, 6, 5, 3), 3);
-  t.same(meta, { objects: 6, values: 3, lengths: { x: 9, y: 7, z: 8 } });
+  set(3, 5, 7, 1);
+  set(7, 5, 4, 2);
+  set(8, 6, 5, 3);
+  set(8, 6, 6, 4); // for test coverage of 'sort' in maxIndexOfObject
+  t.same(meta, { objects: 6, values: 4, lengths: { x: 9, y: 7, z: 8 } });
   unset(3, 5, 7);
-  t.same(meta, { objects: 4, values: 2, lengths: { x: 9, y: 7, z: 6 } });
+  t.same(meta, { objects: 4, values: 3, lengths: { x: 9, y: 7, z: 7 } });
+  unset(8, 6, 6);
   unset(8, 6, 5);
   t.same(meta, { objects: 2, values: 1, lengths: { x: 8, y: 6, z: 5 } });
   t.end();

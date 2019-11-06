@@ -35,7 +35,7 @@ test("Single element array created by set", t => {
 test("square of size 2 created by set using default z", t => {
   const value = 7;
   const defaultValue = 9;
-  const d3a = new Dense3DArray(defaultValue);
+  const d3a = new Dense3DArray({ defaultValue });
   const { get, set, lengths } = d3a;
   set(1, 1, 0, value);
   t.equals(get(0, 0, 0), defaultValue);
@@ -132,7 +132,7 @@ test("large irregular size still dense", t => {
   const z = 19;
   const defaultValue = 9;
   const value = 7;
-  const d3a = new Dense3DArray(defaultValue);
+  const d3a = new Dense3DArray({ defaultValue });
   const { get, set, lengths } = d3a;
   set(x, y, z, value);
   for (let i = 0; i <= x; i++) {
