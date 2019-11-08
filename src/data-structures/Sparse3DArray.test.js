@@ -125,3 +125,15 @@ test("Unset from multiple overlapping values - metadata", t => {
   t.same(meta, { objects: 2, values: 1, lengths: { x: 8, y: 6, z: 5 } });
   t.end();
 });
+
+test("clone", t => {
+  const s3a = new Sparse3DArray();
+  s3a.set(3, 5, 7, 1);
+  s3a.set(8, 6, 4, 2);
+  s3a.set(8, 6, 5, 3);
+  const clone = s3a.clone();
+  t.type(clone, Sparse3DArray);
+  t.notEqual(clone, s3a);
+  t.same(clone, s3a);
+  t.end();
+});

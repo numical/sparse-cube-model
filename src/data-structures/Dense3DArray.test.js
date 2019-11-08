@@ -1,5 +1,6 @@
 const { test } = require("tap");
 const Dense3DArray = require("./Dense3DArray");
+const iterate3D = require("./iterate3D");
 
 test("Array creation", t => {
   const { get, set, lengths } = new Dense3DArray();
@@ -159,5 +160,16 @@ test("get throws RangeError when indices exceeded", t => {
   t.throws(get.bind(null, 1, 3, 3), RangeError);
   t.equals(get(1, 2, 2), 0);
   t.throws(get.bind(null, 1, 2, 4), RangeError);
+  t.end();
+});
+
+test("clone", t => {
+  const d3a = new Dense3DArray();
+  const size = 5;
+  iterate3D(size, (x, y, z) => d3a.set(x, y, z, `${x},${y},${z}`));
+  const clone = d3a.clone();
+  t.type(clone, Dense3DArray);
+  t.notEqual(clone, d3a);
+  t.same(clone, d3a);
   t.end();
 });

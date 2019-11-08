@@ -1,4 +1,4 @@
-const methods = ["get", "set"];
+const iterate3D = require("./iterate3D");
 
 class Dense3DArray {
   lengths;
@@ -7,7 +7,9 @@ class Dense3DArray {
   constructor({ defaultValue = 0 } = {}) {
     this.lengths = { x: 0, y: 0, z: 0 };
     this.#defaultValue = defaultValue;
-    methods.forEach(method => (this[method] = this[method].bind(this)));
+    ["get", "set", "clone"].forEach(
+      method => (this[method] = this[method].bind(this))
+    );
   }
 
   // safety only, normally access direct
@@ -61,6 +63,17 @@ class Dense3DArray {
       this.lengths.z = lenZ;
     }
     this[x][y][z] = value;
+  }
+
+  clone() {
+    const { x: lenX, y: lenY, z: lenZ } = this.lengths;
+    const defaultValue = this.#defaultValue;
+    const clone = new Dense3DArray({ defaultValue });
+    clone.set(lenX - 1, lenY - 1, lenZ - 1, defaultValue);
+    iterate3D(lenX, lenY, lenZ, (x, y, z) => {
+      clone[x][y][z] = this[x][y][z];
+    });
+    return clone;
   }
 }
 

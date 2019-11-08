@@ -1,3 +1,5 @@
+const iterate3D = require("./iterate3D");
+
 const maxIndexOfObject = (object, depth = 0) => {
   if (depth === 0) {
     const indices = Object.keys(object)
@@ -21,7 +23,7 @@ class Sparse3DArray {
   meta;
   constructor() {
     this.meta = { objects: 0, values: 0, lengths: { x: 0, y: 0, z: 0 } };
-    ["get", "set", "unset"].forEach(
+    ["get", "set", "unset", "clone"].forEach(
       method => (this[method] = this[method].bind(this))
     );
   }
@@ -75,6 +77,24 @@ class Sparse3DArray {
         }
       }
     }
+  }
+
+  clone() {
+    const clone = new Sparse3DArray();
+    clone.meta = {
+      ...this.meta,
+      lengths: {
+        ...this.meta.lengths
+      }
+    };
+    const { x: lenX, y: lenY, z: lenZ } = this.meta.lengths;
+    iterate3D(lenX, lenY, lenZ, (x, y, z) => {
+      const v = this.get(x, y, z);
+      if (v !== undefined) {
+        clone.set(x, y, z, v);
+      }
+    });
+    return clone;
   }
 }
 
