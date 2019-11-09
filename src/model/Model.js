@@ -21,16 +21,29 @@ class Model extends Dense3DArray {
     initialValue,
     subsequentValues,
     initialInterval = 0,
-    scenario = "defaultScenario"
+    rowName,
+    scenarioName = "defaultScenario"
   }) {
     const { interval, scenarios } = this.meta;
     const { y } = this.lengths;
-    const z = scenarios[scenario];
-    if (z === undefined) {
-      throw new Error(`Unknown scenario '${scenario}'`);
+    const scenario = scenarios[scenarioName];
+    if (!scenario) {
+      throw new Error(`Unknown scenario '${scenarioName}'`);
     }
+    if (!rowName) {
+      throw new Error(`A row name is required`);
+    }
+    if (scenario.rows[rowName]) {
+      throw new Error(
+        `Scenario '${scenarioName}' already has row '${rowName}'`
+      );
+    }
+    scenario.rows[rowName] = {
+      index: y
+    };
+    const z = scenario.index;
     this.setValue(initialInterval, y, z, initialValue);
-    for (let i = initialInterval + 1; i < interval.number; i++) {
+    for (let i = initialInterval + 1; i < interval.count; i++) {
       this.setValue(i, y, z, subsequentValues);
     }
   }

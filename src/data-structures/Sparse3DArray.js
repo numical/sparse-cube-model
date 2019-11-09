@@ -81,12 +81,6 @@ class Sparse3DArray {
 
   clone() {
     const clone = new Sparse3DArray();
-    clone.meta = {
-      ...this.meta,
-      lengths: {
-        ...this.meta.lengths
-      }
-    };
     const { x: lenX, y: lenY, z: lenZ } = this.meta.lengths;
     iterate3D(lenX, lenY, lenZ, (x, y, z) => {
       const v = this.get(x, y, z);

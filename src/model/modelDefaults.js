@@ -2,10 +2,13 @@ const R = require("ramda");
 
 const defaults = {
   interval: {
-    number: 300
+    count: 300
   },
   scenarios: {
-    defaultScenario: 0
+    defaultScenario: {
+      index: 0,
+      rows: {}
+    }
   }
 };
 
