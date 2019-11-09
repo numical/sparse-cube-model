@@ -1,7 +1,9 @@
 const { test, only } = require("tap");
 const Model = require("./Model");
-const modelDefaults = require("./modelDefaults");
+const modelMetadata = require("./modelMetadata");
 const identity = require("../fns/identity");
+const increment = require("../fns/increment");
+const sequence = require("./sequence");
 
 const intervalCount = 10;
 const testDefaults = {
@@ -12,12 +14,12 @@ const testDefaults = {
 
 test("Model default creation", t => {
   const model = new Model();
-  t.same(model.meta, modelDefaults());
+  t.same(model.meta, modelMetadata());
   t.end();
 });
 
 test("Model custom creation", t => {
-  const defaults = modelDefaults();
+  const defaults = modelMetadata();
   const expected = {
     ...defaults,
     interval: {
@@ -32,69 +34,107 @@ test("Model custom creation", t => {
 
 test("Add row of constants", t => {
   const rowName = "test row";
-  const initialValue = 3;
-  const subsequentValues = 5;
-
+  const constants = sequence(intervalCount);
   const model = new Model(testDefaults);
   model.addRow({
     rowName,
-    initialValue,
-    subsequentValues
+    constants
   });
-  t.equal(model[0][0][0], initialValue);
-  for (let i = 1; i < intervalCount; i++) {
-    t.equal(model[i][0][0], subsequentValues);
+  for (let i = 0; i < intervalCount; i++) {
+    t.equal(model[i][0][0], constants[i]);
+  }
+  t.end();
+});
+
+test("Add sequence row using zero initial constant", t => {
+  const rowName = "test row";
+  const model = new Model(testDefaults);
+  model.addRow({
+    rowName,
+    fn: increment,
+    constants: [0]
+  });
+  for (let i = 0; i < intervalCount; i++) {
+    t.equal(model[i][0][0], i);
+  }
+  t.end();
+});
+
+test("Add sequence row using custom initial constant", t => {
+  const rowName = "test row";
+  const initialValue = 505;
+  const model = new Model(testDefaults);
+  model.addRow({
+    rowName,
+    fn: increment,
+    constants: [initialValue]
+  });
+  for (let i = 0; i < intervalCount; i++) {
+    t.equal(model[i][0][0], i + initialValue);
+  }
+  t.end();
+});
+
+test("Add sequence row using multiple constants", t => {
+  const rowName = "test row";
+  const model = new Model(testDefaults);
+  const constants = new Array(5);
+  constants[0] = 3;
+  constants[2] = 13;
+  constants[4] = 113;
+  constants[6] = 0;
+  const expected = [3, 4, 13, 14, 113, 114, 0, 1, 2, 3];
+
+  model.addRow({
+    rowName,
+    fn: increment,
+    constants
+  });
+  for (let i = 0; i < intervalCount; i++) {
+    t.equal(model[i][0][0], expected[i]);
   }
   t.end();
 });
 
 test("Add row of functions", t => {
   const rowName = "test row";
-  const initialValue = 7;
-  const subsequentValues = identity(9);
-
   const model = new Model(testDefaults);
   model.addRow({
     rowName,
-    initialValue,
-    subsequentValues
+    fn: (model, x) => x
   });
-  t.equal(model[0][0][0], 7);
-  for (let i = 1; i < intervalCount; i++) {
-    t.equal(model[i][0][0], 9);
+  for (let i = 0; i < intervalCount; i++) {
+    t.equal(model[i][0][0], i);
   }
   t.end();
 });
 
 test("Add partial row of functions", t => {
   const rowName = "test row";
-  const initialInterval = 5;
-  const initialValue = 11;
-  const subsequentValues = identity(13);
+  const startInterval = 5;
+  const endInterval = 7;
+  const fn = (model, x) => x;
+  const expected = [0, 0, 0, 0, 0, 5, 6, 7, 0, 0];
 
   const model = new Model(testDefaults);
   model.addRow({
     rowName,
-    initialValue,
-    subsequentValues,
-    initialInterval
+    fn,
+    startInterval,
+    endInterval
   });
-  for (let i = 1; i < initialInterval; i++) {
-    t.equal(model[i][0][0], 0);
-  }
-  t.equal(model[initialInterval][0][0], 11);
-  for (let i = initialInterval + 1; i < intervalCount; i++) {
-    t.equal(model[i][0][0], 13);
+
+  for (let i = 0; i < intervalCount; i++) {
+    t.equal(model[i][0][0], expected[i]);
   }
   t.end();
 });
 
 test("Add row with unknown scenario", t => {
   const rowName = "test row";
-  const initialValue = 15;
-  const subsequentValues = 17;
+  const fn = identity(5);
   const scenarioName = "unknown test scenario";
-  const args = { rowName, initialValue, subsequentValues, scenarioName };
+  const args = { rowName, fn, scenarioName };
 
   const model = new Model(testDefaults);
   t.throws(() => model.addRow(args));
@@ -103,9 +143,8 @@ test("Add row with unknown scenario", t => {
 
 test("Add row with existing name", t => {
   const rowName = "test row";
-  const initialValue = 15;
-  const subsequentValues = 17;
-  const args = { rowName, initialValue, subsequentValues };
+  const fn = identity(7);
+  const args = { rowName, fn };
 
   const model = new Model(testDefaults);
   model.addRow(args);
@@ -113,11 +152,9 @@ test("Add row with existing name", t => {
   t.end();
 });
 
-test("Add row with invalid value", t => {
-  const rowName = "test row";
-  const initialValue = {};
-  const subsequentValues = 13;
-  const args = { rowName, initialValue, subsequentValues };
+test("Add row with no name", t => {
+  const fn = identity(7);
+  const args = { fn };
 
   const model = new Model(testDefaults);
   t.throws(() => model.addRow(args));

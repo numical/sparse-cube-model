@@ -1,4 +1,4 @@
-const R = require("ramda");
+const { clone, mergeDeepLeft } = require("ramda");
 
 const defaults = {
   interval: {
@@ -12,4 +12,4 @@ const defaults = {
   }
 };
 
-module.exports = () => R.clone(defaults);
+module.exports = (custom = {}) => mergeDeepLeft(custom, clone(defaults));

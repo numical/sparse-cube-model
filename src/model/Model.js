@@ -1,26 +1,22 @@
-const R = require("ramda");
-
 const Dense3DArray = require("../data-structures/Dense3DArray");
-const Sparse3DArray = require("../data-structures/Sparse3DArray");
-const modelDefaults = require("./modelDefaults");
+const modelMetadata = require("./modelMetadata");
+
+const defaultValue = 0;
 
 class Model extends Dense3DArray {
   meta;
-  #constants;
 
   constructor(meta = {}) {
-    super({ defaultValue: 0 });
-    this.meta = R.mergeDeepLeft(meta, modelDefaults());
-    this.#constants = new Sparse3DArray();
-    ["addRow", "setValue"].forEach(
-      method => (this[method] = this[method].bind(this))
-    );
+    super({ defaultValue });
+    this.meta = modelMetadata(meta);
+    ["addRow"].forEach(method => (this[method] = this[method].bind(this)));
   }
 
   addRow({
-    initialValue,
-    subsequentValues,
-    initialInterval = 0,
+    fn,
+    constants = [],
+    startInterval = 0,
+    endInterval = this.meta.interval.count - 1,
     rowName,
     scenarioName = "defaultScenario"
   }) {
@@ -38,29 +34,23 @@ class Model extends Dense3DArray {
         `Scenario '${scenarioName}' already has row '${rowName}'`
       );
     }
+    const boundFn = fn ? fn.bind(null, this) : undefined;
     scenario.rows[rowName] = {
-      index: y
+      index: y,
+      fn: boundFn,
+      constants
     };
     const z = scenario.index;
-    this.setValue(initialInterval, y, z, initialValue);
-    for (let i = initialInterval + 1; i < interval.count; i++) {
-      this.setValue(i, y, z, subsequentValues);
+    for (let i = startInterval; i <= endInterval; i++) {
+      if (constants[i] === undefined) {
+        this.set(i, y, z, boundFn(i, y, z));
+      } else {
+        this.set(i, y, z, constants[i]);
+      }
     }
-  }
-
-  setValue(x, y, z, value) {
-    switch (typeof value) {
-      case "function":
-        this.set(x, y, z, value(x, y, z));
-        break;
-      case "number":
-        this.#constants.set(x, y, z, value);
-        this.set(x, y, z, value);
-        break;
-      default:
-        throw new Error(
-          `Invalid type '${typeof value}' for model value '${value}'`
-        );
+    // populate remaining columns if necessary
+    if (endInterval < interval.count - 1) {
+      this.set(interval.count - 1, y, z, defaultValue);
     }
   }
 }
