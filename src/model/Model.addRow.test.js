@@ -1,6 +1,5 @@
 const { test, only } = require("tap");
 const Model = require("./Model");
-const modelMetadata = require("./modelMetadata");
 const identity = require("../fns/identity");
 const increment = require("../fns/increment");
 const sequence = require("./sequence");
@@ -12,23 +11,34 @@ const testDefaults = {
   }
 };
 
-test("Model default creation", t => {
-  const model = new Model();
-  t.same(model.meta, modelMetadata());
+test("Add row with unknown scenario throws error", t => {
+  const rowName = "test row";
+  const fn = identity(5);
+  const scenarioName = "unknown test scenario";
+  const args = { rowName, fn, scenarioName };
+
+  const model = new Model(testDefaults);
+  t.throws(() => model.addRow(args));
   t.end();
 });
 
-test("Model custom creation", t => {
-  const defaults = modelMetadata();
-  const expected = {
-    ...defaults,
-    interval: {
-      ...defaults.interval,
-      ...testDefaults.interval
-    }
-  };
+test("Add row with existing name throws error", t => {
+  const rowName = "test row";
+  const fn = identity(7);
+  const args = { rowName, fn };
+
   const model = new Model(testDefaults);
-  t.same(model.meta, expected);
+  model.addRow(args);
+  t.throws(() => model.addRow(args));
+  t.end();
+});
+
+test("Add row with no name throws error", t => {
+  const fn = identity(7);
+  const args = { fn };
+
+  const model = new Model(testDefaults);
+  t.throws(() => model.addRow(args));
   t.end();
 });
 
@@ -130,33 +140,20 @@ test("Add partial row of functions", t => {
   t.end();
 });
 
-test("Add row with unknown scenario", t => {
-  const rowName = "test row";
-  const fn = identity(5);
-  const scenarioName = "unknown test scenario";
-  const args = { rowName, fn, scenarioName };
-
+test("Add multiple rows", t => {
+  const numRows = 3;
   const model = new Model(testDefaults);
-  t.throws(() => model.addRow(args));
-  t.end();
-});
-
-test("Add row with existing name", t => {
-  const rowName = "test row";
-  const fn = identity(7);
-  const args = { rowName, fn };
-
-  const model = new Model(testDefaults);
-  model.addRow(args);
-  t.throws(() => model.addRow(args));
-  t.end();
-});
-
-test("Add row with no name", t => {
-  const fn = identity(7);
-  const args = { fn };
-
-  const model = new Model(testDefaults);
-  t.throws(() => model.addRow(args));
+  for (let rowNum = 0; rowNum < numRows; rowNum++) {
+    model.addRow({
+      rowName: `row num ${rowNum}`,
+      fn: increment,
+      constants: [0]
+    });
+  }
+  for (let rowNum = 0; rowNum < numRows; rowNum++) {
+    for (let i = 0; i < intervalCount; i++) {
+      t.equal(model[i][rowNum][0], i);
+    }
+  }
   t.end();
 });

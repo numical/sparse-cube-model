@@ -7,7 +7,7 @@ class Dense3DArray {
   constructor({ defaultValue = 0 } = {}) {
     this.lengths = { x: 0, y: 0, z: 0 };
     this.#defaultValue = defaultValue;
-    ["get", "set", "clone"].forEach(
+    ["get", "set", "range", "clone"].forEach(
       method => (this[method] = this[method].bind(this))
     );
   }
@@ -63,6 +63,68 @@ class Dense3DArray {
       this.lengths.z = lenZ;
     }
     this[x][y][z] = value;
+  }
+
+  range({ x, y, z }) {
+    const { x: lenX, y: lenY, z: lenZ } = this.lengths;
+    const values = [];
+    if (x && y && z) {
+      values.push(this[x][y][z]);
+    } else if (x === undefined && y !== undefined && z !== undefined) {
+      if (y >= lenY)
+        throw new RangeError(`${y} is greater than max y index of ${lenY - 1}`);
+      if (z >= lenZ)
+        throw new RangeError(`${z} is greater than max z index of ${lenZ - 1}`);
+      for (x = 0; x < this.lengths.x; x++) {
+        values.push(this[x][y][z]);
+      }
+    } else if (x !== undefined && y === undefined && z !== undefined) {
+      if (x >= lenX)
+        throw new RangeError(`${x} is greater than max x index of ${lenX - 1}`);
+      if (z >= lenZ)
+        throw new RangeError(`${z} is greater than max z index of ${lenZ - 1}`);
+      for (y = 0; y < this.lengths.y; y++) {
+        values.push(this[x][y][z]);
+      }
+    } else if (x !== undefined && y !== undefined && z === undefined) {
+      if (x >= lenX)
+        throw new RangeError(`${x} is greater than max x index of ${lenX - 1}`);
+      if (y >= lenY)
+        throw new RangeError(`${y} is greater than max y index of ${lenY - 1}`);
+      for (z = 0; z < this.lengths.z; z++) {
+        values.push(this[x][y][z]);
+      }
+    } else if (x !== undefined && y === undefined && z === undefined) {
+      if (x >= lenX)
+        throw new RangeError(`${x} is greater than max x index of ${lenX - 1}`);
+      for (y = 0; y < this.lengths.y; y++) {
+        values[y] = [];
+        for (z = 0; z < this.lengths.z; z++) {
+          values[y].push(this[x][y][z]);
+        }
+      }
+    } else if (x === undefined && y !== undefined && z === undefined) {
+      if (y >= lenY)
+        throw new RangeError(`${y} is greater than max y index of ${lenY - 1}`);
+      for (x = 0; x < this.lengths.x; x++) {
+        values[x] = [];
+        for (z = 0; z < this.lengths.z; z++) {
+          values[x].push(this[x][y][z]);
+        }
+      }
+    } else if (x === undefined && y === undefined && z !== undefined) {
+      if (z >= lenZ)
+        throw new RangeError(`${z} is greater than max z index of ${lenZ - 1}`);
+      for (x = 0; x < this.lengths.x; x++) {
+        values[x] = [];
+        for (y = 0; y < this.lengths.y; y++) {
+          values[x].push(this[x][y][z]);
+        }
+      }
+    } else {
+      throw new Error("At least one index must be specified.");
+    }
+    return values;
   }
 
   clone() {
