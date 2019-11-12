@@ -1,1 +1,1 @@
-module.exports = length => Array.from({ length }, (_, i) => i);
+module.exports = (length, mapFn = (_, i) => i) => Array.from({ length }, mapFn);

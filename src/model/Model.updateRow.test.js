@@ -20,6 +20,7 @@ const setUp = () => {
 };
 
 test("Update unknown row throws error", t => {
+  const model = setUp();
   t.throws(() =>
     model.updateRow({
       rowName: "unknown row"
@@ -29,11 +30,38 @@ test("Update unknown row throws error", t => {
 });
 
 test("Update row in unknown scenario throws error", t => {
+  const model = setUp();
   t.throws(() =>
     model.updateRow({
       rowName,
       scenarioName: "unknown scenario"
     })
   );
+  t.end();
+});
+
+test("Update row updates all with constants", t => {
+  const constants = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18];
+  const expected = constants;
+  const model = setUp();
+  model.updateRow({ rowName, constants });
+  t.same(model.row({ rowName }), expected);
+  t.end();
+});
+
+test("Update row updates some with constants", t => {
+  const constants = [0, 2, 4, undefined, undefined, undefined, 12, 14, 16, 18];
+  const expected = [0, 2, 4, 5, 6, 7, 12, 14, 16, 18];
+  const model = setUp();
+  model.updateRow({ rowName, constants });
+  t.same(model.row({ rowName }), expected);
+  t.end();
+});
+
+test("Update row updates all with function", t => {
+  const expected = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18];
+  const model = setUp();
+  model.updateRow({ rowName, fn: x => 2 * x });
+  t.same(model.row({ rowName }), expected);
   t.end();
 });

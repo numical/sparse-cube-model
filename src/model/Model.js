@@ -10,7 +10,7 @@ class Model extends Dense3DArray {
   constructor(meta = {}) {
     super({ defaultValue });
     this.meta = modelMetadata(meta);
-    ["addRow", "updateRow"].forEach(
+    ["addRow", "row", "updateRow"].forEach(
       method => (this[method] = this[method].bind(this))
     );
   }
@@ -61,7 +61,7 @@ class Model extends Dense3DArray {
     if (!scenario) {
       throw new Error(`Unknown scenario '${scenarioName}'`);
     }
-    const row = scenario.rows[scenarioName];
+    const row = scenario.rows[rowName];
     if (!row) {
       throw new Error(`Unknown row '${rowName}' for '${scenarioName}'`);
     }
@@ -71,7 +71,7 @@ class Model extends Dense3DArray {
         (min, value) => (min > value ? value : min),
         interval.count - 1
       );
-      row.constants = [...row.constants, constants];
+      row.constants = [...constants];
     }
     if (fn) {
       startInterval = 0;
@@ -86,6 +86,19 @@ class Model extends Dense3DArray {
         this.set(x, y, z, value);
       }
     }
+  }
+
+  row({ rowName, scenarioName = defaultScenario }) {
+    const { scenarios } = this.meta;
+    const scenario = scenarios[scenarioName];
+    if (!scenario) {
+      throw new Error(`Unknown scenario '${scenarioName}'`);
+    }
+    const row = scenario.rows[rowName];
+    if (!row) {
+      throw new Error(`Unknown row '${rowName}' for '${scenarioName}'`);
+    }
+    return this.range({ y: row.index, z: scenario.index });
   }
 }
 

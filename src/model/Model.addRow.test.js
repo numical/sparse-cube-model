@@ -56,6 +56,19 @@ test("Add row of constants", t => {
   t.end();
 });
 
+test("retrieve added row of constants", t => {
+  const rowName = "test row";
+  const constants = sequence(intervalCount);
+  const model = new Model(testDefaults);
+  model.addRow({
+    rowName,
+    constants
+  });
+  const row = model.row({ rowName });
+  t.same(row, constants);
+  t.end();
+});
+
 test("Add sequence row using zero initial constant", t => {
   const rowName = "test row";
   const model = new Model(testDefaults);
@@ -64,24 +77,22 @@ test("Add sequence row using zero initial constant", t => {
     fn: increment,
     constants: [0]
   });
-  for (let i = 0; i < intervalCount; i++) {
-    t.equal(model[i][0][0], i);
-  }
+  const row = model.row({ rowName });
+  t.same(row, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
   t.end();
 });
 
 test("Add sequence row using custom initial constant", t => {
   const rowName = "test row";
-  const initialValue = 505;
+  const initialValue = 500;
   const model = new Model(testDefaults);
   model.addRow({
     rowName,
     fn: increment,
     constants: [initialValue]
   });
-  for (let i = 0; i < intervalCount; i++) {
-    t.equal(model[i][0][0], i + initialValue);
-  }
+  const row = model.row({ rowName });
+  t.same(row, [500, 501, 502, 503, 504, 505, 506, 507, 508, 509]);
   t.end();
 });
 
@@ -93,16 +104,13 @@ test("Add sequence row using multiple constants", t => {
   constants[2] = 13;
   constants[4] = 113;
   constants[6] = 0;
-  const expected = [3, 4, 13, 14, 113, 114, 0, 1, 2, 3];
-
   model.addRow({
     rowName,
     fn: increment,
     constants
   });
-  for (let i = 0; i < intervalCount; i++) {
-    t.equal(model[i][0][0], expected[i]);
-  }
+  const row = model.row({ rowName });
+  t.same(row, [3, 4, 13, 14, 113, 114, 0, 1, 2, 3]);
   t.end();
 });
 
@@ -113,9 +121,8 @@ test("Add row of functions", t => {
     rowName,
     fn: (model, x) => x
   });
-  for (let i = 0; i < intervalCount; i++) {
-    t.equal(model[i][0][0], i);
-  }
+  const row = model.row({ rowName });
+  t.same(row, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
   t.end();
 });
 
@@ -124,8 +131,6 @@ test("Add partial row of functions", t => {
   const startInterval = 5;
   const endInterval = 7;
   const fn = (model, x) => x;
-  const expected = [0, 0, 0, 0, 0, 5, 6, 7, 0, 0];
-
   const model = new Model(testDefaults);
   model.addRow({
     rowName,
@@ -133,27 +138,25 @@ test("Add partial row of functions", t => {
     startInterval,
     endInterval
   });
-
-  for (let i = 0; i < intervalCount; i++) {
-    t.equal(model[i][0][0], expected[i]);
-  }
+  const row = model.row({ rowName });
+  t.same(row, [0, 0, 0, 0, 0, 5, 6, 7, 0, 0]);
   t.end();
 });
 
 test("Add multiple rows", t => {
   const numRows = 3;
   const model = new Model(testDefaults);
-  for (let rowNum = 0; rowNum < numRows; rowNum++) {
+  const rowNames = ["row 0", "row 1", "row2"];
+  rowNames.forEach(rowName => {
     model.addRow({
-      rowName: `row num ${rowNum}`,
+      rowName,
       fn: increment,
       constants: [0]
     });
-  }
-  for (let rowNum = 0; rowNum < numRows; rowNum++) {
-    for (let i = 0; i < intervalCount; i++) {
-      t.equal(model[i][rowNum][0], i);
-    }
-  }
+  });
+  rowNames.forEach(rowName => {
+    const row = model.row({ rowName });
+    t.same(row, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+  });
   t.end();
 });
