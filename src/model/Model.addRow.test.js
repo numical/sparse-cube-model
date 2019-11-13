@@ -2,6 +2,7 @@ const { test, only } = require("tap");
 const Model = require("./Model");
 const identity = require("../fns/identity");
 const increment = require("../fns/increment");
+const interval = require("../fns/interval");
 const sequence = require("./sequence");
 
 const intervalCount = 10;
@@ -69,6 +70,30 @@ test("retrieve added row of constants", t => {
   t.end();
 });
 
+test("retrieve row fails if unknown row name", t => {
+  const rowName = "test row";
+  const constants = sequence(intervalCount);
+  const model = new Model(testDefaults);
+  model.addRow({
+    rowName,
+    constants
+  });
+  t.throws(() => model.row({ rowName: "unknown row" }));
+  t.end();
+});
+
+test("retrieve row fails if unknown scenario name", t => {
+  const rowName = "test row";
+  const constants = sequence(intervalCount);
+  const model = new Model(testDefaults);
+  model.addRow({
+    rowName,
+    constants
+  });
+  t.throws(() => model.row({ rowName, scenarioName: "unknown scenario" }));
+  t.end();
+});
+
 test("Add sequence row using zero initial constant", t => {
   const rowName = "test row";
   const model = new Model(testDefaults);
@@ -119,7 +144,7 @@ test("Add row of functions", t => {
   const model = new Model(testDefaults);
   model.addRow({
     rowName,
-    fn: (model, x) => x
+    fn: interval
   });
   const row = model.row({ rowName });
   t.same(row, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
@@ -130,7 +155,7 @@ test("Add partial row of functions", t => {
   const rowName = "test row";
   const startInterval = 5;
   const endInterval = 7;
-  const fn = (model, x) => x;
+  const fn = interval;
   const model = new Model(testDefaults);
   model.addRow({
     rowName,

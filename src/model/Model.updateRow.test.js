@@ -40,6 +40,16 @@ test("Update row in unknown scenario throws error", t => {
   t.end();
 });
 
+test("Update row with neither function nor constants throws error", t => {
+  const model = setUp();
+  t.throws(() =>
+    model.updateRow({
+      rowName
+    })
+  );
+  t.end();
+});
+
 test("Update row updates all with constants", t => {
   const constants = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18];
   const expected = constants;
@@ -61,7 +71,8 @@ test("Update row updates some with constants", t => {
 test("Update row updates all with function", t => {
   const expected = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18];
   const model = setUp();
-  model.updateRow({ rowName, fn: x => 2 * x });
+  const fn = () => x => 2 * x;
+  model.updateRow({ rowName, fn });
   t.same(model.row({ rowName }), expected);
   t.end();
 });

@@ -37,7 +37,7 @@ class Model extends Dense3DArray {
         `Scenario '${scenarioName}' already has row '${rowName}'`
       );
     }
-    const boundFn = fn ? fn.bind(null, this) : undefined;
+    const boundFn = fn ? fn(this) : undefined;
     scenario.rows[rowName] = {
       index: y,
       fn: boundFn,
@@ -75,7 +75,7 @@ class Model extends Dense3DArray {
     }
     if (fn) {
       startInterval = 0;
-      row.fn = fn;
+      row.fn = fn(this);
     }
     if (constants || fn) {
       const y = row.index;
@@ -85,6 +85,8 @@ class Model extends Dense3DArray {
           row.constants[x] === undefined ? row.fn(x, y, z) : row.constants[x];
         this.set(x, y, z, value);
       }
+    } else {
+      throw new Error("No function or constants passed to update row.");
     }
   }
 

@@ -174,9 +174,23 @@ test("range throws error if at least one index is not defined", t => {
 test("range throws error if indices bigger than the size", t => {
   const { set, range } = new Dense3DArray();
   set(1, 1, 1, 3);
+  t.throws(() => range({ x: 2 }));
   t.throws(() => range({ x: 2, y: 1 }));
+  t.throws(() => range({ x: 1, y: 2 }));
+  t.throws(() => range({ z: 2 }));
+  t.throws(() => range({ x: 2, z: 2 }));
   t.throws(() => range({ x: 0, z: 2 }));
+  t.throws(() => range({ y: 2 }));
   t.throws(() => range({ y: 2, z: 0 }));
+  t.throws(() => range({ y: 1, z: 2 }));
+  t.end();
+});
+
+test("range returns correct value for three indices", t => {
+  const { set, range } = new Dense3DArray();
+  iterate3D(4, 3, 2, (x, y, z) => set(x, y, z, `${x},${y},${z}`));
+
+  t.same(range({ x: 3, y: 2, z: 1 }), ["3,2,1"]);
   t.end();
 });
 
