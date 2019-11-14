@@ -1,26 +1,47 @@
 const iterate3D = require("./iterate3D");
 
+function validate(coords) {
+  const { x, y, z, numIndices } = coords;
+  const { x: lenX, y: lenY, z: lenZ } = this.lengths;
+  if (x !== undefined && x >= lenX)
+    throw new RangeError(`${x} is greater than max x index of ${lenX - 1}`);
+  if (y !== undefined && y >= lenY)
+    throw new RangeError(`${y} is greater than max y index of ${lenY - 1}`);
+  if (z !== undefined && z >= lenZ)
+    throw new RangeError(`${z} is greater than max z index of ${lenZ - 1}`);
+  if (numIndices) {
+    const count = ["x", "y", "z"].reduce(
+      (count, property) => (coords[property] === undefined ? count : count + 1),
+      0
+    );
+    if (numIndices !== count) {
+      throw new Error(
+        `Exactly ${numIndices} ${
+          numIndices === 1 ? "index" : "indices"
+        } required`
+      );
+    }
+  }
+}
+
 class Dense3DArray {
   lengths;
   #defaultValue;
+  #validate;
 
   constructor({ defaultValue = 0 } = {}) {
     this.lengths = { x: 0, y: 0, z: 0 };
     this.#defaultValue = defaultValue;
-    ["get", "set", "range", "clone"].forEach(
+    ["get", "set", "range", "isEmpty", "clone"].forEach(
       method => (this[method] = this[method].bind(this))
     );
+    this.#validate = validate.bind(this);
   }
 
   // safety only, normally access direct
   get(x, y, z) {
     const { x: lenX, y: lenY, z: lenZ } = this.lengths;
-    if (x >= lenX)
-      throw new RangeError(`${x} is greater than max x index of ${lenX - 1}`);
-    if (y >= lenY)
-      throw new RangeError(`${y} is greater than max y index of ${lenY - 1}`);
-    if (z >= lenZ)
-      throw new RangeError(`${z} is greater than max z index of ${lenZ - 1}`);
+    this.#validate({ x, y, z });
     return this[x][y][z];
   }
 
@@ -65,38 +86,88 @@ class Dense3DArray {
     this[x][y][z] = value;
   }
 
-  range({ x, y, z }) {
+  delete({ x, y, z } = {}) {
+    this.#validate({ x, y, z, numIndices: 1 });
+    const { x: lenX, y: lenY, z: lenZ } = this.lengths;
+    if (x !== undefined) {
+      const indexToDelete = lenX - 1;
+      for (let i = x + 1; i <= indexToDelete; i++) {
+        this[i - 1] = this[i];
+      }
+      delete this[indexToDelete];
+      this.lengths = {
+        x: indexToDelete,
+        y: indexToDelete === 0 ? 0 : lenY,
+        z: indexToDelete === 0 ? 0 : lenZ
+      };
+    } else if (y !== undefined) {
+      const indexToDelete = lenY - 1;
+      for (let i = 0; i < lenX; i++) {
+        for (let j = y + 1; j <= indexToDelete; j++) {
+          this[i][j - 1] = this[i][j];
+        }
+        delete this[i][indexToDelete];
+      }
+      if (indexToDelete === 0) {
+        for (let x = 0; x < lenX; x++) {
+          delete this[x];
+        }
+        this.lengths = { x: 0, y: 0, z: 0 };
+      } else {
+        this.lengths = {
+          x: lenX,
+          y: indexToDelete,
+          z: lenZ
+        };
+      }
+    } else if (z !== undefined) {
+      const indexToDelete = lenZ - 1;
+      for (let i = 0; i < lenX; i++) {
+        for (let j = 0; j < lenY; j++) {
+          for (let k = z + 1; k <= indexToDelete; k++) {
+            this[i][j][k - 1] = this[i][j][k];
+          }
+          delete this[i][j][indexToDelete];
+        }
+      }
+      if (indexToDelete === 0) {
+        for (let x = 0; x < lenX; x++) {
+          delete this[x];
+        }
+        this.lengths = { x: 0, y: 0, z: 0 };
+      } else {
+        this.lengths = {
+          x: lenX,
+          y: lenY,
+          z: indexToDelete
+        };
+      }
+    }
+  }
+
+  range({ x, y, z } = {}) {
     const { x: lenX, y: lenY, z: lenZ } = this.lengths;
     const values = [];
-    if (x && y && z) {
+    if (x !== undefined && y !== undefined && z !== undefined) {
+      this.#validate({ x, y, z });
       values.push(this[x][y][z]);
     } else if (x === undefined && y !== undefined && z !== undefined) {
-      if (y >= lenY)
-        throw new RangeError(`${y} is greater than max y index of ${lenY - 1}`);
-      if (z >= lenZ)
-        throw new RangeError(`${z} is greater than max z index of ${lenZ - 1}`);
+      this.#validate({ y, z });
       for (x = 0; x < this.lengths.x; x++) {
         values.push(this[x][y][z]);
       }
     } else if (x !== undefined && y === undefined && z !== undefined) {
-      if (x >= lenX)
-        throw new RangeError(`${x} is greater than max x index of ${lenX - 1}`);
-      if (z >= lenZ)
-        throw new RangeError(`${z} is greater than max z index of ${lenZ - 1}`);
+      this.#validate({ x, z });
       for (y = 0; y < this.lengths.y; y++) {
         values.push(this[x][y][z]);
       }
     } else if (x !== undefined && y !== undefined && z === undefined) {
-      if (x >= lenX)
-        throw new RangeError(`${x} is greater than max x index of ${lenX - 1}`);
-      if (y >= lenY)
-        throw new RangeError(`${y} is greater than max y index of ${lenY - 1}`);
+      this.#validate({ x, y });
       for (z = 0; z < this.lengths.z; z++) {
         values.push(this[x][y][z]);
       }
     } else if (x !== undefined && y === undefined && z === undefined) {
-      if (x >= lenX)
-        throw new RangeError(`${x} is greater than max x index of ${lenX - 1}`);
+      this.#validate({ x });
       for (y = 0; y < this.lengths.y; y++) {
         values[y] = [];
         for (z = 0; z < this.lengths.z; z++) {
@@ -104,8 +175,7 @@ class Dense3DArray {
         }
       }
     } else if (x === undefined && y !== undefined && z === undefined) {
-      if (y >= lenY)
-        throw new RangeError(`${y} is greater than max y index of ${lenY - 1}`);
+      this.#validate({ y });
       for (x = 0; x < this.lengths.x; x++) {
         values[x] = [];
         for (z = 0; z < this.lengths.z; z++) {
@@ -113,8 +183,7 @@ class Dense3DArray {
         }
       }
     } else if (x === undefined && y === undefined && z !== undefined) {
-      if (z >= lenZ)
-        throw new RangeError(`${z} is greater than max z index of ${lenZ - 1}`);
+      this.#validate({ z });
       for (x = 0; x < this.lengths.x; x++) {
         values[x] = [];
         for (y = 0; y < this.lengths.y; y++) {
@@ -125,6 +194,11 @@ class Dense3DArray {
       throw new Error("At least one index must be specified.");
     }
     return values;
+  }
+
+  isEmpty() {
+    const { x, y, z } = this.lengths;
+    return x === 0 && y === 0 && z === 0;
   }
 
   clone() {
