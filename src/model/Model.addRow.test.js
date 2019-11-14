@@ -19,7 +19,10 @@ test("Add row with unknown scenario throws error", t => {
   const args = { rowName, fn, scenarioName };
 
   const model = new Model(testDefaults);
-  t.throws(() => model.addRow(args));
+  t.throws(
+    () => model.addRow(args),
+    new Error("Unknown scenario 'unknown test scenario'")
+  );
   t.end();
 });
 
@@ -30,7 +33,10 @@ test("Add row with existing name throws error", t => {
 
   const model = new Model(testDefaults);
   model.addRow(args);
-  t.throws(() => model.addRow(args));
+  t.throws(
+    () => model.addRow(args),
+    new Error("Scenario 'defaultScenario' already has row 'test row'")
+  );
   t.end();
 });
 
@@ -39,7 +45,7 @@ test("Add row with no name throws error", t => {
   const args = { fn };
 
   const model = new Model(testDefaults);
-  t.throws(() => model.addRow(args));
+  t.throws(() => model.addRow(args), new Error("A row name is required"));
   t.end();
 });
 
@@ -78,7 +84,10 @@ test("retrieve row fails if unknown row name", t => {
     rowName,
     constants
   });
-  t.throws(() => model.row({ rowName: "unknown row" }));
+  t.throws(
+    () => model.row({ rowName: "unknown row" }),
+    new Error("Unknown row 'unknown row' for 'defaultScenario'")
+  );
   t.end();
 });
 
@@ -90,7 +99,10 @@ test("retrieve row fails if unknown scenario name", t => {
     rowName,
     constants
   });
-  t.throws(() => model.row({ rowName, scenarioName: "unknown scenario" }));
+  t.throws(
+    () => model.row({ rowName, scenarioName: "unknown scenario" }),
+    new Error("Unknown scenario 'unknown scenario'")
+  );
   t.end();
 });
 

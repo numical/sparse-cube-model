@@ -21,31 +21,37 @@ const setUp = () => {
 
 test("Update unknown row throws error", t => {
   const model = setUp();
-  t.throws(() =>
-    model.updateRow({
-      rowName: "unknown row"
-    })
+  t.throws(
+    () =>
+      model.updateRow({
+        rowName: "unknown row"
+      }),
+    new Error("Unknown row 'unknown row' for 'defaultScenario'")
   );
   t.end();
 });
 
 test("Update row in unknown scenario throws error", t => {
   const model = setUp();
-  t.throws(() =>
-    model.updateRow({
-      rowName,
-      scenarioName: "unknown scenario"
-    })
+  t.throws(
+    () =>
+      model.updateRow({
+        rowName,
+        scenarioName: "unknown scenario"
+      }),
+    new Error("Unknown scenario 'unknown scenario'")
   );
   t.end();
 });
 
 test("Update row with neither function nor constants throws error", t => {
   const model = setUp();
-  t.throws(() =>
-    model.updateRow({
-      rowName
-    })
+  t.throws(
+    () =>
+      model.updateRow({
+        rowName
+      }),
+    new Error("No function or constants passed to update row.")
   );
   t.end();
 });
