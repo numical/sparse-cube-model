@@ -22,13 +22,13 @@ test("test setup", t => {
 
 test("delete errors if no args sent", t => {
   const d3a = setUp();
-  t.throws(() => d3a.delete(), new Error("Exactly 1 index required"));
+  t.throws(() => d3a.delete(), new Error("Number of indices must be 1."));
   t.end();
 });
 
 test("delete errors if empty args sent", t => {
   const d3a = setUp();
-  t.throws(() => d3a.delete({}), new Error("Exactly 1 index required"));
+  t.throws(() => d3a.delete({}), new Error("Number of indices must be 1."));
   t.end();
 });
 
@@ -36,7 +36,7 @@ test("delete errors if more than 1 index sent", t => {
   const d3a = setUp();
   t.throws(
     () => d3a.delete({ x: 0, y: 0 }),
-    new Error("Exactly 1 index required")
+    new Error("Number of indices must be 1.")
   );
   t.end();
 });

@@ -24,7 +24,7 @@ class Model extends Dense3DArray {
   constructor(meta = {}) {
     super({ defaultValue });
     this.meta = modelMetadata(meta);
-    ["addRow", "row", "updateRow"].forEach(
+    ["addRow", "updateRow", "deleteRow", "deleteRows", "row"].forEach(
       method => (this[method] = this[method].bind(this))
     );
     this.#getRow = getRow.bind(this);
@@ -59,10 +59,10 @@ class Model extends Dense3DArray {
         if (!provider) {
           throw new Error(`Depends on unknown row '${rowName}'`);
         } else {
-          if (provider.dependencies) {
-            provider.dependencies.push(rowName);
+          if (provider.dependents) {
+            provider.dependents.push(rowName);
           } else {
-            provider.dependencies = [rowName];
+            provider.dependents = [rowName];
           }
         }
       });
@@ -71,7 +71,8 @@ class Model extends Dense3DArray {
     scenario.rows[rowName] = {
       index: y,
       fn: boundFn,
-      constants
+      constants,
+      name: rowName
     };
 
     const z = scenario.index;
@@ -104,9 +105,9 @@ class Model extends Dense3DArray {
     }
     if (constants || fn) {
       const rowstoUpdate = [row];
-      if (row.dependencies) {
+      if (row.dependents) {
         rowstoUpdate.push(
-          ...row.dependencies.map(
+          ...row.dependents.map(
             dependencyName =>
               this.#getRow({ rowName: dependencyName, scenarioName }).row
           )
@@ -124,6 +125,48 @@ class Model extends Dense3DArray {
     } else {
       throw new Error("No function or constants passed to update row.");
     }
+  }
+
+  deleteRow({ rowName, scenarioName = defaultScenario }) {
+    const { row, scenario } = this.#getRow({ rowName, scenarioName });
+    if (row.dependents && row.dependents.length > 0) {
+      throw new Error(
+        `Cannot delete row '${rowName}' as rows '${row.dependents.join(
+          ", "
+        )}' depend on it.`
+      );
+    }
+    this.delete({ y: row.index });
+    delete scenario.rows[rowName];
+  }
+
+  deleteRows({ rowNames, scenarioName = defaultScenario }) {
+    const { rows, scenario } = rowNames.reduce(
+      ({ rows, scenario }, rowName) => {
+        const { row: r, scenario: s } = this.#getRow({ rowName, scenarioName });
+        return { rows: [...rows, r], scenario: s };
+      },
+      { rows: [] }
+    );
+    // can delete all if they are dependent only on each other
+    rows.forEach(row => {
+      if (row.dependents && row.dependents.length > 0) {
+        row.dependents.forEach(dependent => {
+          if (!rowNames.includes(dependent)) {
+            throw new Error(
+              `Cannot delete row '${row.name}' as row '${dependent}' depends on it.`
+            );
+          }
+        });
+      }
+    });
+    // delete from largest index downwards
+    rows
+      .sort((r1, r2) => r2.index - r1.index)
+      .forEach(row => {
+        this.delete({ y: row.index });
+        delete scenario.rows[row.name];
+      });
   }
 
   row({ rowName, scenarioName = defaultScenario }) {

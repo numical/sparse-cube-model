@@ -15,11 +15,7 @@ function validate(coords) {
       0
     );
     if (numIndices !== count) {
-      throw new Error(
-        `Exactly ${numIndices} ${
-          numIndices === 1 ? "index" : "indices"
-        } required`
-      );
+      throw new Error(`Number of indices must be ${numIndices}.`);
     }
   }
 }
@@ -89,6 +85,7 @@ class Dense3DArray {
   delete({ x, y, z } = {}) {
     this.#validate({ x, y, z, numIndices: 1 });
     const { x: lenX, y: lenY, z: lenZ } = this.lengths;
+
     if (x !== undefined) {
       const indexToDelete = lenX - 1;
       for (let i = x + 1; i <= indexToDelete; i++) {
@@ -100,7 +97,9 @@ class Dense3DArray {
         y: indexToDelete === 0 ? 0 : lenY,
         z: indexToDelete === 0 ? 0 : lenZ
       };
-    } else if (y !== undefined) {
+    }
+
+    if (y !== undefined) {
       const indexToDelete = lenY - 1;
       for (let i = 0; i < lenX; i++) {
         for (let j = y + 1; j <= indexToDelete; j++) {
@@ -120,7 +119,9 @@ class Dense3DArray {
           z: lenZ
         };
       }
-    } else if (z !== undefined) {
+    }
+
+    if (z !== undefined) {
       const indexToDelete = lenZ - 1;
       for (let i = 0; i < lenX; i++) {
         for (let j = 0; j < lenY; j++) {
