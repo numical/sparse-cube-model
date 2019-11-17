@@ -24,9 +24,14 @@ class Model extends Dense3DArray {
   constructor(meta = {}) {
     super({ defaultValue });
     this.meta = modelMetadata(meta);
-    ["addRow", "updateRow", "deleteRow", "deleteRows", "row"].forEach(
-      method => (this[method] = this[method].bind(this))
-    );
+    [
+      "addRow",
+      "updateRow",
+      "deleteRow",
+      "deleteRows",
+      "row",
+      "addScenario"
+    ].forEach(method => (this[method] = this[method].bind(this)));
     this.#getRow = getRow.bind(this);
   }
 
@@ -129,6 +134,7 @@ class Model extends Dense3DArray {
 
   deleteRow({ rowName, scenarioName = defaultScenario }) {
     const { row, scenario } = this.#getRow({ rowName, scenarioName });
+    const { x: lenX, z: lenZ } = this.lengths;
     if (row.dependents && row.dependents.length > 0) {
       throw new Error(
         `Cannot delete row '${rowName}' as rows '${row.dependents.join(
@@ -136,8 +142,14 @@ class Model extends Dense3DArray {
         )}' depend on it.`
       );
     }
-    this.delete({ y: row.index });
     delete scenario.rows[rowName];
+    if (lenZ === 1) {
+      this.delete({ y: row.index });
+    } else {
+      for (let x = 0; x < lenX; x++) {
+        this.set(x, row.index, scenario.index, defaultValue);
+      }
+    }
   }
 
   deleteRows({ rowNames, scenarioName = defaultScenario }) {
@@ -172,6 +184,23 @@ class Model extends Dense3DArray {
   row({ rowName, scenarioName = defaultScenario }) {
     const { row, scenario } = this.#getRow({ rowName, scenarioName });
     return this.range({ y: row.index, z: scenario.index });
+  }
+
+  addScenario({ scenarioName, copyOf = "defaultScenario" } = {}) {
+    const { scenarios } = this.meta;
+    if (!scenarioName) {
+      throw new Error("A scenario name is required.");
+    }
+    if (!scenarios[copyOf]) {
+      throw new Error(`Unknown scenario '${copyOf}'`);
+    }
+    scenarios[scenarioName] = {
+      index: this.lengths.z,
+      rows: { ...scenarios[copyOf].rows }
+    };
+    if (!this.isEmpty()) {
+      this.duplicate({ z: scenarios[copyOf].index });
+    }
   }
 }
 

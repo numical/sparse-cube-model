@@ -1,3 +1,4 @@
+const iterate2D = require("./iterate2D");
 const iterate3D = require("./iterate3D");
 
 function validate(coords) {
@@ -28,7 +29,7 @@ class Dense3DArray {
   constructor({ defaultValue = 0 } = {}) {
     this.lengths = { x: 0, y: 0, z: 0 };
     this.#defaultValue = defaultValue;
-    ["get", "set", "range", "isEmpty", "clone"].forEach(
+    ["get", "set", "range", "isEmpty", "delete", "duplicate", "clone"].forEach(
       method => (this[method] = this[method].bind(this))
     );
     this.#validate = validate.bind(this);
@@ -143,6 +144,29 @@ class Dense3DArray {
           z: indexToDelete
         };
       }
+    }
+  }
+
+  duplicate({ x, y, z } = {}) {
+    this.#validate({ x, y, z, numIndices: 1 });
+    const { x: lenX, y: lenY, z: lenZ } = this.lengths;
+
+    if (x !== undefined) {
+      iterate2D(lenY, lenZ, (y, z) => {
+        this.set(lenX, y, z, this[x][y][z]);
+      });
+    }
+
+    if (y !== undefined) {
+      iterate2D(lenX, lenZ, (x, z) => {
+        this.set(x, lenY, z, this[x][y][z]);
+      });
+    }
+
+    if (z !== undefined) {
+      iterate2D(lenX, lenY, (x, y) => {
+        this.set(x, y, lenZ, this[x][y][z]);
+      });
     }
   }
 
