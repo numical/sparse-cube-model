@@ -1,7 +1,7 @@
 const Dense3DArray = require("../data-structures/Dense3DArray");
 const modelMetadata = require("./modelMetadata");
 
-const defaultScenario = "defaultScenario";
+const { defaultScenario } = modelMetadata; //"defaultScenario";
 const defaultValue = 0;
 
 function getRow({ rowName, scenarioName }) {
@@ -30,7 +30,8 @@ class Model extends Dense3DArray {
       "deleteRow",
       "deleteRows",
       "row",
-      "addScenario"
+      "addScenario",
+      "deleteScenario"
     ].forEach(method => (this[method] = this[method].bind(this)));
     this.#getRow = getRow.bind(this);
   }
@@ -186,7 +187,7 @@ class Model extends Dense3DArray {
     return this.range({ y: row.index, z: scenario.index });
   }
 
-  addScenario({ scenarioName, copyOf = "defaultScenario" } = {}) {
+  addScenario({ scenarioName, copyOf = defaultScenario } = {}) {
     const { scenarios } = this.meta;
     if (!scenarioName) {
       throw new Error("A scenario name is required.");
@@ -201,6 +202,22 @@ class Model extends Dense3DArray {
     if (!this.isEmpty()) {
       this.duplicate({ z: scenarios[copyOf].index });
     }
+  }
+
+  deleteScenario(scenarioName) {
+    const { scenarios } = this.meta;
+    if (!scenarioName) {
+      throw new Error("A scenario name is required.");
+    }
+    const scenario = scenarios[scenarioName];
+    if (!scenario) {
+      throw new Error(`Unknown scenario '${scenarioName}'`);
+    }
+    if (Object.keys(scenarios).length === 1) {
+      throw new Error(`Cannot delete only scenario '${scenarioName}'.`);
+    }
+    delete scenarios[scenarioName];
+    this.delete({ z: scenario.index });
   }
 }
 

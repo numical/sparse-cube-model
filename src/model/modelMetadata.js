@@ -12,4 +12,7 @@ const defaults = {
   }
 };
 
-module.exports = (custom = {}) => mergeDeepLeft(custom, clone(defaults));
+const factory = (custom = {}) => mergeDeepLeft(custom, clone(defaults));
+factory.defaultScenario = "defaultScenario";
+
+module.exports = factory;
