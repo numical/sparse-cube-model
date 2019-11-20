@@ -1,8 +1,6 @@
 const { test, only } = require("tap");
 const Model = require("./Model");
-const identity = require("../fns/identity");
-const increment = require("../fns/increment");
-const interval = require("../fns/interval");
+const { increment, interval } = require("../fns/coreFunctions");
 const sequence = require("./sequence");
 
 const intervalCount = 10;
@@ -14,7 +12,7 @@ const testDefaults = {
 
 test("Add row with unknown scenario throws error", t => {
   const rowName = "test row";
-  const fn = identity(5);
+  const fn = () => {};
   const scenarioName = "unknown test scenario";
   const args = { rowName, fn, scenarioName };
 
@@ -26,9 +24,23 @@ test("Add row with unknown scenario throws error", t => {
   t.end();
 });
 
+test("Add row with function with no key throws error", t => {
+  const rowName = "test row";
+  const fn = () => {};
+  const args = { rowName, fn };
+
+  const model = new Model(testDefaults);
+  t.throws(
+    () => model.addRow(args),
+    new Error("function 'fn' must have a 'key' property.")
+  );
+  t.end();
+});
+
 test("Add row with existing name throws error", t => {
   const rowName = "test row";
-  const fn = identity(7);
+  const fn = () => () => {};
+  fn.key = "test fn";
   const args = { rowName, fn };
 
   const model = new Model(testDefaults);
@@ -41,7 +53,8 @@ test("Add row with existing name throws error", t => {
 });
 
 test("Add row with no name throws error", t => {
-  const fn = identity(7);
+  const fn = () => () => {};
+  fn.key = "test fn";
   const args = { fn };
 
   const model = new Model(testDefaults);

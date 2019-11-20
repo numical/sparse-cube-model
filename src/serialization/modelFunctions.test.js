@@ -42,7 +42,7 @@ test("add creates property on object", t => {
   t.end();
 });
 
-test("add fails if function key property is nont unique", t => {
+test("add fails if function key property is not unique", t => {
   const fn = () => "";
   fn.key = "test 2";
   modelFunctions.add(fn);

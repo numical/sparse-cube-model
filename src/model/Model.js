@@ -1,10 +1,10 @@
 const Dense3DArray = require("../data-structures/Dense3DArray");
 const modelMetadata = require("./modelMetadata");
 
-const { defaultScenario } = modelMetadata; //"defaultScenario";
+const { defaultScenario } = modelMetadata;
 const defaultValue = 0;
 
-function getRow({ rowName, scenarioName }) {
+function getRow(rowName, scenarioName) {
   const { scenarios } = this.meta;
   const scenario = scenarios[scenarioName];
   if (!scenario) {
@@ -42,6 +42,7 @@ class Model extends Dense3DArray {
     startInterval = 0,
     endInterval = this.meta.interval.count - 1,
     fn,
+    fnArgs = {},
     constants = [],
     dependsOn
   }) {
@@ -59,6 +60,9 @@ class Model extends Dense3DArray {
         `Scenario '${scenarioName}' already has row '${rowName}'`
       );
     }
+    if (fn && !fn.key) {
+      throw new Error(`function '${fn.name}' must have a 'key' property.`);
+    }
     if (dependsOn) {
       dependsOn.forEach(providerName => {
         const provider = scenario.rows[providerName];
@@ -73,10 +77,10 @@ class Model extends Dense3DArray {
         }
       });
     }
-    const boundFn = fn ? fn(this, scenario) : undefined;
     scenario.rows[rowName] = {
       index: y,
-      fn: boundFn,
+      fn,
+      fnArgs,
       constants,
       name: rowName
     };
@@ -84,7 +88,9 @@ class Model extends Dense3DArray {
     const z = scenario.index;
     for (let x = startInterval; x <= endInterval; x++) {
       const value =
-        constants[x] === undefined ? boundFn(x, y, z) : constants[x];
+        constants[x] === undefined
+          ? fn({ model: this, scenario, x, y, z, ...fnArgs })
+          : constants[x];
       this.set(x, y, z, value);
     }
     // populate remaining columns if necessary
@@ -93,9 +99,18 @@ class Model extends Dense3DArray {
     }
   }
 
-  updateRow({ rowName, scenarioName = defaultScenario, fn, constants }) {
+  updateRow({
+    rowName,
+    scenarioName = defaultScenario,
+    fn,
+    fnArgs = {},
+    constants
+  }) {
     const { interval } = this.meta;
-    const { row, scenario } = this.#getRow({ rowName, scenarioName });
+    const { row, scenario } = this.#getRow(rowName, scenarioName);
+    if (fn && !fn.key) {
+      throw new Error(`function '${fn.name}' must have a 'key' property.`);
+    }
     let startInterval = 0;
     if (constants) {
       startInterval = constants.reduce(
@@ -107,15 +122,16 @@ class Model extends Dense3DArray {
     }
     if (fn) {
       startInterval = 0;
-      row.fn = fn(this);
+      row.fn = fn;
+      row.fnArgs = fnArgs;
     }
     if (constants || fn) {
       const rowstoUpdate = [row];
       if (row.dependents) {
         rowstoUpdate.push(
           ...row.dependents.map(
-            dependencyName =>
-              this.#getRow({ rowName: dependencyName, scenarioName }).row
+            dependencyRowName =>
+              this.#getRow(dependencyRowName, scenarioName).row
           )
         );
       }
@@ -124,7 +140,9 @@ class Model extends Dense3DArray {
         const z = scenario.index;
         for (let x = startInterval; x < interval.count; x++) {
           const value =
-            row.constants[x] === undefined ? row.fn(x, y, z) : row.constants[x];
+            row.constants[x] === undefined
+              ? row.fn({ model: this, scenario, x, y, z, ...row.fnArgs })
+              : row.constants[x];
           this.set(x, y, z, value);
         }
       });
@@ -134,7 +152,7 @@ class Model extends Dense3DArray {
   }
 
   deleteRow({ rowName, scenarioName = defaultScenario }) {
-    const { row, scenario } = this.#getRow({ rowName, scenarioName });
+    const { row, scenario } = this.#getRow(rowName, scenarioName);
     const { x: lenX, z: lenZ } = this.lengths;
     if (row.dependents && row.dependents.length > 0) {
       throw new Error(
@@ -156,7 +174,7 @@ class Model extends Dense3DArray {
   deleteRows({ rowNames, scenarioName = defaultScenario }) {
     const { rows, scenario } = rowNames.reduce(
       ({ rows, scenario }, rowName) => {
-        const { row: r, scenario: s } = this.#getRow({ rowName, scenarioName });
+        const { row: r, scenario: s } = this.#getRow(rowName, scenarioName);
         return { rows: [...rows, r], scenario: s };
       },
       { rows: [] }
@@ -183,7 +201,7 @@ class Model extends Dense3DArray {
   }
 
   row({ rowName, scenarioName = defaultScenario }) {
-    const { row, scenario } = this.#getRow({ rowName, scenarioName });
+    const { row, scenario } = this.#getRow(rowName, scenarioName);
     return this.range({ y: row.index, z: scenario.index });
   }
 

@@ -1,6 +1,6 @@
 const { test, only } = require("tap");
 const Model = require("./Model");
-const increment = require("../fns/increment");
+const { increment } = require("../fns/coreFunctions");
 
 const intervalCount = 10;
 const rowName = "test row";
@@ -56,6 +56,19 @@ test("Update row with neither function nor constants throws error", t => {
   t.end();
 });
 
+test("Update row with a function with no key throws an error", t => {
+  const model = setUp();
+  t.throws(
+    () =>
+      model.updateRow({
+        rowName,
+        fn: () => 2
+      }),
+    new Error("function 'fn' must have a 'key' property.")
+  );
+  t.end();
+});
+
 test("Update row updates all with constants", t => {
   const constants = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18];
   const expected = constants;
@@ -77,7 +90,8 @@ test("Update row updates some with constants", t => {
 test("Update row updates all with function", t => {
   const expected = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18];
   const model = setUp();
-  const fn = () => x => 2 * x;
+  const fn = ({ x }) => 2 * x;
+  fn.key = "test fn";
   model.updateRow({ rowName, fn });
   t.same(model.row({ rowName }), expected);
   t.end();

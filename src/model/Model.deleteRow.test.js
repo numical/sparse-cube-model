@@ -1,7 +1,6 @@
 const { test, only } = require("tap");
 const Model = require("./Model");
-const increment = require("../fns/increment");
-const lookup = require("../fns/lookup");
+const { increment, lookup } = require("../fns/coreFunctions");
 
 const rows = [
   {
@@ -11,7 +10,8 @@ const rows = [
   },
   {
     rowName: "first lookup row",
-    fn: lookup("increment row"),
+    fn: lookup,
+    fnArgs: { rowName: "increment row" },
     dependsOn: ["increment row"]
   },
   {
@@ -21,7 +21,8 @@ const rows = [
   },
   {
     rowName: "second lookup row",
-    fn: lookup("increment row"),
+    fn: lookup,
+    fnArgs: { rowName: "increment row" },
     dependsOn: ["increment row"]
   }
 ];

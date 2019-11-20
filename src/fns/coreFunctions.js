@@ -1,19 +1,16 @@
 const keyPrefix = "core.";
 
-const identity = require("./identity");
-identity.key = `${keyPrefix}identity`;
-
-const increment = require("./increment");
+const increment = ({ model, x, y, z }) => model[x - 1][y][z] + 1;
 increment.key = `${keyPrefix}increment`;
 
-const interval = require("./interval");
+const interval = ({ x }) => x;
 interval.key = `${keyPrefix}interval`;
 
-const lookup = require("./lookup");
+const lookup = ({ model, scenario, x, y, z, rowName }) =>
+  model[x][scenario.rows[rowName].index][z];
 lookup.key = `${keyPrefix}lookup`;
 
 module.exports = {
-  identity,
   increment,
   interval,
   lookup
