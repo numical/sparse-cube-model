@@ -21,6 +21,16 @@ function getRow(rowName, scenarioName) {
   return { row, scenario };
 }
 
+function calculateRow(row, scenario, startInterval, endInterval) {
+  for (let interval = startInterval; interval <= endInterval; interval++) {
+    const value =
+      row.constants[interval] === undefined
+        ? row.fn(interval)
+        : row.constants[interval];
+    this.set(interval, row.index, scenario.index, value);
+  }
+}
+
 class Model extends Dense3DArray {
   static from(serialized, fnsRepo = modelFunctions) {
     const meta = JSON.parse(serialized, reviver.bind(null, fnsRepo));
@@ -29,6 +39,7 @@ class Model extends Dense3DArray {
 
   meta;
   #getRow;
+  #calculateRow;
 
   constructor(meta = {}) {
     super({ defaultValue });
@@ -44,19 +55,14 @@ class Model extends Dense3DArray {
       "toString"
     ].forEach(method => (this[method] = this[method].bind(this)));
     this.#getRow = getRow.bind(this);
-    /*
-    const { scenarios } = this.meta;
-    const rowCount = Object.values(scenarios).reduce(
-      (max, scenario) => {
-        const scenarioRowCount = Object.keys(scenario).length;
-        return scenarioRowCount > max ? scenarioRowCount : max;
-      },
-      0
-    );
-    if (rowCount > 0) {
-
-    }
-     */
+    this.#calculateRow = calculateRow.bind(this);
+    // recalculate all/any values
+    const { intervals, scenarios } = this.meta;
+    Object.values(scenarios).forEach(scenario => {
+      Object.values(scenario.rows).forEach(row => {
+        this.#calculateRow(row, scenario, 0, intervals.count - 1);
+      });
+    });
   }
 
   addRow({
@@ -113,14 +119,8 @@ class Model extends Dense3DArray {
       row.fn = boundFn;
     }
     scenario.rows[rowName] = row;
+    this.#calculateRow(row, scenario, startInterval, endInterval);
 
-    for (let interval = startInterval; interval <= endInterval; interval++) {
-      const value =
-        constants[interval] === undefined
-          ? row.fn(interval)
-          : constants[interval];
-      this.set(interval, row.index, scenario.index, value);
-    }
     // populate remaining columns if necessary
     if (endInterval < intervals.count - 1) {
       this.set(intervals.count - 1, row.index, scenario.index, defaultValue);
@@ -166,17 +166,7 @@ class Model extends Dense3DArray {
         );
       }
       rowstoUpdate.forEach(row => {
-        for (
-          let interval = startInterval;
-          interval < intervals.count;
-          interval++
-        ) {
-          const value =
-            row.constants[interval] === undefined
-              ? row.fn(interval)
-              : row.constants[interval];
-          this.set(interval, row.index, scenario.index, value);
-        }
+        this.#calculateRow(row, scenario, startInterval, intervals.count - 1);
       });
     } else {
       throw new Error("No function or constants passed to update row.");
