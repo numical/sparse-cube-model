@@ -31,7 +31,8 @@ class Model extends Dense3DArray {
       "deleteRows",
       "row",
       "addScenario",
-      "deleteScenario"
+      "deleteScenario",
+      "toString"
     ].forEach(method => (this[method] = this[method].bind(this)));
     this.#getRow = getRow.bind(this);
   }
@@ -236,6 +237,10 @@ class Model extends Dense3DArray {
     }
     delete scenarios[scenarioName];
     this.delete({ z: scenario.index });
+  }
+
+  toString() {
+    return this.meta.toString();
   }
 }
 

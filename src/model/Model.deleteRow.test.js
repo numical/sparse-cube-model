@@ -1,50 +1,10 @@
 const { test, only } = require("tap");
-const Model = require("./Model");
-const { increment, lookup } = require("../fns/coreFunctions");
-
-const rows = [
-  {
-    rowName: "increment row",
-    fn: increment,
-    constants: [0]
-  },
-  {
-    rowName: "first lookup row",
-    fn: lookup,
-    fnArgs: { rowName: "increment row" },
-    dependsOn: ["increment row"]
-  },
-  {
-    rowName: "independent row",
-    fn: increment,
-    constants: [10]
-  },
-  {
-    rowName: "second lookup row",
-    fn: lookup,
-    fnArgs: { rowName: "increment row" },
-    dependsOn: ["increment row"]
-  }
-];
-
-const intervalCount = 10;
-
-const setUp = () => {
-  const model = new Model({
-    interval: {
-      count: intervalCount
-    }
-  });
-  rows.forEach(row => {
-    model.addRow(row);
-  });
-  return model;
-};
+const testFixture = require("./testFixture");
 
 test("Delete row with unknown scenario throws error", t => {
   const rowName = "test row";
   const scenarioName = "unknown test scenario";
-  const model = setUp();
+  const { model } = testFixture();
   t.throws(
     () => model.deleteRow({ rowName, scenarioName }),
     new Error("Unknown scenario 'unknown test scenario'")
@@ -54,7 +14,7 @@ test("Delete row with unknown scenario throws error", t => {
 
 test("Delete row with unknown row name throws error", t => {
   const rowName = "test row";
-  const model = setUp();
+  const { model } = testFixture();
   t.throws(
     () => model.deleteRow({ rowName }),
     new Error("Unknown row 'test row' for 'defaultScenario'")
@@ -63,7 +23,7 @@ test("Delete row with unknown row name throws error", t => {
 });
 
 test("Delete independent row", t => {
-  const model = setUp();
+  const { model } = testFixture();
   t.same(model.lengths, { x: 10, y: 4, z: 1 });
   const rowName = "independent row";
   model.deleteRow({
@@ -79,7 +39,7 @@ test("Delete independent row", t => {
 });
 
 test("Delete independent row, default scenario", t => {
-  const model = setUp();
+  const { model } = testFixture();
   t.same(model.lengths, { x: 10, y: 4, z: 1 });
   const rowName = "independent row";
   model.deleteRow({
@@ -94,7 +54,7 @@ test("Delete independent row, default scenario", t => {
 });
 
 test("Delete dependent row", t => {
-  const model = setUp();
+  const { model } = testFixture();
   t.same(model.lengths, { x: 10, y: 4, z: 1 });
   const rowName = "first lookup row";
   model.deleteRow({
@@ -110,7 +70,7 @@ test("Delete dependent row", t => {
 });
 
 test("Delete row with dependencies fails", t => {
-  const model = setUp();
+  const { model } = testFixture();
   const rowName = "increment row";
   t.throws(
     () => model.deleteRow({ rowName }),
@@ -122,7 +82,7 @@ test("Delete row with dependencies fails", t => {
 });
 
 test("Delete multiple rows", t => {
-  const model = setUp();
+  const { model } = testFixture();
   const rowNames = ["first lookup row", "independent row"];
   model.deleteRows({ rowNames });
   t.same(model.lengths, { x: 10, y: 2, z: 1 });
@@ -136,7 +96,7 @@ test("Delete multiple rows", t => {
 });
 
 test("Delete multiple linked rows", t => {
-  const model = setUp();
+  const { model } = testFixture();
   const rowNames = ["increment row", "first lookup row", "second lookup row"];
   model.deleteRows({ rowNames });
   t.same(model.lengths, { x: 10, y: 1, z: 1 });
@@ -150,7 +110,7 @@ test("Delete multiple linked rows", t => {
 });
 
 test("Delete multiple linked rows errors if other rows also linked", t => {
-  const model = setUp();
+  const { model } = testFixture();
   const rowNames = ["increment row", "second lookup row"];
   t.throws(
     () => model.deleteRows({ rowNames }),

@@ -1,26 +1,10 @@
 const { test, only } = require("tap");
-const Model = require("./Model");
-const { increment } = require("../fns/coreFunctions");
+const testFixture = require("./testFixture");
 
-const intervalCount = 10;
-const rowName = "test row";
-
-const setUp = () => {
-  const model = new Model({
-    interval: {
-      count: intervalCount
-    }
-  });
-  model.addRow({
-    rowName,
-    fn: increment,
-    constants: [0]
-  });
-  return model;
-};
+const rowName = "increment row";
 
 test("Update unknown row throws error", t => {
-  const model = setUp();
+  const { model } = testFixture();
   t.throws(
     () =>
       model.updateRow({
@@ -32,7 +16,7 @@ test("Update unknown row throws error", t => {
 });
 
 test("Update row in unknown scenario throws error", t => {
-  const model = setUp();
+  const { model } = testFixture();
   t.throws(
     () =>
       model.updateRow({
@@ -45,7 +29,7 @@ test("Update row in unknown scenario throws error", t => {
 });
 
 test("Update row with neither function nor constants throws error", t => {
-  const model = setUp();
+  const { model } = testFixture();
   t.throws(
     () =>
       model.updateRow({
@@ -57,7 +41,7 @@ test("Update row with neither function nor constants throws error", t => {
 });
 
 test("Update row with a function with no key throws an error", t => {
-  const model = setUp();
+  const { model } = testFixture();
   t.throws(
     () =>
       model.updateRow({
@@ -72,7 +56,7 @@ test("Update row with a function with no key throws an error", t => {
 test("Update row updates all with constants", t => {
   const constants = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18];
   const expected = constants;
-  const model = setUp();
+  const { model } = testFixture();
   model.updateRow({ rowName, constants });
   t.same(model.row({ rowName }), expected);
   t.end();
@@ -81,7 +65,7 @@ test("Update row updates all with constants", t => {
 test("Update row updates some with constants", t => {
   const constants = [0, 2, 4, undefined, undefined, undefined, 12, 14, 16, 18];
   const expected = [0, 2, 4, 5, 6, 7, 12, 14, 16, 18];
-  const model = setUp();
+  const { model } = testFixture();
   model.updateRow({ rowName, constants });
   t.same(model.row({ rowName }), expected);
   t.end();
@@ -89,7 +73,7 @@ test("Update row updates some with constants", t => {
 
 test("Update row updates all with function", t => {
   const expected = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18];
-  const model = setUp();
+  const { model } = testFixture();
   const fn = ({ x }) => 2 * x;
   fn.key = "test fn";
   model.updateRow({ rowName, fn });

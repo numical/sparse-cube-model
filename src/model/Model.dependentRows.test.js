@@ -1,52 +1,20 @@
 const { test, only } = require("tap");
-const Model = require("./Model");
-const { increment, lookup } = require("../fns/coreFunctions");
+const testFixture = require("./testFixture");
+const { increment } = require("../fns/coreFunctions");
 
-const intervalCount = 10;
-
-const rows = [
-  {
-    rowName: "increment row",
-    fn: increment,
-    constants: [0]
-  },
-  {
-    rowName: "first lookup row",
-    fn: lookup,
-    fnArgs: { rowName: "increment row" },
-    dependsOn: ["increment row"]
-  },
-  {
-    rowName: "second lookup row",
-    fn: lookup,
-    fnArgs: { rowName: "increment row" },
-    dependsOn: ["increment row"]
-  }
-];
-
-const setUp = () => {
-  const model = new Model({
-    interval: {
-      count: intervalCount
-    }
-  });
-  rows.forEach(row => {
-    model.addRow(row);
-  });
-  return model;
-};
-
-test("Add 3 rows, second two dependent on first", t => {
+test("Dependent rows have same values a their lookup", t => {
   const expected = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-  const model = setUp();
-  rows.forEach(row => {
-    t.same(model.row(row), expected);
-  });
+  const { model, rows } = testFixture();
+  [0, 1, 3]
+    .map(index => rows[index].rowName)
+    .forEach(rowName => {
+      t.same(model.row({ rowName }), expected);
+    });
   t.end();
 });
 
 test("Add row dependent on unknown row", t => {
-  const model = setUp();
+  const { model } = testFixture();
   const row = {
     rowName: "test row",
     fn: increment,
@@ -57,19 +25,21 @@ test("Add row dependent on unknown row", t => {
   t.end();
 });
 
-test("Add 2 rows, update initial reference constant", t => {
+test("Update initial reference constants affects dependents", t => {
   const expected = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
-  const model = setUp();
+  const { model, rows } = testFixture();
   model.updateRow({
     rowName: "increment row",
     constants: [10]
   });
-  rows.forEach(row => {
-    t.same(
-      model.row(row),
-      expected,
-      `Row '${row.rowName}' does not match expected`
-    );
-  });
+  [0, 1, 3]
+    .map(index => rows[index].rowName)
+    .forEach(rowName => {
+      t.same(
+        model.row({ rowName }),
+        expected,
+        `Row '${rowName}' does not match expected`
+      );
+    });
   t.end();
 });
