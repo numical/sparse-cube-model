@@ -3,10 +3,10 @@ const Model = require("./Model");
 const { increment, interval } = require("../fns/coreFunctions");
 const sequence = require("./sequence");
 
-const intervalCount = 10;
+const count = 10;
 const testDefaults = {
-  interval: {
-    count: intervalCount
+  intervals: {
+    count
   }
 };
 
@@ -64,13 +64,13 @@ test("Add row with no name throws error", t => {
 
 test("Add row of constants", t => {
   const rowName = "test row";
-  const constants = sequence(intervalCount);
+  const constants = sequence(count);
   const model = new Model(testDefaults);
   model.addRow({
     rowName,
     constants
   });
-  for (let i = 0; i < intervalCount; i++) {
+  for (let i = 0; i < count; i++) {
     t.equal(model[i][0][0], constants[i]);
   }
   t.end();
@@ -78,7 +78,7 @@ test("Add row of constants", t => {
 
 test("retrieve added row of constants", t => {
   const rowName = "test row";
-  const constants = sequence(intervalCount);
+  const constants = sequence(count);
   const model = new Model(testDefaults);
   model.addRow({
     rowName,
@@ -91,7 +91,7 @@ test("retrieve added row of constants", t => {
 
 test("retrieve row fails if unknown row name", t => {
   const rowName = "test row";
-  const constants = sequence(intervalCount);
+  const constants = sequence(count);
   const model = new Model(testDefaults);
   model.addRow({
     rowName,
@@ -106,7 +106,7 @@ test("retrieve row fails if unknown row name", t => {
 
 test("retrieve row fails if unknown scenario name", t => {
   const rowName = "test row";
-  const constants = sequence(intervalCount);
+  const constants = sequence(count);
   const model = new Model(testDefaults);
   model.addRow({
     rowName,

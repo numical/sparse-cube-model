@@ -63,13 +63,13 @@ class Model extends Dense3DArray {
     rowName,
     scenarioName = defaultScenario,
     startInterval = 0,
-    endInterval = this.meta.interval.count - 1,
+    endInterval = this.meta.intervals.count - 1,
     fn,
     fnArgs = {},
     constants = [],
     dependsOn
   }) {
-    const { interval, scenarios } = this.meta;
+    const { intervals, scenarios } = this.meta;
     const { y } = this.lengths;
     const scenario = scenarios[scenarioName];
     if (!scenario) {
@@ -117,8 +117,8 @@ class Model extends Dense3DArray {
       this.set(x, y, z, value);
     }
     // populate remaining columns if necessary
-    if (endInterval < interval.count - 1) {
-      this.set(interval.count - 1, y, z, defaultValue);
+    if (endInterval < intervals.count - 1) {
+      this.set(intervals.count - 1, y, z, defaultValue);
     }
   }
 
@@ -129,7 +129,7 @@ class Model extends Dense3DArray {
     fnArgs = {},
     constants
   }) {
-    const { interval } = this.meta;
+    const { intervals } = this.meta;
     const { row, scenario } = this.#getRow(rowName, scenarioName);
     if (fn && !fn.key) {
       throw new Error(`function '${fn.name}' must have a 'key' property.`);
@@ -161,7 +161,7 @@ class Model extends Dense3DArray {
       rowstoUpdate.forEach(row => {
         const y = row.index;
         const z = scenario.index;
-        for (let x = startInterval; x < interval.count; x++) {
+        for (let x = startInterval; x < intervals.count; x++) {
           const value =
             row.constants[x] === undefined
               ? row.fn({ model: this, scenario, x, y, z, ...row.fnArgs })

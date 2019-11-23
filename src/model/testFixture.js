@@ -26,16 +26,16 @@ const rows = [
   }
 ];
 
-const intervalCount = 10;
+const intervals = {
+  count: 10
+};
 
 module.exports = () => {
   const model = new Model({
-    interval: {
-      count: intervalCount
-    }
+    intervals
   });
   rows.forEach(row => {
     model.addRow(row);
   });
-  return { intervalCount, rows, model };
+  return { intervals, rows, model };
 };

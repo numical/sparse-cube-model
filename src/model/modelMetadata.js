@@ -1,7 +1,7 @@
 const { clone, mergeDeepLeft } = require("ramda");
 
 const defaults = {
-  interval: {
+  intervals: {
     count: 300
   },
   scenarios: {

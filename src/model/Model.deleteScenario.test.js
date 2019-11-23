@@ -29,12 +29,12 @@ test("Delete only scenario throws error", t => {
 });
 
 test("Delete scenario", t => {
-  const { intervalCount, model, rows } = testFixture();
-  const scenarioName = "second scenario";
+  const { intervals, model, rows } = testFixture();
+  const scenarioName = "ssecond scenario";
   model.addScenario({ scenarioName });
-  t.same(model.lengths, { x: intervalCount, y: rows.length, z: 2 });
+  t.same(model.lengths, { x: intervals.count, y: rows.length, z: 2 });
   model.deleteScenario(scenarioName);
-  t.same(model.lengths, { x: intervalCount, y: rows.length, z: 1 });
+  t.same(model.lengths, { x: intervals.count, y: rows.length, z: 1 });
   t.throws(
     () => model.addRow({ rowName: "test row", scenarioName }),
     new Error(`Unknown scenario '${scenarioName}'`)
@@ -43,11 +43,11 @@ test("Delete scenario", t => {
 });
 
 test("Can delete default scenario if another is available", t => {
-  const { intervalCount, model, rows } = testFixture();
+  const { intervals, model, rows } = testFixture();
   model.addScenario({ scenarioName: "second scenario" });
   const scenarioName = "defaultScenario";
   model.deleteScenario(scenarioName);
-  t.same(model.lengths, { x: intervalCount, y: rows.length, z: 1 });
+  t.same(model.lengths, { x: intervals.count, y: rows.length, z: 1 });
   t.throws(
     () => model.addRow({ rowName: "test row" }),
     new Error(`Unknown scenario '${scenarioName}'`)

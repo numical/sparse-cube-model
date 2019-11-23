@@ -2,10 +2,10 @@ const { test } = require("tap");
 const Model = require("./Model");
 const modelMetadata = require("./modelMetadata");
 
-const intervalCount = 10;
+const count = 10;
 const testDefaults = {
-  interval: {
-    count: intervalCount
+  intervals: {
+    count
   }
 };
 
@@ -19,9 +19,9 @@ test("Model custom creation", t => {
   const defaults = modelMetadata();
   const expected = {
     ...defaults,
-    interval: {
-      ...defaults.interval,
-      ...testDefaults.interval
+    intervals: {
+      ...defaults.intervals,
+      ...testDefaults.intervals
     }
   };
   const model = new Model(testDefaults);
