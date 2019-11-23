@@ -100,25 +100,30 @@ class Model extends Dense3DArray {
         }
       });
     }
-    scenario.rows[rowName] = {
+    const row = {
       index: y,
       fn,
       fnArgs,
       constants,
       name: rowName
     };
+    if (fn) {
+      const boundFn = fn.bind(this, { model: this, scenario, row, ...fnArgs });
+      boundFn.key = fn.key;
+      row.fn = boundFn;
+    }
+    scenario.rows[rowName] = row;
 
-    const z = scenario.index;
-    for (let x = startInterval; x <= endInterval; x++) {
+    for (let interval = startInterval; interval <= endInterval; interval++) {
       const value =
-        constants[x] === undefined
-          ? fn({ model: this, scenario, x, y, z, ...fnArgs })
-          : constants[x];
-      this.set(x, y, z, value);
+        constants[interval] === undefined
+          ? row.fn(interval)
+          : constants[interval];
+      this.set(interval, row.index, scenario.index, value);
     }
     // populate remaining columns if necessary
     if (endInterval < intervals.count - 1) {
-      this.set(intervals.count - 1, y, z, defaultValue);
+      this.set(intervals.count - 1, row.index, scenario.index, defaultValue);
     }
   }
 
@@ -145,7 +150,9 @@ class Model extends Dense3DArray {
     }
     if (fn) {
       startInterval = 0;
-      row.fn = fn;
+      const boundFn = fn.bind(this, { model: this, scenario, row, ...fnArgs });
+      boundFn.key = fn.key;
+      row.fn = boundFn;
       row.fnArgs = fnArgs;
     }
     if (constants || fn) {
@@ -159,14 +166,16 @@ class Model extends Dense3DArray {
         );
       }
       rowstoUpdate.forEach(row => {
-        const y = row.index;
-        const z = scenario.index;
-        for (let x = startInterval; x < intervals.count; x++) {
+        for (
+          let interval = startInterval;
+          interval < intervals.count;
+          interval++
+        ) {
           const value =
-            row.constants[x] === undefined
-              ? row.fn({ model: this, scenario, x, y, z, ...row.fnArgs })
-              : row.constants[x];
-          this.set(x, y, z, value);
+            row.constants[interval] === undefined
+              ? row.fn(interval)
+              : row.constants[interval];
+          this.set(interval, row.index, scenario.index, value);
         }
       });
     } else {

@@ -103,7 +103,8 @@ test("Mutator operations work on new scenario", t => {
   model.updateRow({
     rowName: "increment row",
     scenarioName,
-    constants: [100]
+    constants: [100],
+    fn: increment
   });
   t.same(model.range({ y: 0, z: 1 }), [
     100,

@@ -74,7 +74,7 @@ test("Update row updates some with constants", t => {
 test("Update row updates all with function", t => {
   const expected = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18];
   const { model } = testFixture();
-  const fn = ({ x }) => 2 * x;
+  const fn = (_, x) => 2 * x;
   fn.key = "test fn";
   model.updateRow({ rowName, fn });
   t.same(model.row({ rowName }), expected);

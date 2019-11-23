@@ -1,13 +1,14 @@
 const keyPrefix = "core.";
 
-const increment = ({ model, x, y, z }) => model[x - 1][y][z] + 1;
+const increment = ({ model, scenario, row }, interval) =>
+  model[interval - 1][row.index][scenario.index] + 1;
 increment.key = `${keyPrefix}increment`;
 
-const interval = ({ x }) => x;
+const interval = (_, interval) => interval;
 interval.key = `${keyPrefix}interval`;
 
-const lookup = ({ model, scenario, x, y, z, rowName }) =>
-  model[x][scenario.rows[rowName].index][z];
+const lookup = ({ model, scenario, row, rowName }, interval) =>
+  model[interval][scenario.rows[rowName].index][scenario.index];
 lookup.key = `${keyPrefix}lookup`;
 
 module.exports = {
