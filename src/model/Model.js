@@ -1,5 +1,9 @@
 const Dense3DArray = require("../data-structures/Dense3DArray");
 const modelMetadata = require("./modelMetadata");
+const modelFunctions = require("../serialization/modelFunctions");
+
+const replacer = (key, value) => (key === "fn" ? value.key : value);
+const reviver = (fnsRepo, key, value) => (key === "fn" ? fnsRepo[key] : value);
 
 const { defaultScenario } = modelMetadata;
 const defaultValue = 0;
@@ -18,6 +22,11 @@ function getRow(rowName, scenarioName) {
 }
 
 class Model extends Dense3DArray {
+  static from(serialized, fnsRepo = modelFunctions) {
+    const meta = JSON.parse(serialized, reviver.bind(null, fnsRepo));
+    return new Model(meta);
+  }
+
   meta;
   #getRow;
 
@@ -35,6 +44,19 @@ class Model extends Dense3DArray {
       "toString"
     ].forEach(method => (this[method] = this[method].bind(this)));
     this.#getRow = getRow.bind(this);
+    /*
+    const { scenarios } = this.meta;
+    const rowCount = Object.values(scenarios).reduce(
+      (max, scenario) => {
+        const scenarioRowCount = Object.keys(scenario).length;
+        return scenarioRowCount > max ? scenarioRowCount : max;
+      },
+      0
+    );
+    if (rowCount > 0) {
+
+    }
+     */
   }
 
   addRow({
@@ -239,8 +261,9 @@ class Model extends Dense3DArray {
     this.delete({ z: scenario.index });
   }
 
-  toString() {
-    return this.meta.toString();
+  toString({ pretty = false } = {}) {
+    const space = pretty ? 2 : 0;
+    return JSON.stringify(this.meta, replacer, space);
   }
 }
 
