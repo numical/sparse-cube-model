@@ -59,7 +59,6 @@ test("Empty model can be serialized and deserialized", t => {
   t.end();
 });
 
-/*
 test("Populated model can be serialized and deserialized", t => {
   const { model } = testFixture();
   const serialized = model.toString();
@@ -68,6 +67,14 @@ test("Populated model can be serialized and deserialized", t => {
   t.end();
 });
 
- */
+test("Populated model with row of constants correctly deserializes", t => {
+  const { intervals, model } = testFixture();
+  const constants = Array(intervals.count).fill(5);
+  model.addRow({ rowName: "constants row", constants });
+  const serialized = model.toString();
+  const deserialized = Model.from(serialized);
+  t.same(model, deserialized);
+  t.end();
+});
 
 // console.log(testFixture().model.toString({ pretty: true }));

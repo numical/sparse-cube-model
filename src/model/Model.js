@@ -3,7 +3,10 @@ const modelMetadata = require("./modelMetadata");
 const modelFunctions = require("../serialization/modelFunctions");
 
 const replacer = (key, value) => (key === "fn" ? value.key : value);
-const reviver = (fnsRepo, key, value) => (key === "fn" ? fnsRepo[key] : value);
+const reviver = (fnsRepo, key, value) =>
+  key === "fn" ? fnsRepo[value] : value;
+const compareByIndex = ({ index: index1 }, { index: index2 }) =>
+  index1 - index2;
 
 const { defaultScenario } = modelMetadata;
 const defaultValue = 0;
@@ -52,17 +55,12 @@ class Model extends Dense3DArray {
       "row",
       "addScenario",
       "deleteScenario",
+      "recalculate",
       "toString"
     ].forEach(method => (this[method] = this[method].bind(this)));
     this.#getRow = getRow.bind(this);
     this.#calculateRow = calculateRow.bind(this);
-    // recalculate all/any values
-    const { intervals, scenarios } = this.meta;
-    Object.values(scenarios).forEach(scenario => {
-      Object.values(scenario.rows).forEach(row => {
-        this.#calculateRow(row, scenario, 0, intervals.count - 1);
-      });
-    });
+    this.recalculate();
   }
 
   addRow({
@@ -108,8 +106,6 @@ class Model extends Dense3DArray {
     }
     const row = {
       index: y,
-      fn,
-      fnArgs,
       constants,
       name: rowName
     };
@@ -117,6 +113,7 @@ class Model extends Dense3DArray {
       const boundFn = fn.bind(this, { model: this, scenario, row, ...fnArgs });
       boundFn.key = fn.key;
       row.fn = boundFn;
+      row.fnArgs = fnArgs;
     }
     scenario.rows[rowName] = row;
     this.#calculateRow(row, scenario, startInterval, endInterval);
@@ -258,6 +255,30 @@ class Model extends Dense3DArray {
     }
     delete scenarios[scenarioName];
     this.delete({ z: scenario.index });
+  }
+
+  recalculate() {
+    // compareByIndex a good proxy for dependencies
+    const { intervals, scenarios } = this.meta;
+    Object.values(scenarios)
+      .sort(compareByIndex)
+      .forEach(scenario => {
+        Object.values(scenario.rows)
+          .sort(compareByIndex)
+          .forEach(row => {
+            if (row.fn) {
+              const boundFn = row.fn.bind(this, {
+                model: this,
+                scenario,
+                row,
+                ...row.fnArgs
+              });
+              boundFn.key = row.fn.key;
+              row.fn = boundFn;
+            }
+            this.#calculateRow(row, scenario, 0, intervals.count - 1);
+          });
+      });
   }
 
   toString({ pretty = false } = {}) {
