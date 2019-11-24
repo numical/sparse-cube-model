@@ -1,7 +1,7 @@
 const { test } = require("tap");
-const Model = require("./Model");
-const { increment } = require("../fns/coreFunctions");
-const iterate2D = require("../data-structures/iterate2D");
+const Model = require("../Model");
+const { increment } = require("../../fns/coreFunctions");
+const iterate2D = require("../../data-structures/iterate2D");
 const testFixture = require("./testFixture");
 
 test("Add scenario with no args throws error", t => {

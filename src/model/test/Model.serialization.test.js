@@ -1,5 +1,5 @@
 const { test } = require("tap");
-const Model = require("./Model");
+const Model = require("../Model");
 const testFixture = require("./testFixture");
 
 test("Blank model toString does not error", t => {

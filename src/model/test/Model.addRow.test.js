@@ -1,6 +1,6 @@
 const { test, only } = require("tap");
-const Model = require("./Model");
-const { increment, interval } = require("../fns/coreFunctions");
+const Model = require("../Model");
+const { increment, interval } = require("../../fns/coreFunctions");
 
 const sequence = (length, mapFn = (_, i) => i) => Array.from({ length }, mapFn);
 

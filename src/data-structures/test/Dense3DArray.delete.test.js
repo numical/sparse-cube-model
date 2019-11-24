@@ -1,6 +1,6 @@
 const { test, only } = require("tap");
-const Dense3DArray = require("./Dense3DArray");
-const iterate3D = require("./iterate3D");
+const Dense3DArray = require("../Dense3DArray");
+const iterate3D = require("../iterate3D");
 
 const setUp = () => {
   const d3a = new Dense3DArray();

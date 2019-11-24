@@ -1,5 +1,5 @@
-const Model = require("./Model");
-const { increment, lookup } = require("../fns/coreFunctions");
+const Model = require("../Model");
+const { increment, lookup } = require("../../fns/coreFunctions");
 
 const rows = [
   {

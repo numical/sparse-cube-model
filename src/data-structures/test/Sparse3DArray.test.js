@@ -1,5 +1,5 @@
 const { test } = require("tap");
-const Sparse3DArray = require("./Sparse3DArray");
+const Sparse3DArray = require("../Sparse3DArray");
 
 test("Array creation", t => {
   const { get, set, unset, meta } = new Sparse3DArray();

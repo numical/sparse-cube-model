@@ -1,6 +1,6 @@
 const { test, only } = require("tap");
 const testFixture = require("./testFixture");
-const { increment } = require("../fns/coreFunctions");
+const { increment } = require("../../fns/coreFunctions");
 
 const rowName = "increment row";
 

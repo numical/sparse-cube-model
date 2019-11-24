@@ -1,6 +1,6 @@
 const { test, only } = require("tap");
 const testFixture = require("./testFixture");
-const { increment } = require("../fns/coreFunctions");
+const { increment } = require("../../fns/coreFunctions");
 
 test("Dependent rows have same values a their lookup", t => {
   const expected = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];

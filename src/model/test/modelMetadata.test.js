@@ -1,5 +1,5 @@
 const { test } = require("tap");
-const modelMetadata = require("./modelMetadata");
+const modelMetadata = require("../modelMetadata");
 
 test("Default metadata", t => {
   const meta = modelMetadata();
