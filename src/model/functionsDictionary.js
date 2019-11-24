@@ -1,6 +1,6 @@
 const coreFns = require("../fns/coreFunctions");
 
-class ModelFunctions {
+class FunctionsDictionary {
   constructor() {
     this.add = this.add.bind(this);
   }
@@ -24,7 +24,7 @@ class ModelFunctions {
   }
 }
 
-const singleton = new ModelFunctions();
+const singleton = new FunctionsDictionary();
 Object.keys(coreFns).forEach(key => singleton.add(coreFns[key]));
 
 module.exports = singleton;

@@ -30,7 +30,8 @@ test("Update initial reference constants affects dependents", t => {
   const { model, rows } = testFixture();
   model.updateRow({
     rowName: "increment row",
-    constants: [10]
+    constants: [10],
+    fn: increment
   });
   [0, 1, 3]
     .map(index => rows[index].rowName)

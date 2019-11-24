@@ -1,7 +1,8 @@
 const { test, only } = require("tap");
 const Model = require("./Model");
 const { increment, interval } = require("../fns/coreFunctions");
-const sequence = require("./sequence");
+
+const sequence = (length, mapFn = (_, i) => i) => Array.from({ length }, mapFn);
 
 const count = 10;
 const testDefaults = {
@@ -59,6 +60,16 @@ test("Add row with no name throws error", t => {
 
   const model = new Model(testDefaults);
   t.throws(() => model.addRow(args), new Error("A row name is required"));
+  t.end();
+});
+
+test("Add row with no function and fewer constants that intervals throws error", t => {
+  const model = new Model(testDefaults);
+  const args = { rowName: "test row", constants: [0] };
+  t.throws(
+    () => model.addRow(args),
+    new Error("Row has no function, but only 1 of 10 required constants.")
+  );
   t.end();
 });
 

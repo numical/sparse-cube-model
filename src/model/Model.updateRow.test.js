@@ -1,5 +1,6 @@
 const { test, only } = require("tap");
 const testFixture = require("./testFixture");
+const { increment } = require("../fns/coreFunctions");
 
 const rowName = "increment row";
 
@@ -35,7 +36,7 @@ test("Update row with neither function nor constants throws error", t => {
       model.updateRow({
         rowName
       }),
-    new Error("No function or constants passed to update row.")
+    new Error("No function or constants passed.")
   );
   t.end();
 });
@@ -53,6 +54,25 @@ test("Update row with a function with no key throws an error", t => {
   t.end();
 });
 
+test("Update row with no function and smaller constants array than intervals throws error", t => {
+  const { model } = testFixture();
+  t.throws(
+    () => model.updateRow({ rowName, constants: [0] }),
+    new Error("Row has no function, but only 1 of 10 required constants.")
+  );
+  t.end();
+});
+
+test("Update row with no function and fewer constants than intervals throws error", t => {
+  const { model } = testFixture();
+  const constants = [0, 2, 4, undefined, undefined, undefined, 12, 14, 16, 18];
+  t.throws(
+    () => model.updateRow({ rowName, constants }),
+    new Error("Row has no function, but only 7 of 10 required constants.")
+  );
+  t.end();
+});
+
 test("Update row updates all with constants", t => {
   const constants = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18];
   const expected = constants;
@@ -66,7 +86,7 @@ test("Update row updates some with constants", t => {
   const constants = [0, 2, 4, undefined, undefined, undefined, 12, 14, 16, 18];
   const expected = [0, 2, 4, 5, 6, 7, 12, 14, 16, 18];
   const { model } = testFixture();
-  model.updateRow({ rowName, constants });
+  model.updateRow({ rowName, constants, fn: increment });
   t.same(model.row({ rowName }), expected);
   t.end();
 });

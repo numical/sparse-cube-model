@@ -58,12 +58,14 @@ test("Ensure added scenario is independent", t => {
   model.addScenario({ scenarioName });
   model.updateRow({
     rowName: "increment row",
-    constants: [10]
+    constants: [10],
+    fn: increment
   });
   model.updateRow({
     rowName: "independent row",
     scenarioName,
-    constants: [100]
+    constants: [100],
+    fn: increment
   });
   // original constants independent
   t.equal(model[0][0][0], 10);

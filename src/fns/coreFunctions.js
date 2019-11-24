@@ -7,8 +7,8 @@ increment.key = `${keyPrefix}increment`;
 const interval = (_, interval) => interval;
 interval.key = `${keyPrefix}interval`;
 
-const lookup = ({ model, scenario, row, rowName }, interval) =>
-  model[interval][scenario.rows[rowName].index][scenario.index];
+const lookup = ({ model, scenario, row, lookupRowName }, interval) =>
+  model[interval][scenario.rows[lookupRowName].index][scenario.index];
 lookup.key = `${keyPrefix}lookup`;
 
 module.exports = {

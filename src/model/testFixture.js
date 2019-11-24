@@ -10,7 +10,7 @@ const rows = [
   {
     rowName: "first lookup row",
     fn: lookup,
-    fnArgs: { rowName: "increment row" },
+    fnArgs: { lookupRowName: "increment row" },
     dependsOn: ["increment row"]
   },
   {
@@ -21,7 +21,7 @@ const rows = [
   {
     rowName: "second lookup row",
     fn: lookup,
-    fnArgs: { rowName: "increment row" },
+    fnArgs: { lookupRowName: "increment row" },
     dependsOn: ["increment row"]
   }
 ];
