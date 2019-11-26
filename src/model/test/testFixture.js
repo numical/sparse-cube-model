@@ -10,7 +10,7 @@ const rows = [
   {
     rowName: "first lookup row",
     fn: lookup,
-    fnArgs: { lookupRowName: "increment row" },
+    fnArgs: { reference: "increment row" },
     dependsOn: ["increment row"]
   },
   {
@@ -21,7 +21,7 @@ const rows = [
   {
     rowName: "second lookup row",
     fn: lookup,
-    fnArgs: { lookupRowName: "increment row" },
+    fnArgs: { reference: "increment row" },
     dependsOn: ["increment row"]
   }
 ];
@@ -30,8 +30,8 @@ const intervals = {
   count: 10
 };
 
-module.exports = () => {
-  const model = new Model({
+module.exports = (constructorFn = Model) => {
+  const model = new constructorFn({
     intervals
   });
   rows.forEach(row => {
