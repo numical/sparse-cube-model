@@ -22,7 +22,7 @@ const testFixture = require("./testFixture");
       const { model } = testFixture(Type);
       t.throws(
         () => model.deleteRow({ rowName }),
-        new Error("Unknown row 'test row' for 'defaultScenario'")
+        new Error("Unknown row 'test row'")
       );
       t.end();
     });
@@ -38,7 +38,7 @@ const testFixture = require("./testFixture");
       t.same(model.lengths, { x: 10, y: 3, z: 1 });
       t.throws(
         () => model.row({ rowName }),
-        new Error(`Unknown row '${rowName}' for 'defaultScenario'`)
+        new Error(`Unknown row '${rowName}'`)
       );
       t.end();
     });
@@ -53,7 +53,7 @@ const testFixture = require("./testFixture");
       t.same(model.lengths, { x: 10, y: 3, z: 1 });
       t.throws(
         () => model.row({ rowName }),
-        new Error(`Unknown row '${rowName}' for 'defaultScenario'`)
+        new Error(`Unknown row '${rowName}'`)
       );
       t.end();
     });
@@ -69,7 +69,7 @@ const testFixture = require("./testFixture");
       t.same(model.lengths, { x: 10, y: 3, z: 1 });
       t.throws(
         () => model.row({ rowName }),
-        new Error(`Unknown row '${rowName}' for 'defaultScenario'`)
+        new Error(`Unknown row '${rowName}'`)
       );
       t.end();
     });
@@ -94,7 +94,7 @@ const testFixture = require("./testFixture");
       rowNames.forEach(rowName => {
         t.throws(
           () => model.row({ rowName }),
-          new Error(`Unknown row '${rowName}' for 'defaultScenario'`)
+          new Error(`Unknown row '${rowName}'`)
         );
       });
       t.end();
@@ -112,7 +112,7 @@ const testFixture = require("./testFixture");
       rowNames.forEach(rowName => {
         t.throws(
           () => model.row({ rowName }),
-          new Error(`Unknown row '${rowName}' for 'defaultScenario'`)
+          new Error(`Unknown row '${rowName}'`)
         );
       });
       t.end();

@@ -17,7 +17,7 @@ const rowName = "increment row";
           model.updateRow({
             rowName: "unknown row"
           }),
-        new Error("Unknown row 'unknown row' for 'defaultScenario'")
+        new Error("Unknown row 'unknown row'")
       );
       t.end();
     });

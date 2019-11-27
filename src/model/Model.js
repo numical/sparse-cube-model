@@ -21,7 +21,7 @@ const getRow = (rowName, scenarioName, scenarios) => {
   }
   const row = scenario.rows[rowName];
   if (!row) {
-    throw new Error(`Unknown row '${rowName}' for '${scenarioName}'`);
+    throw new Error(`Unknown row '${rowName}'`);
   }
   return { row, scenario };
 };
@@ -81,17 +81,6 @@ class Model extends Dense3DArray {
   constructor(meta = {}) {
     super({ defaultValue });
     this.#meta = modelMetadata(meta);
-    [
-      "addRow",
-      "updateRow",
-      "deleteRow",
-      "deleteRows",
-      "row",
-      "addScenario",
-      "deleteScenario",
-      "recalculate",
-      "toString"
-    ].forEach(method => (this[method] = this[method].bind(this)));
     this.recalculate();
   }
 

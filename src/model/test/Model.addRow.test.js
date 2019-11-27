@@ -114,7 +114,7 @@ const testDefaults = {
       });
       t.throws(
         () => model.row({ rowName: "unknown row" }),
-        new Error("Unknown row 'unknown row' for 'defaultScenario'")
+        new Error("Unknown row 'unknown row'")
       );
       t.end();
     });
