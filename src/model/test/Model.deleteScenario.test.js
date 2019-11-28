@@ -59,6 +59,19 @@ const testFixture = require("./testFixture");
       );
       t.end();
     });
+
+    test("Can re-add default scenario", t => {
+      const { intervals, model, rows } = testFixture(Type);
+      model.addScenario({ scenarioName: "second scenario" });
+      t.doesNotThrow(() =>
+        model.addScenario({
+          scenarioName: "defaultScenario",
+          copyOf: "second scenario"
+        })
+      );
+      t.end();
+    });
+
     typeTests.end();
   });
 });

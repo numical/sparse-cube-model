@@ -51,22 +51,38 @@ const bindFnToRow = (row, scenario, model, fn, fnArgs) => {
 };
 
 const validateFnConstants = (fn, constants, intervals) => {
-  if (fn) {
-    if (!fn.key) {
-      throw new Error(`function '${fn.name}' must have a 'key' property.`);
-    }
-  } else if (constants) {
-    const constantsCount = constants.reduce(
-      (count, constant) => (constant === undefined ? count : count + 1),
-      0
-    );
-    if (constantsCount < intervals.count) {
-      throw new Error(
-        `Row has no function, but only ${constantsCount} of ${intervals.count} required constants.`
-      );
-    }
-  } else {
+  if (!fn && !constants) {
     throw new Error("No function or constants passed.");
+  }
+  if (fn && !fn.key) {
+    throw new Error(`function '${fn.name}' must have a 'key' property.`);
+  }
+  if (constants) {
+    if (Array.isArray(constants)) {
+      if (!fn) {
+        const constantsCount = constants.reduce(
+          (count, constant) => (constant === undefined ? count : count + 1),
+          0
+        );
+        if (constantsCount < intervals.count) {
+          throw new Error(
+            `Row has no function, but only ${constantsCount} of ${intervals.count} required constants.`
+          );
+        }
+      }
+    } else if (typeof constants === "object") {
+      Object.keys(constants).forEach(constant => {
+        if (Number.isNaN(Number.parseInt(constant))) {
+          throw new Error(`Constant key '${constant}' must be an integer.`);
+        } else if (constant >= intervals.count) {
+          throw new Error(
+            `Constant index ${constant} must be less than ${intervals.count}.`
+          );
+        }
+      });
+    } else {
+      throw new Error("Constants must be an array or an object.");
+    }
   }
 };
 
@@ -109,6 +125,12 @@ class Model extends Dense3DArray {
       );
     }
     validateFnConstants(fn, constants, intervals);
+    const arrayOfConstants = Array.isArray(constants)
+      ? constants
+      : Object.entries(constants).reduce((array, [key, value]) => {
+          array[key] = value;
+          return array;
+        }, Array(intervals.count));
     if (dependsOn) {
       dependsOn.forEach(providerName => {
         const provider = scenario.rows[providerName];
@@ -125,7 +147,7 @@ class Model extends Dense3DArray {
     }
     const row = {
       index: y,
-      constants,
+      constants: arrayOfConstants,
       name: rowName
     };
     bindFnToRow(row, scenario, this, fn, fnArgs);
@@ -150,12 +172,22 @@ class Model extends Dense3DArray {
     validateFnConstants(fn, constants, intervals);
     let startInterval = 0;
     if (constants) {
-      startInterval = constants.reduce(
-        (min, value, index) =>
-          value !== undefined ? (index < min ? index : min) : min,
-        constants.length
-      );
-      row.constants = [...constants];
+      if (Array.isArray(constants)) {
+        startInterval = constants.reduce(
+          (min, value, index) =>
+            value !== undefined ? (index < min ? index : min) : min,
+          constants.length
+        );
+        row.constants = [...constants];
+      } else {
+        startInterval = Object.entries(constants).reduce(
+          (min, [index, value]) => {
+            row.constants[index] = value;
+            return index < min ? index : min;
+          },
+          intervals.count
+        );
+      }
     }
     if (bindFnToRow(row, scenario, this, fn, fnArgs)) {
       startInterval = 0;

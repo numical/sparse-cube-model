@@ -104,6 +104,55 @@ const testDefaults = {
       t.end();
     });
 
+    test("Add partial constants via object", t => {
+      const rowName = "test row";
+      const constants = {
+        1: 10,
+        3: 10,
+        7: 10
+      };
+      const expected = [0, 10, 2, 10, 4, 5, 6, 10, 8, 9];
+      const model = new Type(testDefaults);
+      model.addRow({
+        rowName,
+        constants,
+        fn: interval
+      });
+      const row = model.row({ rowName });
+      t.same(row, expected);
+      t.end();
+    });
+
+    test("Add partial constants via object fails if keys are not integers", t => {
+      const rowName = "test row";
+      const constants = {
+        1: 10,
+        a: 10,
+        7: 10
+      };
+      const model = new Type(testDefaults);
+      const args = { rowName: "test row", constants, fn: interval };
+      t.throws(() => {
+        model.addRow(args);
+      }, new Error("Constant key 'a' must be an integer."));
+      t.end();
+    });
+
+    test("Add partial constants via object fails if indices greater than interval count", t => {
+      const rowName = "test row";
+      const constants = {
+        1: 10,
+        11: 10,
+        7: 10
+      };
+      const model = new Type(testDefaults);
+      const args = { rowName: "test row", constants, fn: interval };
+      t.throws(() => {
+        model.addRow(args);
+      }, new Error("Constant index 11 must be less than 10."));
+      t.end();
+    });
+
     test("retrieve row fails if unknown row name", t => {
       const rowName = "test row";
       const constants = sequence(count);
