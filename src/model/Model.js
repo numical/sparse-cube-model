@@ -1,15 +1,9 @@
 const Dense3DArray = require("../data-structures/Dense3DArray");
 const modelMetadata = require("./modelMetadata");
-const fnsDictionary = require("./functionsDictionary");
+const serializer = require("./serializer");
 
 const { defaultScenario } = modelMetadata;
 const defaultValue = 0;
-
-const replacer = (key, value) =>
-  key === "fn" ? (value ? value.key : undefined) : value;
-
-const reviver = (fnsRepo, key, value) =>
-  key === "fn" ? fnsRepo[value] : value;
 
 const compareByIndex = ({ index: index1 }, { index: index2 }) =>
   index1 - index2;
@@ -87,8 +81,8 @@ const validateFnConstants = (fn, constants, intervals) => {
 };
 
 class Model extends Dense3DArray {
-  static from(serialized, fnsRepo = fnsDictionary) {
-    const meta = JSON.parse(serialized, reviver.bind(null, fnsRepo));
+  static parse(serialized, fnsRepo) {
+    const meta = serializer.parse(serialized, fnsRepo);
     return new Model(meta);
   }
 
@@ -315,9 +309,8 @@ class Model extends Dense3DArray {
       });
   }
 
-  toString({ pretty = false } = {}) {
-    const space = pretty ? 2 : 0;
-    return JSON.stringify(this.#meta, replacer, space);
+  stringify(args) {
+    return serializer.stringify(this.#meta, args);
   }
 }
 

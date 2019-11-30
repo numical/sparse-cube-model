@@ -1,9 +1,10 @@
 const Model = require("./Model");
 const mappingGenerator = require("nanoid/non-secure").bind(null, 10);
 const modelMetadata = require("./modelMetadata");
+const serializer = require("./serializer");
 const { defaultScenario } = modelMetadata;
 
-const addKey = (type, toMap, fromMap, callMappings, key, doNotMap) => {
+const addKey = (type, fromMap, callMappings, key, doNotMap) => {
   if (!key) {
     throw new Error(`A ${type} name is required.`);
   } else if (fromMap[type][key]) {
@@ -12,19 +13,17 @@ const addKey = (type, toMap, fromMap, callMappings, key, doNotMap) => {
     return mapped;
   } else {
     const mapped = key === doNotMap ? key : mappingGenerator();
-    toMap[type][mapped] = key;
     fromMap[type][key] = mapped;
     callMappings[mapped] = key;
     return mapped;
   }
 };
 
-const removeKey = (type, toMap, fromMap, callMappings, key) => {
+const removeKey = (type, fromMap, callMappings, key) => {
   if (Array.isArray(key)) {
-    key.map(removeKey.bind(null, type, toMap, fromMap, callMappings));
+    key.map(removeKey.bind(null, type, fromMap, callMappings));
   } else {
     const mapped = fromMap[type][key];
-    delete toMap[type][mapped];
     delete fromMap[type][key];
     callMappings[mapped] = key;
   }
@@ -56,30 +55,42 @@ const fromKey = (type, fromMap, callMappings, key, doNotMap) => {
   }
 };
 
-const unmapMessage = (message, callMappings, toMap = {}) =>
-  Object.entries({ ...callMappings, ...toMap }).reduce(
+const unmapMessage = (message, callMappings, fromMap) => {
+  let unmapped = Object.entries(callMappings).reduce(
     (message, [mapped, key]) => message.replace(mapped, key),
     message
   );
+  if (fromMap) {
+    unmapped = Object.entries(fromMap).reduce(
+      (message, [key, mapped]) => message.replace(mapped, key),
+      unmapped
+    );
+  }
+  return unmapped;
+};
 
-const unmapError = (fn, toMap) => {
+const unmapError = (fn, fromMap) => {
   const callMappings = {};
   try {
     return fn(callMappings);
   } catch (error) {
-    error.message = unmapMessage(error.message, callMappings, toMap);
+    error.message = unmapMessage(error.message, callMappings, fromMap);
     throw error;
   }
 };
 
 class MappedModel extends Model {
-  #toMap;
+  static parse([serializedModel, serializedMap], fnsRepo) {
+    const meta = serializer.parse(serializedModel, fnsRepo);
+    const map = serializer.parse(serializedMap, fnsRepo);
+    return new MappedModel(meta, map);
+  }
+
   #fromMap;
 
-  constructor(meta) {
+  constructor(meta, map = { row: {}, scenario: {} }) {
     super(meta);
-    this.#toMap = { row: {}, scenario: {} };
-    this.#fromMap = { row: {}, scenario: {} };
+    this.#fromMap = map;
   }
 
   addRow({
@@ -101,13 +112,7 @@ class MappedModel extends Model {
           scenarioName,
           defaultScenario
         ),
-        rowName: addKey(
-          "row",
-          this.#toMap,
-          this.#fromMap,
-          callMappings,
-          rowName
-        ),
+        rowName: addKey("row", this.#fromMap, callMappings, rowName),
         startInterval,
         endInterval,
         fn,
@@ -154,8 +159,8 @@ class MappedModel extends Model {
         ),
         rowName: fromKey("row", this.#fromMap, callMappings, rowName)
       });
-      removeKey("row", this.#toMap, this.#fromMap, callMappings, rowName);
-    }, this.#toMap.row);
+      removeKey("row", this.#fromMap, callMappings, rowName);
+    }, this.#fromMap.row);
   }
 
   deleteRows({ rowNames, scenarioName = defaultScenario }) {
@@ -170,8 +175,8 @@ class MappedModel extends Model {
         ),
         rowNames: fromKey("row", this.#fromMap, callMappings, rowNames)
       });
-      removeKey("row", this.#toMap, this.#fromMap, callMappings, rowNames);
-    }, this.#toMap.row);
+      removeKey("row", this.#fromMap, callMappings, rowNames);
+    }, this.#fromMap.row);
   }
 
   row({ rowName, scenarioName = defaultScenario }) {
@@ -194,7 +199,6 @@ class MappedModel extends Model {
       super.addScenario({
         scenarioName: addKey(
           "scenario",
-          this.#toMap,
           this.#fromMap,
           callMappings,
           scenarioName,
@@ -221,8 +225,14 @@ class MappedModel extends Model {
         defaultScenario
       );
       super.deleteScenario(mapped);
-      removeKey("scenario", this.#toMap, this.#fromMap, callMappings, mapped);
+      removeKey("scenario", this.#fromMap, callMappings, mapped);
     });
+  }
+
+  stringify(args) {
+    const model = super.stringify(args);
+    const map = serializer.stringify(this.#fromMap, args);
+    return [model, map];
   }
 }
 
