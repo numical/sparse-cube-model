@@ -2,7 +2,9 @@ const { clone, mergeDeepLeft } = require("ramda");
 
 const defaults = {
   intervals: {
-    count: 300
+    count: 300,
+    epoch: 1577836800000, // 01/01/2020 00:00:00
+    duration: "month"
   },
   scenarios: {
     defaultScenario: {

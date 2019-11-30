@@ -1,4 +1,4 @@
-const { test, only } = require("tap");
+const { test } = require("tap");
 const Model = require("../Model");
 const MappedModel = require("../MappedModel");
 const testFixture = require("./testFixture");
