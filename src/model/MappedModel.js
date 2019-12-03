@@ -96,11 +96,11 @@ class MappedModel extends Model {
   addRow({
     rowName,
     scenarioName = defaultScenario,
-    startInterval,
-    endInterval,
     fn,
     fnArgs,
     constants,
+    start,
+    end,
     dependsOn
   }) {
     unmapError(callMappings => {
@@ -113,11 +113,11 @@ class MappedModel extends Model {
           defaultScenario
         ),
         rowName: addKey("row", this.#fromMap, callMappings, rowName),
-        startInterval,
-        endInterval,
         fn,
         fnArgs: fromKey("row", this.#fromMap, callMappings, fnArgs),
         constants,
+        start,
+        end,
         dependsOn: fromKey("row", this.#fromMap, callMappings, dependsOn)
       });
     });

@@ -67,12 +67,33 @@ const testDefaults = {
       t.end();
     });
 
-    test("Add row with no function and fewer constants that intervals throws error", t => {
+    test("Add row with no function and smaller constants array than intervals throws error", t => {
       const model = new Type(testDefaults);
       const args = { rowName: "test row", constants: [0] };
       t.throws(
         () => model.addRow(args),
-        new Error("Row has no function, but only 1 of 10 required constants.")
+        new Error("Row has no function, but less constants than intervals.")
+      );
+      t.end();
+    });
+
+    test("Add row with no function and fewer constants that intervals throws error", t => {
+      const model = new Type(testDefaults);
+      const args = { rowName: "test row", constants: { 0: 5 } };
+      t.throws(
+        () => model.addRow(args),
+        new Error("Row has no function, but less constants than intervals.")
+      );
+      t.end();
+    });
+
+    test("Add row with no function and undefined constants", t => {
+      const model = new Type(testDefaults);
+      const constants = [0, 1, 2, 3, 4, 5, 6, undefined, 8, 9];
+      const args = { rowName: "test row", constants };
+      t.throws(
+        () => model.addRow(args),
+        new Error("Row has no function, but undefined constants.")
       );
       t.end();
     });
@@ -149,7 +170,7 @@ const testDefaults = {
       const args = { rowName: "test row", constants, fn: interval };
       t.throws(() => {
         model.addRow(args);
-      }, new Error("Constant index 11 must be less than 10."));
+      }, new Error("Constant index 11 must be 9 or less."));
       t.end();
     });
 
@@ -242,15 +263,15 @@ const testDefaults = {
 
     test("Add partial row of functions", t => {
       const rowName = "test row";
-      const startInterval = 5;
-      const endInterval = 7;
+      const start = 5;
+      const end = 7;
       const fn = interval;
       const model = new Type(testDefaults);
       model.addRow({
         rowName,
         fn,
-        startInterval,
-        endInterval
+        start,
+        end
       });
       const row = model.row({ rowName });
       t.same(row, [0, 0, 0, 0, 0, 5, 6, 7, 0, 0]);

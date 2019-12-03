@@ -63,7 +63,7 @@ test("Populated model can be serialized and deserialized", t => {
   const { model } = testFixture();
   const serialized = model.stringify();
   const deserialized = Model.parse(serialized);
-  t.same(model, deserialized);
+  t.same(deserialized, model);
   t.end();
 });
 
@@ -73,7 +73,7 @@ test("Populated model with row of constants correctly deserializes", t => {
   model.addRow({ rowName: "constants row", constants });
   const serialized = model.stringify();
   const deserialized = Model.parse(serialized);
-  t.same(model, deserialized);
+  t.same(deserialized, model);
   t.end();
 });
 

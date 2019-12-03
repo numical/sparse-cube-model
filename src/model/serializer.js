@@ -4,7 +4,7 @@ const replacer = (key, value) =>
   key === "fn" ? (value ? value.key : undefined) : value;
 
 const reviver = (fnsRepo, key, value) =>
-  key === "fn" ? fnsRepo[value] : value;
+  key === "fn" ? fnsRepo[value] : value === null ? undefined : value;
 
 const stringify = (obj, { pretty = false } = {}) => {
   const space = pretty ? 2 : 0;

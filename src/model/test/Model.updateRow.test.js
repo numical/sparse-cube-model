@@ -64,7 +64,7 @@ const rowName = "increment row";
       const { model } = testFixture(Type);
       t.throws(
         () => model.updateRow({ rowName, constants: [0] }),
-        new Error("Row has no function, but only 1 of 10 required constants.")
+        new Error("Row has no function, but less constants than intervals.")
       );
       t.end();
     });
@@ -85,7 +85,7 @@ const rowName = "increment row";
       ];
       t.throws(
         () => model.updateRow({ rowName, constants }),
-        new Error("Row has no function, but only 7 of 10 required constants.")
+        new Error("Row has no function, but undefined constants.")
       );
       t.end();
     });

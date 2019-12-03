@@ -1,5 +1,6 @@
 const Dense3DArray = require("../data-structures/Dense3DArray");
 const modelMetadata = require("./modelMetadata");
+const getIntervalFromDate = require("./getIntervalFromDate");
 const serializer = require("./serializer");
 
 const { defaultScenario } = modelMetadata;
@@ -36,48 +37,115 @@ const bindFnToRow = (row, scenario, model, fn, fnArgs) => {
     boundFn.key = fn.key;
     row.fn = boundFn;
     row.fnArgs = fnArgs;
-    return true;
   } else {
     row.fn = undefined;
     row.fnArgs = undefined;
-    return false;
   }
 };
 
-const validateFnConstants = (fn, constants, intervals) => {
+const prepareRowConstants = (
+  fn,
+  constants,
+  start,
+  end,
+  intervals,
+  existingConstants
+) => {
   if (!fn && !constants) {
     throw new Error("No function or constants passed.");
   }
   if (fn && !fn.key) {
     throw new Error(`function '${fn.name}' must have a 'key' property.`);
   }
-  if (constants) {
-    if (Array.isArray(constants)) {
-      if (!fn) {
-        const constantsCount = constants.reduce(
-          (count, constant) => (constant === undefined ? count : count + 1),
-          0
-        );
-        if (constantsCount < intervals.count) {
-          throw new Error(
-            `Row has no function, but only ${constantsCount} of ${intervals.count} required constants.`
-          );
-        }
+  if (!constants) {
+    const rowConstants =
+      end < intervals.count - 1
+        ? Array(intervals.count)
+        : start > 0
+        ? Array(start)
+        : [];
+    if (start > 0) {
+      for (let index = 0; index < start; index++) {
+        rowConstants[index] = defaultValue;
       }
-    } else if (typeof constants === "object") {
-      Object.keys(constants).forEach(constant => {
-        if (Number.isNaN(Number.parseInt(constant))) {
-          throw new Error(`Constant key '${constant}' must be an integer.`);
-        } else if (constant >= intervals.count) {
-          throw new Error(
-            `Constant index ${constant} must be less than ${intervals.count}.`
-          );
-        }
-      });
-    } else {
-      throw new Error("Constants must be an array or an object.");
+    }
+    if (end < intervals.count - 1) {
+      for (let index = end + 1; index < intervals.count; index++) {
+        rowConstants[index] = defaultValue;
+      }
+    }
+    return {
+      rowConstants,
+      startInterval: start,
+      endInterval: end
+    };
+  }
+  if (typeof constants !== "object") {
+    throw new Error("Constants must be an array or an object.");
+  }
+  const isArray = Array.isArray(constants);
+  if (!fn) {
+    const values = isArray ? constants : Object.values(constants);
+    if (values.length < end - start) {
+      throw new Error(
+        `Row has no function, but less constants than intervals.`
+      );
+    } else if (values.some(value => value === undefined)) {
+      throw new Error(`Row has no function, but undefined constants.`);
     }
   }
+  if (isArray) {
+    const startInterval =
+      start > 0
+        ? start
+        : existingConstants
+        ? constants.reduce(
+            (min, value, index) =>
+              value !== undefined ? (index < min ? index : min) : min,
+            constants.length
+          )
+        : 0;
+    const startDefaultArray = Array(start).fill(defaultValue);
+    const calculatedValuesArray = Array(end + 1 - constants.length - start);
+    const endDefaultArray = Array(intervals.count - 1 - end).fill(defaultValue);
+    const rowConstants = [
+      ...startDefaultArray,
+      ...constants,
+      ...calculatedValuesArray,
+      ...endDefaultArray
+    ];
+    return {
+      rowConstants,
+      startInterval,
+      endInterval: end
+    };
+  }
+  Object.keys(constants).forEach(constant => {
+    if (Number.isNaN(Number.parseInt(constant))) {
+      throw new Error(`Constant key '${constant}' must be an integer.`);
+    } else if (constant > end) {
+      throw new Error(`Constant index ${constant} must be ${end} or less.`);
+    } else if (constant < start) {
+      throw new Error(`Constant index ${constant} must be ${start} or more.`);
+    }
+  });
+  const rowConstants = existingConstants || [
+    ...Array(start).fill(defaultValue),
+    ...Array(end + 1 - start),
+    ...Array(intervals.count - 1 - end).fill(defaultValue)
+  ];
+  const startInterval = Object.entries(constants).reduce(
+    (min, [index, value]) => {
+      rowConstants[index] = value;
+      return index < min ? index : min;
+    },
+    existingConstants ? intervals.count : start
+  );
+  return {
+    rowConstants,
+    startInterval,
+    endInterval: end
+  };
 };
 
 class Model extends Dense3DArray {
@@ -87,21 +155,23 @@ class Model extends Dense3DArray {
   }
 
   #meta;
+  #getIntervalFromDate;
 
   constructor(meta = {}) {
     super({ defaultValue });
     this.#meta = modelMetadata(meta);
+    this.#getIntervalFromDate = getIntervalFromDate(this.#meta.intervals);
     this.recalculate();
   }
 
   addRow({
     rowName,
     scenarioName = defaultScenario,
-    startInterval = 0,
-    endInterval = this.#meta.intervals.count - 1,
     fn,
     fnArgs,
-    constants = [],
+    start = 0,
+    end = this.#meta.intervals.count - 1,
+    constants,
     dependsOn
   }) {
     const { intervals, scenarios } = this.#meta;
@@ -118,13 +188,13 @@ class Model extends Dense3DArray {
         `Scenario '${scenarioName}' already has row '${rowName}'`
       );
     }
-    validateFnConstants(fn, constants, intervals);
-    const arrayOfConstants = Array.isArray(constants)
-      ? constants
-      : Object.entries(constants).reduce((array, [key, value]) => {
-          array[key] = value;
-          return array;
-        }, Array(intervals.count));
+    const { rowConstants } = prepareRowConstants(
+      fn,
+      constants,
+      start,
+      end,
+      intervals
+    );
     if (dependsOn) {
       dependsOn.forEach(providerName => {
         const provider = scenario.rows[providerName];
@@ -141,17 +211,19 @@ class Model extends Dense3DArray {
     }
     const row = {
       index: y,
-      constants: arrayOfConstants,
+      constants: rowConstants,
       name: rowName
     };
     bindFnToRow(row, scenario, this, fn, fnArgs);
     scenario.rows[rowName] = row;
-    calculateRow(row, scenario, startInterval, endInterval, this.set);
+    calculateRow(row, scenario, 0, intervals.count - 1, this.set);
 
+    /*
     // populate remaining columns if necessary
     if (endInterval < intervals.count - 1) {
       this.set(intervals.count - 1, row.index, scenario.index, defaultValue);
     }
+    */
   }
 
   updateRow({
@@ -163,29 +235,16 @@ class Model extends Dense3DArray {
   }) {
     const { intervals, scenarios } = this.#meta;
     const { row, scenario } = getRow(rowName, scenarioName, scenarios);
-    validateFnConstants(fn, constants, intervals);
-    let startInterval = 0;
-    if (constants) {
-      if (Array.isArray(constants)) {
-        startInterval = constants.reduce(
-          (min, value, index) =>
-            value !== undefined ? (index < min ? index : min) : min,
-          constants.length
-        );
-        row.constants = [...constants];
-      } else {
-        startInterval = Object.entries(constants).reduce(
-          (min, [index, value]) => {
-            row.constants[index] = value;
-            return index < min ? index : min;
-          },
-          intervals.count
-        );
-      }
-    }
-    if (bindFnToRow(row, scenario, this, fn, fnArgs)) {
-      startInterval = 0;
-    }
+    const { rowConstants, startInterval } = prepareRowConstants(
+      fn,
+      constants,
+      0,
+      intervals.count - 1,
+      intervals,
+      row.constants
+    );
+    bindFnToRow(row, scenario, this, fn, fnArgs);
+    row.constants = rowConstants;
     const rowstoUpdate = [row];
     if (row.dependents) {
       rowstoUpdate.push(
