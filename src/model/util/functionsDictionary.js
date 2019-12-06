@@ -1,4 +1,4 @@
-const coreFns = require("../fns/coreFunctions");
+const coreFns = require("../../fns/coreFunctions");
 
 class FunctionsDictionary {
   constructor() {

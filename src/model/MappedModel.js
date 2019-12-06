@@ -1,7 +1,7 @@
 const Model = require("./Model");
 const mappingGenerator = require("nanoid/non-secure").bind(null, 10);
-const modelMetadata = require("./modelMetadata");
-const serializer = require("./serializer");
+const modelMetadata = require("./util/modelMetadata");
+const serializer = require("./util/serializer");
 const { defaultScenario } = modelMetadata;
 
 const addKey = (type, fromMap, callMappings, key, doNotMap) => {
