@@ -32,7 +32,7 @@ const prepareRowConstants = ({
         ? Array(maxInterval + 1)
         : start > 0
         ? Array(start)
-        : [];
+        : existingConstants || [];
     if (start > 0) {
       for (let index = 0; index < start; index++) {
         rowConstants[index] = defaultValue;
