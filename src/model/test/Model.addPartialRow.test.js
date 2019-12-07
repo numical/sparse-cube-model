@@ -82,7 +82,7 @@ const testDefaults = {
     test("Add partial row of constants with a start, no end, and insufficient constants", t => {
       const rowName = "test row";
       const start = 5;
-      const constants = [50, 60, 70];
+      const constants = [50, 60, 70, 80];
       const model = new Type(testDefaults);
       t.throws(
         () =>

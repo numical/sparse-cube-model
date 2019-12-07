@@ -1,21 +1,30 @@
 const defaultValue = require("./defaultValue");
+const getIntervalFromDate = require("./getIntervalFromDate");
 
 const prepareRowConstants = ({
   fn,
   constants,
   start = 0,
   end,
-  maxInterval,
-  existingConstants
+  existingConstants,
+  intervals
 }) => {
-  if (!end) {
-    end = maxInterval;
-  }
   if (!fn && !constants) {
     throw new Error("No function or constants passed.");
   }
   if (fn && !fn.key) {
     throw new Error(`function '${fn.name}' must have a 'key' property.`);
+  }
+  const maxInterval = intervals.count - 1;
+  if (!end) {
+    end = maxInterval;
+  }
+  const calcIntervalFromDate = getIntervalFromDate(intervals);
+  if (start instanceof Date) {
+    start = calcIntervalFromDate(start);
+  }
+  if (end instanceof Date) {
+    end = calcIntervalFromDate(end);
   }
   if (!constants) {
     const rowConstants =
@@ -43,14 +52,21 @@ const prepareRowConstants = ({
   if (typeof constants !== "object") {
     throw new Error("Constants must be an array or an object.");
   }
-  const isArray = Array.isArray(constants);
+  if (constants instanceof Map) {
+    constants = Array.from(constants.entries()).reduce(
+      (constants, [key, value]) => {
+        const index = key instanceof Date ? calcIntervalFromDate(key) : key;
+        constants[index] = constants[index] ? constants[index] + value : value;
+        return constants;
+      },
+      {}
+    );
+  }
   if (!fn) {
-    const values = isArray
+    const values = Array.isArray(constants)
       ? constants
-      : constants instanceof Map
-      ? Array.from(constants.values())
       : Object.values(constants);
-    if (values.length < end - start) {
+    if (values.length <= end - start) {
       throw new Error(
         `Row has no function, but less constants than intervals.`
       );
@@ -58,7 +74,7 @@ const prepareRowConstants = ({
       throw new Error(`Row has no function, but undefined constants.`);
     }
   }
-  if (isArray) {
+  if (Array.isArray(constants)) {
     const startInterval =
       start > 0
         ? start
@@ -84,11 +100,8 @@ const prepareRowConstants = ({
       endInterval: end
     };
   }
-  const keys =
-    constants instanceof Map
-      ? Array.from(constants.keys())
-      : Object.keys(constants);
-  keys.forEach(key => {
+
+  Object.keys(constants).forEach(key => {
     if (Number.isNaN(Number.parseInt(key))) {
       throw new Error(`Constant key '${key}' must be an integer.`);
     } else if (key > end) {
@@ -102,11 +115,7 @@ const prepareRowConstants = ({
     ...Array(end + 1 - start),
     ...Array(maxInterval - end).fill(defaultValue)
   ];
-  const entries =
-    constants instanceof Map
-      ? Array.from(constants.entries())
-      : Object.entries(constants);
-  const startInterval = entries.reduce(
+  const startInterval = Object.entries(constants).reduce(
     (min, [index, value]) => {
       rowConstants[index] = value;
       return index < min ? index : min;

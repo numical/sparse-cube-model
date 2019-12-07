@@ -153,6 +153,23 @@ const rowName = "increment row";
       t.end();
     });
 
+    test("Update row updates some with constants Map of Dates", t => {
+      const constants = new Map([
+        [new Date(2020, 0, 31), 0],
+        [new Date(2020, 1, 29), 2],
+        [new Date(2020, 2, 1), 4],
+        [new Date(2020, 6, 31), 12],
+        [new Date(2020, 7, 31), 14],
+        [new Date(2020, 8, 30), 16],
+        [new Date(2020, 9, 31), 18]
+      ]);
+      const expected = [0, 2, 4, 5, 6, 7, 12, 14, 16, 18];
+      const { model } = testFixture(Type);
+      model.updateRow({ rowName, constants, fn: increment });
+      t.same(model.row({ rowName }), expected);
+      t.end();
+    });
+
     test("Update row with a non-array, non-object constants fails", t => {
       const constants = "should fail";
       const { model } = testFixture(Type);

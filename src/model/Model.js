@@ -1,6 +1,5 @@
 const Dense3DArray = require("../data-structures/Dense3DArray");
 const modelMetadata = require("./util/modelMetadata");
-const getIntervalFromDate = require("./util/getIntervalFromDate");
 const prepareRowConstants = require("./util/prepareRowConstants");
 const getRow = require("./util/getRow");
 const calculateRow = require("./util/calculateRow");
@@ -54,8 +53,7 @@ class Model extends Dense3DArray {
       constants,
       start,
       end,
-      maxInterval: intervals.count - 1,
-      getIntervalFromDate: getIntervalFromDate(this.#meta.intervals)
+      intervals
     });
     if (dependsOn) {
       dependsOn.forEach(providerName => {
@@ -93,9 +91,8 @@ class Model extends Dense3DArray {
     const { rowConstants, startInterval } = prepareRowConstants({
       fn,
       constants,
-      maxInterval: intervals.count - 1,
       existingConstants: row.constants,
-      getIntervalFromDate: getIntervalFromDate(this.#meta.intervals)
+      intervals
     });
     bindFnToRow(row, scenario, this, fn, fnArgs);
     row.constants = rowConstants;
