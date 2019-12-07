@@ -144,6 +144,25 @@ const testDefaults = {
       t.end();
     });
 
+    test("Add partial constants via Map", t => {
+      const rowName = "test row";
+      const constants = new Map([
+        [1, 10],
+        [3, 10],
+        [7, 10]
+      ]);
+      const expected = [0, 10, 2, 10, 4, 5, 6, 10, 8, 9];
+      const model = new Type(testDefaults);
+      model.addRow({
+        rowName,
+        constants,
+        fn: interval
+      });
+      const row = model.row({ rowName });
+      t.same(row, expected);
+      t.end();
+    });
+
     test("Add partial constants via object fails if keys are not integers", t => {
       const rowName = "test row";
       const constants = {
@@ -159,6 +178,21 @@ const testDefaults = {
       t.end();
     });
 
+    test("Add partial constants via Map fails if keys are not integers", t => {
+      const rowName = "test row";
+      const constants = new Map([
+        [1, 10],
+        ["a", 10],
+        [7, 10]
+      ]);
+      const model = new Type(testDefaults);
+      const args = { rowName: "test row", constants, fn: interval };
+      t.throws(() => {
+        model.addRow(args);
+      }, new Error("Constant key 'a' must be an integer."));
+      t.end();
+    });
+
     test("Add partial constants via object fails if indices greater than interval count", t => {
       const rowName = "test row";
       const constants = {
@@ -166,6 +200,21 @@ const testDefaults = {
         11: 10,
         7: 10
       };
+      const model = new Type(testDefaults);
+      const args = { rowName: "test row", constants, fn: interval };
+      t.throws(() => {
+        model.addRow(args);
+      }, new Error("Constant index 11 must be 9 or less."));
+      t.end();
+    });
+
+    test("Add partial constants via Map fails if indices greater than interval count", t => {
+      const rowName = "test row";
+      const constants = new Map([
+        [1, 10],
+        [11, 10],
+        [7, 10]
+      ]);
       const model = new Type(testDefaults);
       const args = { rowName: "test row", constants, fn: interval };
       t.throws(() => {
@@ -239,6 +288,25 @@ const testDefaults = {
       constants[2] = 13;
       constants[4] = 113;
       constants[6] = 0;
+      model.addRow({
+        rowName,
+        fn: increment,
+        constants
+      });
+      const row = model.row({ rowName });
+      t.same(row, [3, 4, 13, 14, 113, 114, 0, 1, 2, 3]);
+      t.end();
+    });
+
+    test("Add sequence row using multiple constants via Map", t => {
+      const rowName = "test row";
+      const model = new Type(testDefaults);
+      const constants = new Map([
+        [0, 3],
+        [2, 13],
+        [4, 113],
+        [6, 0]
+      ]);
       model.addRow({
         rowName,
         fn: increment,

@@ -42,7 +42,11 @@ const prepareRowConstants = (
   }
   const isArray = Array.isArray(constants);
   if (!fn) {
-    const values = isArray ? constants : Object.values(constants);
+    const values = isArray
+      ? constants
+      : constants instanceof Map
+      ? Array.from(constants.values())
+      : Object.values(constants);
     if (values.length < end - start) {
       throw new Error(
         `Row has no function, but less constants than intervals.`
@@ -77,13 +81,17 @@ const prepareRowConstants = (
       endInterval: end
     };
   }
-  Object.keys(constants).forEach(constant => {
-    if (Number.isNaN(Number.parseInt(constant))) {
-      throw new Error(`Constant key '${constant}' must be an integer.`);
-    } else if (constant > end) {
-      throw new Error(`Constant index ${constant} must be ${end} or less.`);
-    } else if (constant < start) {
-      throw new Error(`Constant index ${constant} must be ${start} or more.`);
+  const keys =
+    constants instanceof Map
+      ? Array.from(constants.keys())
+      : Object.keys(constants);
+  keys.forEach(key => {
+    if (Number.isNaN(Number.parseInt(key))) {
+      throw new Error(`Constant key '${key}' must be an integer.`);
+    } else if (key > end) {
+      throw new Error(`Constant index ${key} must be ${end} or less.`);
+    } else if (key < start) {
+      throw new Error(`Constant index ${key} must be ${start} or more.`);
     }
   });
   const rowConstants = existingConstants || [
@@ -91,7 +99,11 @@ const prepareRowConstants = (
     ...Array(end + 1 - start),
     ...Array(intervals.count - 1 - end).fill(defaultValue)
   ];
-  const startInterval = Object.entries(constants).reduce(
+  const entries =
+    constants instanceof Map
+      ? Array.from(constants.entries())
+      : Object.entries(constants);
+  const startInterval = entries.reduce(
     (min, [index, value]) => {
       rowConstants[index] = value;
       return index < min ? index : min;
