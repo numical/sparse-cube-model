@@ -18,12 +18,10 @@ class Model extends Dense3DArray {
   }
 
   #meta;
-  #getIntervalFromDate;
 
   constructor(meta = {}) {
     super({ defaultValue });
     this.#meta = modelMetadata(meta);
-    this.#getIntervalFromDate = getIntervalFromDate(this.#meta.intervals);
     this.recalculate();
   }
 
@@ -32,8 +30,8 @@ class Model extends Dense3DArray {
     scenarioName = defaultScenario,
     fn,
     fnArgs,
-    start = 0,
-    end = this.#meta.intervals.count - 1,
+    start,
+    end,
     constants,
     dependsOn
   }) {
@@ -51,13 +49,14 @@ class Model extends Dense3DArray {
         `Scenario '${scenarioName}' already has row '${rowName}'`
       );
     }
-    const { rowConstants } = prepareRowConstants(
+    const { rowConstants } = prepareRowConstants({
       fn,
       constants,
       start,
       end,
-      intervals
-    );
+      maxInterval: intervals.count - 1,
+      getIntervalFromDate: getIntervalFromDate(this.#meta.intervals)
+    });
     if (dependsOn) {
       dependsOn.forEach(providerName => {
         const provider = scenario.rows[providerName];
@@ -91,14 +90,13 @@ class Model extends Dense3DArray {
   }) {
     const { intervals, scenarios } = this.#meta;
     const { row, scenario } = getRow(rowName, scenarioName, scenarios);
-    const { rowConstants, startInterval } = prepareRowConstants(
+    const { rowConstants, startInterval } = prepareRowConstants({
       fn,
       constants,
-      0,
-      intervals.count - 1,
-      intervals,
-      row.constants
-    );
+      maxInterval: intervals.count - 1,
+      existingConstants: row.constants,
+      getIntervalFromDate: getIntervalFromDate(this.#meta.intervals)
+    });
     bindFnToRow(row, scenario, this, fn, fnArgs);
     row.constants = rowConstants;
     const rowstoUpdate = [row];

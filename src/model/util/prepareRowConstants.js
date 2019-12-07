@@ -1,13 +1,16 @@
 const defaultValue = require("./defaultValue");
 
-const prepareRowConstants = (
+const prepareRowConstants = ({
   fn,
   constants,
-  start,
+  start = 0,
   end,
-  intervals,
+  maxInterval,
   existingConstants
-) => {
+}) => {
+  if (!end) {
+    end = maxInterval;
+  }
   if (!fn && !constants) {
     throw new Error("No function or constants passed.");
   }
@@ -16,8 +19,8 @@ const prepareRowConstants = (
   }
   if (!constants) {
     const rowConstants =
-      end < intervals.count - 1
-        ? Array(intervals.count)
+      end < maxInterval
+        ? Array(maxInterval + 1)
         : start > 0
         ? Array(start)
         : [];
@@ -26,8 +29,8 @@ const prepareRowConstants = (
         rowConstants[index] = defaultValue;
       }
     }
-    if (end < intervals.count - 1) {
-      for (let index = end + 1; index < intervals.count; index++) {
+    if (end < maxInterval) {
+      for (let index = end + 1; index <= maxInterval; index++) {
         rowConstants[index] = defaultValue;
       }
     }
@@ -68,7 +71,7 @@ const prepareRowConstants = (
         : 0;
     const startDefaultArray = Array(start).fill(defaultValue);
     const calculatedValuesArray = Array(end + 1 - constants.length - start);
-    const endDefaultArray = Array(intervals.count - 1 - end).fill(defaultValue);
+    const endDefaultArray = Array(maxInterval - end).fill(defaultValue);
     const rowConstants = [
       ...startDefaultArray,
       ...constants,
@@ -97,7 +100,7 @@ const prepareRowConstants = (
   const rowConstants = existingConstants || [
     ...Array(start).fill(defaultValue),
     ...Array(end + 1 - start),
-    ...Array(intervals.count - 1 - end).fill(defaultValue)
+    ...Array(maxInterval - end).fill(defaultValue)
   ];
   const entries =
     constants instanceof Map
@@ -108,7 +111,7 @@ const prepareRowConstants = (
       rowConstants[index] = value;
       return index < min ? index : min;
     },
-    existingConstants ? intervals.count : start
+    existingConstants ? maxInterval : start
   );
   return {
     rowConstants,
