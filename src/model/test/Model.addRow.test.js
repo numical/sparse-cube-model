@@ -347,22 +347,33 @@ const testDefaults = {
     });
 
     test("Add multiple rows", t => {
-      const numRows = 3;
       const model = new Type(testDefaults);
       const rowNames = ["row 0", "row 1", "row2"];
-      rowNames.forEach(rowName => {
+      rowNames.forEach((rowName, index) => {
         model.addRow({
           rowName,
           fn: increment,
-          constants: [0]
+          constants: [index]
         });
       });
-      rowNames.forEach(rowName => {
+      rowNames.forEach((rowName, index) => {
         const row = model.row({ rowName });
-        t.same(row, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+        t.same(row, [
+          0 + index,
+          1 + index,
+          2 + index,
+          3 + index,
+          4 + index,
+          5 + index,
+          6 + index,
+          7 + index,
+          8 + index,
+          9 + index
+        ]);
       });
       t.end();
     });
+
     typeTests.end();
   });
 });

@@ -194,6 +194,20 @@ class MappedModel extends Model {
     });
   }
 
+  scenario({ scenarioName = defaultScenario } = {}) {
+    return unmapError(callMappings => {
+      return super.scenario({
+        scenarioName: fromKey(
+          "scenario",
+          this.#fromMap,
+          callMappings,
+          scenarioName,
+          defaultScenario
+        )
+      });
+    });
+  }
+
   addScenario({ scenarioName, copyOf = defaultScenario } = {}) {
     unmapError(callMappings => {
       super.addScenario({

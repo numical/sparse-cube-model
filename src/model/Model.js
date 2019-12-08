@@ -71,8 +71,7 @@ class Model extends Dense3DArray {
     }
     const row = {
       index: y,
-      constants: rowConstants,
-      name: rowName
+      constants: rowConstants
     };
     bindFnToRow(row, scenario, this, fn, fnArgs);
     scenario.rows[rowName] = row;
@@ -133,16 +132,17 @@ class Model extends Dense3DArray {
 
   deleteRows({ rowNames, scenarioName = defaultScenario }) {
     const { scenarios } = this.#meta;
-    const { rows, scenario } = rowNames.reduce(
-      ({ rows, scenario }, rowName) => {
+    const { rows, mappedRowNames, scenario } = rowNames.reduce(
+      ({ rows, mappedRowNames, scenario }, rowName) => {
         const { row: r, scenario: s } = getRow(
           rowName,
           scenarioName,
           scenarios
         );
-        return { rows: [...rows, r], scenario: s };
+        mappedRowNames[r] = rowName;
+        return { rows: [...rows, r], mappedRowNames, scenario: s };
       },
-      { rows: [] }
+      { rows: [], mappedRowNames: {} }
     );
     // can delete all if they are dependent only on each other
     rows.forEach(row => {
@@ -150,7 +150,7 @@ class Model extends Dense3DArray {
         row.dependents.forEach(dependent => {
           if (!rowNames.includes(dependent)) {
             throw new Error(
-              `Cannot delete row '${row.name}' as row '${dependent}' depends on it.`
+              `Cannot delete row '${mappedRowNames[row]}' as row '${dependent}' depends on it.`
             );
           }
         });
@@ -161,7 +161,7 @@ class Model extends Dense3DArray {
       .sort((r1, r2) => r2.index - r1.index)
       .forEach(row => {
         this.delete({ y: row.index });
-        delete scenario.rows[row.name];
+        delete scenario.rows[mappedRowNames[row]];
       });
   }
 
@@ -169,6 +169,15 @@ class Model extends Dense3DArray {
     const { scenarios } = this.#meta;
     const { row, scenario } = getRow(rowName, scenarioName, scenarios);
     return this.range({ y: row.index, z: scenario.index });
+  }
+
+  scenario({ scenarioName = defaultScenario } = {}) {
+    const { scenarios } = this.#meta;
+    const scenario = scenarios[scenarioName];
+    if (!scenario) {
+      throw new Error(`Unknown scenario '${scenarioName}'`);
+    }
+    return this.range({ z: scenario.index });
   }
 
   addScenario({ scenarioName, copyOf = defaultScenario } = {}) {

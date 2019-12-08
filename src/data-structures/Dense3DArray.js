@@ -193,26 +193,26 @@ class Dense3DArray {
       }
     } else if (x !== undefined && y === undefined && z === undefined) {
       this.#validate({ x });
-      for (y = 0; y < this.lengths.y; y++) {
-        values[y] = [];
-        for (z = 0; z < this.lengths.z; z++) {
-          values[y].push(this[x][y][z]);
+      for (z = 0; z < this.lengths.z; z++) {
+        values[z] = [];
+        for (y = 0; y < this.lengths.y; y++) {
+          values[z].push(this[x][y][z]);
         }
       }
     } else if (x === undefined && y !== undefined && z === undefined) {
       this.#validate({ y });
-      for (x = 0; x < this.lengths.x; x++) {
-        values[x] = [];
-        for (z = 0; z < this.lengths.z; z++) {
-          values[x].push(this[x][y][z]);
+      for (z = 0; z < this.lengths.z; z++) {
+        values[z] = [];
+        for (x = 0; x < this.lengths.x; x++) {
+          values[z].push(this[x][y][z]);
         }
       }
     } else if (x === undefined && y === undefined && z !== undefined) {
       this.#validate({ z });
-      for (x = 0; x < this.lengths.x; x++) {
-        values[x] = [];
-        for (y = 0; y < this.lengths.y; y++) {
-          values[x].push(this[x][y][z]);
+      for (y = 0; y < this.lengths.y; y++) {
+        values[y] = [];
+        for (x = 0; x < this.lengths.x; x++) {
+          values[y].push(this[x][y][z]);
         }
       }
     } else {

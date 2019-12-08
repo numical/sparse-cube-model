@@ -139,6 +139,7 @@ const testFixture = require("./testFixture");
       t.same(model.range({ y: 3, z: 1 }), [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
       t.end();
     });
+
     typeTests.end();
   });
 });

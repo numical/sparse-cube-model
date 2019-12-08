@@ -11,8 +11,13 @@ const lookup = ({ model, scenario, row, reference }, interval) =>
   model[interval][scenario.rows[reference].index][scenario.index];
 lookup.key = `${keyPrefix}lookup`;
 
+const previous = ({ model, scenario, row }, interval) =>
+  model[interval - 1][row.index][scenario.index];
+previous.key = `${keyPrefix}previous`;
+
 module.exports = {
   increment,
   interval,
-  lookup
+  lookup,
+  previous
 };
