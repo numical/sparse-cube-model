@@ -1,7 +1,7 @@
 const tap = require("tap");
 const Model = require("../Model");
 const MappedModel = require("../MappedModel");
-const { increment, interval } = require("../../fns/coreFunctions");
+const { increment, interval, previous } = require("../../fns/coreFunctions");
 
 const sequence = (length, mapFn = (_, i) => i) => Array.from({ length }, mapFn);
 
@@ -263,6 +263,19 @@ const testDefaults = {
       });
       const row = model.row({ rowName });
       t.same(row, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+      t.end();
+    });
+
+    test("Add fixed value row using initial constant", t => {
+      const rowName = "test row";
+      const model = new Type(testDefaults);
+      model.addRow({
+        rowName,
+        fn: previous,
+        constants: [8]
+      });
+      const row = model.row({ rowName });
+      t.same(row, [8, 8, 8, 8, 8, 8, 8, 8, 8, 8]);
       t.end();
     });
 

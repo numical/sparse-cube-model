@@ -56,6 +56,9 @@ class Model extends Dense3DArray {
       intervals
     });
     if (dependsOn) {
+      if (!Array.isArray(dependsOn)) {
+        dependsOn = [ dependsOn ];
+      }
       dependsOn.forEach(providerName => {
         const provider = scenario.rows[providerName];
         if (!provider) {
@@ -139,10 +142,10 @@ class Model extends Dense3DArray {
           scenarioName,
           scenarios
         );
-        mappedRowNames[r] = rowName;
+        mappedRowNames.set(r, rowName);
         return { rows: [...rows, r], mappedRowNames, scenario: s };
       },
-      { rows: [], mappedRowNames: {} }
+      { rows: [], mappedRowNames: new Map() }
     );
     // can delete all if they are dependent only on each other
     rows.forEach(row => {
@@ -150,7 +153,7 @@ class Model extends Dense3DArray {
         row.dependents.forEach(dependent => {
           if (!rowNames.includes(dependent)) {
             throw new Error(
-              `Cannot delete row '${mappedRowNames[row]}' as row '${dependent}' depends on it.`
+              `Cannot delete row '${mappedRowNames.get(row)}' as row '${dependent}' depends on it.`
             );
           }
         });
@@ -161,7 +164,7 @@ class Model extends Dense3DArray {
       .sort((r1, r2) => r2.index - r1.index)
       .forEach(row => {
         this.delete({ y: row.index });
-        delete scenario.rows[mappedRowNames[row]];
+        delete scenario.rows[mappedRowNames.get(row)];
       });
   }
 
@@ -177,7 +180,7 @@ class Model extends Dense3DArray {
     if (!scenario) {
       throw new Error(`Unknown scenario '${scenarioName}'`);
     }
-    return this.range({ z: scenario.index });
+    return this.isEmpty() ? [] : this.range({ z: scenario.index });
   }
 
   addScenario({ scenarioName, copyOf = defaultScenario } = {}) {
@@ -185,16 +188,25 @@ class Model extends Dense3DArray {
     if (!scenarioName) {
       throw new Error("A scenario name is required.");
     }
-    if (!scenarios[copyOf]) {
+    const scenarioToCopy = scenarios[copyOf];
+    if (!scenarioToCopy) {
       throw new Error(`Unknown scenario '${copyOf}'`);
     }
+    const copiedRows = Object.entries(scenarioToCopy.rows).reduce(
+        (copy, [rowName, row]) => {
+          copy[rowName] = {
+            ...row,
+            fn: row.fn.unbound
+          };
+          return copy;
+        },
+        {}
+    );
     scenarios[scenarioName] = {
-      index: this.lengths.z,
-      rows: { ...scenarios[copyOf].rows }
+      index: this.isEmpty() ? 1 : this.lengths.z,
+      rows: copiedRows
     };
-    if (!this.isEmpty()) {
-      this.duplicate({ z: scenarios[copyOf].index });
-    }
+    this.recalculate({ scenarioName });
   }
 
   deleteScenario(scenarioName) {
@@ -213,10 +225,11 @@ class Model extends Dense3DArray {
     this.delete({ z: scenario.index });
   }
 
-  recalculate() {
+  recalculate( { scenarioName } =  {}) {
     // compareByIndex a good proxy for dependencies
     const { intervals, scenarios } = this.#meta;
-    Object.values(scenarios)
+    const toRecalc = scenarioName ? [scenarios[scenarioName]] : scenarios;
+    Object.values(toRecalc)
       .sort(compareByIndex)
       .forEach(scenario => {
         Object.values(scenario.rows)
