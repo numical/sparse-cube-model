@@ -12,13 +12,14 @@
   "devDependencies": {
     "faucet": "0.0.1",
     "prettier": "^1.19.1",
-    "tap": "^14.10.2"
+    "tap": "^14.10.2",
+    "testdouble": "^3.12.4"
   },
   "scripts": {
     "test": "tap src/**/*.test.js --100",
     "test:debug": "DEBUG=sparse-cube-model:* tap --only --timeout=600 --no-coverage src/**/*.test.js",
     "test:only": "tap --only --timeout=600 --no-coverage src/**/*.test.js",
-    "test:focus": "tap --timeout=600 --no-coverage src/**/Model.addScenario.test.js",
+    "test:focus": "tap --timeout=600 --no-coverage src/**/coreFunctions.test.js",
     "test:model": "tap --timeout=600 --no-coverage src/**/Model.**.test.js",
     "test:d3da": "tap --timeout=600 --no-coverage src/**/Dense3DArray.**.test.js"
   },

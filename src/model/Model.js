@@ -57,7 +57,7 @@ class Model extends Dense3DArray {
     });
     if (dependsOn) {
       if (!Array.isArray(dependsOn)) {
-        dependsOn = [ dependsOn ];
+        dependsOn = [dependsOn];
       }
       dependsOn.forEach(providerName => {
         const provider = scenario.rows[providerName];
@@ -76,7 +76,7 @@ class Model extends Dense3DArray {
       index: y,
       constants: rowConstants
     };
-    bindFnToRow(row, scenario, this, fn, fnArgs);
+    bindFnToRow(this, this.#meta.intervals, scenario, row, fn, fnArgs);
     scenario.rows[rowName] = row;
     calculateRow(row, scenario, 0, intervals.count - 1, this.set);
   }
@@ -96,7 +96,7 @@ class Model extends Dense3DArray {
       existingConstants: row.constants,
       intervals
     });
-    bindFnToRow(row, scenario, this, fn, fnArgs);
+    bindFnToRow(this, this.#meta.intervals, scenario, row, fn, fnArgs);
     row.constants = rowConstants;
     const rowstoUpdate = [row];
     if (row.dependents) {
@@ -153,7 +153,9 @@ class Model extends Dense3DArray {
         row.dependents.forEach(dependent => {
           if (!rowNames.includes(dependent)) {
             throw new Error(
-              `Cannot delete row '${mappedRowNames.get(row)}' as row '${dependent}' depends on it.`
+              `Cannot delete row '${mappedRowNames.get(
+                row
+              )}' as row '${dependent}' depends on it.`
             );
           }
         });
@@ -193,14 +195,14 @@ class Model extends Dense3DArray {
       throw new Error(`Unknown scenario '${copyOf}'`);
     }
     const copiedRows = Object.entries(scenarioToCopy.rows).reduce(
-        (copy, [rowName, row]) => {
-          copy[rowName] = {
-            ...row,
-            fn: row.fn.unbound
-          };
-          return copy;
-        },
-        {}
+      (copy, [rowName, row]) => {
+        copy[rowName] = {
+          ...row,
+          fn: row.fn.unbound
+        };
+        return copy;
+      },
+      {}
     );
     scenarios[scenarioName] = {
       index: this.isEmpty() ? 1 : this.lengths.z,
@@ -225,7 +227,7 @@ class Model extends Dense3DArray {
     this.delete({ z: scenario.index });
   }
 
-  recalculate( { scenarioName } =  {}) {
+  recalculate({ scenarioName } = {}) {
     // compareByIndex a good proxy for dependencies
     const { intervals, scenarios } = this.#meta;
     const toRecalc = scenarioName ? [scenarios[scenarioName]] : scenarios;
@@ -235,7 +237,14 @@ class Model extends Dense3DArray {
         Object.values(scenario.rows)
           .sort(compareByIndex)
           .forEach(row => {
-            bindFnToRow(row, scenario, this, row.fn, row.fnArgs);
+            bindFnToRow(
+              this,
+              this.#meta.intervals,
+              scenario,
+              row,
+              row.fn,
+              row.fnArgs
+            );
             calculateRow(row, scenario, 0, intervals.count - 1, this.set);
           });
       });

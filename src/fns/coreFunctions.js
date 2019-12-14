@@ -15,9 +15,22 @@ const previous = ({ model, scenario, row }, interval) =>
   model[interval - 1][row.index][scenario.index];
 previous.key = `${keyPrefix}previous`;
 
+const intervalsPerYear = ({ intervals }) => {
+  switch (intervals.duration) {
+    case "month":
+      return 12;
+    case "year":
+      return 1;
+    default:
+      throw new Error(`Unknown duration '${intervals.duration}'.`);
+  }
+};
+intervalsPerYear.key = "intervalsPerYear";
+
 module.exports = {
   increment,
   interval,
+  intervalsPerYear,
   lookup,
   previous
 };

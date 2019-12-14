@@ -1,4 +1,4 @@
-const { test, only } = require("tap");
+const { test } = require("tap");
 const Dense3DArray = require("../Dense3DArray");
 const iterate3D = require("../iterate3D");
 

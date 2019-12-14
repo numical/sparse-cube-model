@@ -1,7 +1,13 @@
-const bindFnToRow = (row, scenario, model, fn, fnArgs) => {
+const bindFnToRow = (model, intervals, scenario, row, fn, fnArgs) => {
   if (fn) {
     const fnToBind = fn.unbound || fn;
-    const boundFn = fnToBind.bind(this, { model, scenario, row, ...fnArgs });
+    const boundFn = fnToBind.bind(this, {
+      model,
+      intervals,
+      scenario,
+      row,
+      ...fnArgs
+    });
     boundFn.key = fn.key;
     boundFn.unbound = fnToBind;
     row.fn = boundFn;

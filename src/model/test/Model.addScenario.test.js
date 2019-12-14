@@ -1,7 +1,12 @@
 const tap = require("tap");
 const Model = require("../Model");
 const MappedModel = require("../MappedModel");
-const { increment, interval, lookup, previous } = require("../../fns/coreFunctions");
+const {
+  increment,
+  interval,
+  lookup,
+  previous
+} = require("../../fns/coreFunctions");
 const iterate2D = require("../../data-structures/iterate2D");
 const testFixture = require("./testFixture");
 
@@ -185,20 +190,23 @@ const testFixture = require("./testFixture");
     });
 
     test("scenario with unknown name errors", t => {
-      const model = new Type({intervals: {count: 3}});
-      t.throws(() => model.scenario({scenarioName: 'unknown'}), new Error("Unknown scenario 'unknown'"));
+      const model = new Type({ intervals: { count: 3 } });
+      t.throws(
+        () => model.scenario({ scenarioName: "unknown" }),
+        new Error("Unknown scenario 'unknown'")
+      );
       t.end();
     });
 
     test("scenario with default scenario returns OK", t => {
-      const model = new Type({intervals: {count: 3}});
+      const model = new Type({ intervals: { count: 3 } });
       model.addRow({ rowName: "default scenario row", fn: interval });
       t.same(model.scenario(), [[0, 1, 2]]);
       t.end();
     });
 
     test("scenario with default empty scenario returns empty array", t => {
-      const model = new Type({intervals: {count: 3}});
+      const model = new Type({ intervals: { count: 3 } });
       t.same(model.scenario(), []);
       t.end();
     });
@@ -209,7 +217,7 @@ const testFixture = require("./testFixture");
       const scenarioName = "scenario 1";
       const rowNames = ["row 0", "row 1", "row 2"];
       const fn = ({ scenario, row }, index) =>
-          `${index},${row.index},${scenario.index}`;
+        `${index},${row.index},${scenario.index}`;
       fn.key = "testfn";
       model.addScenario({ scenarioName });
       rowNames.forEach(rowName => {
@@ -222,22 +230,10 @@ const testFixture = require("./testFixture");
 
       const scenario1 = model.scenario({ scenarioName });
       t.same(scenario1, [
-        [ 0, 1, 2],
-        [
-          "0,1,1",
-          "1,1,1",
-          "2,1,1"
-        ],
-        [
-          "0,2,1",
-          "1,2,1",
-          "2,2,1"
-        ],
-        [
-          "0,3,1",
-          "1,3,1",
-          "2,3,1"
-        ]
+        [0, 1, 2],
+        ["0,1,1", "1,1,1", "2,1,1"],
+        ["0,2,1", "1,2,1", "2,2,1"],
+        ["0,3,1", "1,3,1", "2,3,1"]
       ]);
 
       t.end();
@@ -245,33 +241,71 @@ const testFixture = require("./testFixture");
 
     test("Add scenario based on empty default", t => {
       const scenarioName = "test scenario";
-      const model = new Type({intervals: {count: 3}});
+      const model = new Type({ intervals: { count: 3 } });
       model.addScenario({ scenarioName });
       t.same(model.scenario({ scenarioName }), []);
       t.end();
     });
 
-    test('Mutating a scenario based on an empty default is fine', t => {
+    test("Mutating a scenario based on an empty default is fine", t => {
       const scenarioName = "test scenario";
-      const model = new Type({intervals: {count: 3}});
+      const model = new Type({ intervals: { count: 3 } });
       model.addScenario({ scenarioName });
-      model.addRow({ scenarioName, rowName: 'row 0', fn: previous, constants: [5,6] });
-      model.addRow({ scenarioName, rowName: 'row 1', fn: lookup, fnArgs: { reference: 'row 0' }});
-      t.same(model.scenario({ scenarioName }), [[5, 6, 6], [5, 6, 6]]);
+      model.addRow({
+        scenarioName,
+        rowName: "row 0",
+        fn: previous,
+        constants: [5, 6]
+      });
+      model.addRow({
+        scenarioName,
+        rowName: "row 1",
+        fn: lookup,
+        fnArgs: { reference: "row 0" }
+      });
+      t.same(model.scenario({ scenarioName }), [
+        [5, 6, 6],
+        [5, 6, 6]
+      ]);
       // and default is still fine
-      t.same(model.scenario({ scenarioName: 'defaultScenario' }), [[0, 0, 0], [0, 0, 0]]);
+      t.same(model.scenario({ scenarioName: "defaultScenario" }), [
+        [0, 0, 0],
+        [0, 0, 0]
+      ]);
       t.end();
     });
 
-    test('Mutating then updating a scenario based on an empty default is fine', t => {
+    test("Mutating then updating a scenario based on an empty default is fine", t => {
       const scenarioName = "test scenario";
-      const model = new Type({intervals: {count: 3}});
+      const model = new Type({ intervals: { count: 3 } });
       model.addScenario({ scenarioName });
-      model.addRow({ scenarioName, rowName: 'row 0', fn: previous, constants: [5,6] });
-      model.addRow({ scenarioName, rowName: 'row 1', fn: lookup, fnArgs: { reference: 'row 0' }, dependsOn: 'row 0'});
-      model.updateRow({ scenarioName, rowName: 'row 0', fn: increment, constants: [1] });
-      t.same(model.scenario({ scenarioName }), [[1, 2, 3], [1, 2, 3]]);
-      t.same(model.scenario({ scenarioName: 'defaultScenario' }), [[0, 0, 0], [0, 0, 0]]);
+      model.addRow({
+        scenarioName,
+        rowName: "row 0",
+        fn: previous,
+        constants: [5, 6]
+      });
+      model.addRow({
+        scenarioName,
+        rowName: "row 1",
+        fn: lookup,
+        fnArgs: { reference: "row 0" },
+        dependsOn: "row 0"
+      });
+      model.updateRow({
+        scenarioName,
+        rowName: "row 0",
+        fn: increment,
+        constants: [1]
+      });
+      t.same(model.scenario({ scenarioName }), [
+        [1, 2, 3],
+        [1, 2, 3]
+      ]);
+      t.same(model.scenario({ scenarioName: "defaultScenario" }), [
+        [0, 0, 0],
+        [0, 0, 0]
+      ]);
       t.end();
     });
 
@@ -280,7 +314,7 @@ const testFixture = require("./testFixture");
       model.addRow({ rowName: "default scenario row", fn: interval });
       const rowNames = ["row 0", "row 1", "row 2"];
       const fn = ({ scenario, row }, index) =>
-          `${index},${row.index},${scenario.index}`;
+        `${index},${row.index},${scenario.index}`;
       fn.key = "testfn";
       model.addScenario({ scenarioName: "scenario 1" });
       rowNames.forEach(rowName => {
@@ -290,46 +324,22 @@ const testFixture = require("./testFixture");
           fn
         });
       });
-      model.addScenario({ scenarioName: "scenario 2", copyOf: 'scenario 1' });
+      model.addScenario({ scenarioName: "scenario 2", copyOf: "scenario 1" });
 
       const scenario1 = model.scenario({ scenarioName: "scenario 1" });
       t.same(scenario1, [
-        [ 0, 1, 2],
-        [
-          "0,1,1",
-          "1,1,1",
-          "2,1,1"
-        ],
-        [
-          "0,2,1",
-          "1,2,1",
-          "2,2,1"
-        ],
-        [
-          "0,3,1",
-          "1,3,1",
-          "2,3,1"
-        ]
+        [0, 1, 2],
+        ["0,1,1", "1,1,1", "2,1,1"],
+        ["0,2,1", "1,2,1", "2,2,1"],
+        ["0,3,1", "1,3,1", "2,3,1"]
       ]);
 
       const scenario2 = model.scenario({ scenarioName: "scenario 2" });
       t.same(scenario2, [
-        [ 0, 1, 2],
-        [
-          "0,1,2",
-          "1,1,2",
-          "2,1,2"
-        ],
-        [
-          "0,2,2",
-          "1,2,2",
-          "2,2,2"
-        ],
-        [
-          "0,3,2",
-          "1,3,2",
-          "2,3,2"
-        ]
+        [0, 1, 2],
+        ["0,1,2", "1,1,2", "2,1,2"],
+        ["0,2,2", "1,2,2", "2,2,2"],
+        ["0,3,2", "1,3,2", "2,3,2"]
       ]);
 
       t.end();
@@ -339,7 +349,7 @@ const testFixture = require("./testFixture");
       const model = new Type({ intervals: { count: 3 } });
       const rowNames = ["row 0", "row 1", "row 2"];
       const fn = ({ scenario, row }, index) =>
-          `${index},${row.index},${scenario.index}`;
+        `${index},${row.index},${scenario.index}`;
       fn.key = "testfn";
       model.addScenario({ scenarioName: "scenario 1" });
       rowNames.forEach(rowName => {
@@ -349,44 +359,20 @@ const testFixture = require("./testFixture");
           fn
         });
       });
-      model.addScenario({ scenarioName: "scenario 2", copyOf: 'scenario 1' });
+      model.addScenario({ scenarioName: "scenario 2", copyOf: "scenario 1" });
 
       const scenario1 = model.scenario({ scenarioName: "scenario 1" });
       t.same(scenario1, [
-        [
-          "0,0,1",
-          "1,0,1",
-          "2,0,1"
-        ],
-        [
-          "0,1,1",
-          "1,1,1",
-          "2,1,1"
-        ],
-        [
-          "0,2,1",
-          "1,2,1",
-          "2,2,1"
-        ]
+        ["0,0,1", "1,0,1", "2,0,1"],
+        ["0,1,1", "1,1,1", "2,1,1"],
+        ["0,2,1", "1,2,1", "2,2,1"]
       ]);
 
       const scenario2 = model.scenario({ scenarioName: "scenario 2" });
       t.same(scenario2, [
-        [
-          "0,0,2",
-          "1,0,2",
-          "2,0,2"
-        ],
-        [
-          "0,1,2",
-          "1,1,2",
-          "2,1,2"
-        ],
-        [
-          "0,2,2",
-          "1,2,2",
-          "2,2,2"
-        ]
+        ["0,0,2", "1,0,2", "2,0,2"],
+        ["0,1,2", "1,1,2", "2,1,2"],
+        ["0,2,2", "1,2,2", "2,2,2"]
       ]);
 
       t.end();
