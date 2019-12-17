@@ -7,8 +7,8 @@ const cacheKey = (annualPercent, { intervals }) =>
 
 const getAnnualisedIntervalMultiplier = memoizeWith(
   cacheKey,
-  (annualPercent, args) =>
-    add(divide(annualPercent, multiply(intervalsPerYear(args), 100)), 1)
+  (annualPercent, ...args) =>
+    add(divide(annualPercent, multiply(intervalsPerYear(...args), 100)), 1)
 );
 
 // https://money.stackexchange.com/questions/51728/converting-annual-interest-rate-to-monthly-when-compounding-frequency-known
@@ -16,29 +16,35 @@ const getAnnualisedIntervalMultiplier = memoizeWith(
 // Where:- FV = Future Value P = Principal R = Rate of interest n = time.
 const getAnnualisedCompoundIntervalMultiplier = memoizeWith(
   cacheKey,
-  (annualPercent, args) =>
-    power(add(1, divide(annualPercent, 100)), divide(1, intervalsPerYear(args)))
+  (annualPercent, ...args) =>
+    power(
+      add(1, divide(annualPercent, 100)),
+      divide(1, intervalsPerYear(...args))
+    )
 );
 
-const applyInterest = args => {
-  const amount = previous(args);
-  const percent = lookup(args);
+const applyInterest = (...args) => {
+  const amount = previous(...args);
+  const percent = lookup(...args);
   return add(amount, multiply(amount, divide(percent, 100)));
 };
 applyInterest.key = "applyInterest";
 
-const applyAnnualisedInterest = args => {
-  const amount = previous(args);
-  const annualPercent = lookup(args);
-  const percent = getAnnualisedIntervalMultiplier(annualPercent, args);
+const applyAnnualisedInterest = (...args) => {
+  const amount = previous(...args);
+  const annualPercent = lookup(...args);
+  const percent = getAnnualisedIntervalMultiplier(annualPercent, ...args);
   return multiply(amount, percent);
 };
 applyAnnualisedInterest.key = "applyAnnualisedInterest";
 
-const applyAnnualisedCompoundInterest = args => {
-  const amount = previous(args);
-  const annualPercent = lookup(args);
-  const percent = getAnnualisedCompoundIntervalMultiplier(annualPercent, args);
+const applyAnnualisedCompoundInterest = (...args) => {
+  const amount = previous(...args);
+  const annualPercent = lookup(...args);
+  const percent = getAnnualisedCompoundIntervalMultiplier(
+    annualPercent,
+    ...args
+  );
   return multiply(amount, percent);
 };
 applyAnnualisedCompoundInterest.key = "applyAnnualisedCompoundInterest";

@@ -1,33 +1,43 @@
-const asTable = require("as-table");
 const Model = require("../model/Model");
 const MappedModel = require("../model/MappedModel");
-const { lookup, previous } = require("../fns/coreFunctions");
+const { interval, previous } = require("../fns/coreFunctions");
+const {
+  applyAnnualisedInterest,
+  applyAnnualisedCompoundInterest
+} = require("../fns/interestFunctions");
+const tablePrint = require("./tablePrint");
 
-const model = new MappedModel({
+const model = new Model({
   intervals: {
-    count: 12
+    count: 13
   }
 });
 
 model.addRow({
-  rowName: "income",
+  rowName: "interval",
+  fn: interval
+});
+
+model.addRow({
+  rowName: "interest rate",
   fn: previous,
-  constants: [2000]
+  constants: [3]
 });
 
 model.addRow({
-  rowName: "lookup income",
-  fn: lookup,
-  fnArgs: { reference: "income" }
+  rowName: "total",
+  fn: applyAnnualisedInterest,
+  fnArgs: { reference: "interest rate" },
+  constants: [1000]
 });
 
 model.addRow({
-  rowName: "temporary income",
-  start: 4,
-  end: 6,
-  constants: [300, 400, 500]
+  rowName: "compound total",
+  fn: applyAnnualisedCompoundInterest,
+  fnArgs: { reference: "interest rate" },
+  constants: [1000]
 });
 
-// console.log(model.stringify({ pretty: true }));
-console.log(asTable(model.scenario()));
-console.log(model.row({ rowName: "temporary income" }));
+tablePrint(model);
+
+// console.log(model.stringify());
