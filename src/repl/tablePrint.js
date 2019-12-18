@@ -1,3 +1,7 @@
+/*
+ Note: uses internal knowledge of Model serialization and metadata structure.
+ */
+
 const asTable = require("as-table");
 
 const tablePrint = (model, printFn = console.log) => {

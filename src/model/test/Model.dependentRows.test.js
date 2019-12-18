@@ -2,7 +2,7 @@ const tap = require("tap");
 const Model = require("../Model");
 const MappedModel = require("../MappedModel");
 const testFixture = require("./testFixture");
-const { increment } = require("../../fns/coreFunctions");
+const { increment, lookup } = require("../../fns/coreFunctions");
 
 [Model, MappedModel].forEach(Type => {
   tap.test(`${Type.name} tests: `, typeTests => {
@@ -49,6 +49,21 @@ const { increment } = require("../../fns/coreFunctions");
         });
       t.end();
     });
+
+    test("Update row dependsOn", t => {
+      const expected = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
+      const { model, rows } = testFixture(Type);
+      const rowName = "second lookup row";
+      model.updateRow({
+        rowName,
+        fn: lookup,
+        fnArgs: { reference: "independent row" },
+        dependsOn: ["independent row"]
+      });
+      t.same(model.row({ rowName }), expected);
+      t.end();
+    });
+
     typeTests.end();
   });
 });

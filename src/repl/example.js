@@ -25,6 +25,12 @@ model.addRow({
 });
 
 model.addRow({
+  rowName: "contributions",
+  fn: previous,
+  constants: [300]
+});
+
+model.addRow({
   rowName: "total",
   fn: applyAnnualisedInterest,
   fnArgs: { reference: "interest rate" },

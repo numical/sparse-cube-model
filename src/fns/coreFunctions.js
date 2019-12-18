@@ -15,6 +15,10 @@ const previous = ({ model, scenario, row }, interval) =>
   model[interval - 1][row.index][scenario.index];
 previous.key = `${keyPrefix}previous`;
 
+const lookupPrevious = ({ model, scenario, row, reference }, interval) =>
+  model[interval - 1][scenario.rows[reference].index][scenario.index];
+lookupPrevious.key = `${keyPrefix}lookupPrevious`;
+
 const intervalsPerYear = ({ intervals }) => {
   switch (intervals.duration) {
     case "month":
@@ -32,5 +36,6 @@ module.exports = {
   interval,
   intervalsPerYear,
   lookup,
+  lookupPrevious,
   previous
 };

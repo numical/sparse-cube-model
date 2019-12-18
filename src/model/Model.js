@@ -5,6 +5,7 @@ const getRow = require("./util/getRow");
 const calculateRow = require("./util/calculateRow");
 const bindFnToRow = require("./util/bindFnToRow");
 const compareByIndex = require("./util/compareByIndex");
+const linkDependentRows = require("./util/linkDependentRows");
 const serializer = require("./util/serializer");
 const defaultValue = require("./util/defaultValue");
 
@@ -55,28 +56,20 @@ class Model extends Dense3DArray {
       end,
       intervals
     });
-    if (dependsOn) {
-      if (!Array.isArray(dependsOn)) {
-        dependsOn = [dependsOn];
-      }
-      dependsOn.forEach(providerName => {
-        const provider = scenario.rows[providerName];
-        if (!provider) {
-          throw new Error(`Depends on unknown row '${rowName}'`);
-        } else {
-          if (provider.dependents) {
-            provider.dependents.push(rowName);
-          } else {
-            provider.dependents = [rowName];
-          }
-        }
-      });
-    }
+    linkDependentRows(scenario, rowName, dependsOn);
     const row = {
       index: y,
       constants: rowConstants
     };
-    bindFnToRow(this, this.#meta.intervals, scenario, row, fn, fnArgs);
+    bindFnToRow(
+      this,
+      this.#meta.intervals,
+      scenario,
+      row,
+      fn,
+      fnArgs,
+      dependsOn
+    );
     scenario.rows[rowName] = row;
     calculateRow(row, scenario, 0, intervals.count - 1, this.set);
   }
@@ -86,7 +79,8 @@ class Model extends Dense3DArray {
     scenarioName = defaultScenario,
     fn,
     fnArgs,
-    constants
+    constants,
+    dependsOn
   }) {
     const { intervals, scenarios } = this.#meta;
     const { row, scenario } = getRow(rowName, scenarioName, scenarios);
@@ -96,7 +90,16 @@ class Model extends Dense3DArray {
       existingConstants: row.constants,
       intervals
     });
-    bindFnToRow(this, this.#meta.intervals, scenario, row, fn, fnArgs);
+    linkDependentRows(scenario, rowName, dependsOn);
+    bindFnToRow(
+      this,
+      this.#meta.intervals,
+      scenario,
+      row,
+      fn,
+      fnArgs,
+      dependsOn
+    );
     row.constants = rowConstants;
     const rowstoUpdate = [row];
     if (row.dependents) {
