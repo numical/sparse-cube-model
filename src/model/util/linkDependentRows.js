@@ -1,9 +1,7 @@
 const linkDependentRows = (scenario, rowName, dependsOn) => {
   if (dependsOn) {
-    if (!Array.isArray(dependsOn)) {
-      dependsOn = [dependsOn];
-    }
-    dependsOn.forEach(providerName => {
+    const array = Array.isArray(dependsOn) ? dependsOn : [dependsOn];
+    array.forEach(providerName => {
       const provider = scenario.rows[providerName];
       if (!provider) {
         throw new Error(`Depends on unknown row '${rowName}'`);

@@ -1,5 +1,9 @@
 const Model = require("../Model");
-const { increment, lookup } = require("../../fns/coreFunctions");
+const {
+  increment,
+  lookup,
+  lookupPrevious
+} = require("../../fns/coreFunctions");
 
 const rows = [
   {
@@ -10,8 +14,7 @@ const rows = [
   {
     rowName: "first lookup row",
     fn: lookup,
-    fnArgs: { reference: "increment row" },
-    dependsOn: ["increment row"]
+    dependsOn: "increment row"
   },
   {
     rowName: "independent row",
@@ -20,9 +23,9 @@ const rows = [
   },
   {
     rowName: "second lookup row",
-    fn: lookup,
-    fnArgs: { reference: "increment row" },
-    dependsOn: ["increment row"]
+    fn: lookupPrevious,
+    constants: [1000],
+    dependsOn: ["increment row"] // note: deliberate array
   }
 ];
 

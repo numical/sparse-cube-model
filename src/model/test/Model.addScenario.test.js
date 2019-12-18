@@ -184,7 +184,7 @@ const testFixture = require("./testFixture");
       const { model } = testFixture(Type);
       model.addScenario({ scenarioName });
       model.deleteRow({ rowName, scenarioName });
-      t.same(model.range({ y: 3, z: 0 }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+      t.same(model.range({ y: 3, z: 0 }), [1000, 0, 1, 2, 3, 4, 5, 6, 7, 8]);
       t.same(model.range({ y: 3, z: 1 }), [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
       t.end();
     });
@@ -261,7 +261,7 @@ const testFixture = require("./testFixture");
         scenarioName,
         rowName: "row 1",
         fn: lookup,
-        fnArgs: { reference: "row 0" }
+        dependsOn: "row 0"
       });
       t.same(model.scenario({ scenarioName }), [
         [5, 6, 6],

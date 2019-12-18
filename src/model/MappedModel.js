@@ -36,14 +36,7 @@ const fromKey = (type, fromMap, callMappings, key, doNotMap) => {
     } else if (Array.isArray(key)) {
       return key.map(fromKey.bind(null, type, fromMap, callMappings));
     } else if (typeof key === "object") {
-      if (key.reference) {
-        // if an object (fnArgs probably) which has a 'reference' property
-        const mapped = fromMap[type][key.reference];
-        callMappings[mapped] = key;
-        return { ...key, reference: mapped };
-      } else {
-        return key;
-      }
+      return key;
     } else {
       const mapped = fromMap[type][key];
       if (!mapped) {
@@ -128,7 +121,8 @@ class MappedModel extends Model {
     scenarioName = defaultScenario,
     fn,
     fnArgs,
-    constants
+    constants,
+    dependsOn
   }) {
     unmapError(callMappings => {
       super.updateRow({
@@ -142,7 +136,8 @@ class MappedModel extends Model {
         rowName: fromKey("row", this.#fromMap, callMappings, rowName),
         fn,
         fnArgs: fromKey("row", this.#fromMap, callMappings, fnArgs),
-        constants
+        constants,
+        dependsOn: fromKey("row", this.#fromMap, callMappings, dependsOn)
       });
     });
   }

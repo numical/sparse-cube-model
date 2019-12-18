@@ -33,14 +33,14 @@ model.addRow({
 model.addRow({
   rowName: "total",
   fn: applyAnnualisedInterest,
-  fnArgs: { reference: "interest rate" },
+  dependsOn: "interest rate",
   constants: [1000]
 });
 
 model.addRow({
   rowName: "compound total",
   fn: applyAnnualisedCompoundInterest,
-  fnArgs: { reference: "interest rate" },
+  dependsOn: "interest rate",
   constants: [1000]
 });
 

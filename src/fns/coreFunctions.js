@@ -7,16 +7,16 @@ increment.key = `${keyPrefix}increment`;
 const interval = (_, interval) => interval;
 interval.key = `${keyPrefix}interval`;
 
-const lookup = ({ model, scenario, row, reference }, interval) =>
-  model[interval][scenario.rows[reference].index][scenario.index];
+const lookup = ({ model, scenario, row, dependsOn }, interval) =>
+  model[interval][scenario.rows[dependsOn].index][scenario.index];
 lookup.key = `${keyPrefix}lookup`;
 
 const previous = ({ model, scenario, row }, interval) =>
   model[interval - 1][row.index][scenario.index];
 previous.key = `${keyPrefix}previous`;
 
-const lookupPrevious = ({ model, scenario, row, reference }, interval) =>
-  model[interval - 1][scenario.rows[reference].index][scenario.index];
+const lookupPrevious = ({ model, scenario, row, dependsOn }, interval) =>
+  model[interval - 1][scenario.rows[dependsOn].index][scenario.index];
 lookupPrevious.key = `${keyPrefix}lookupPrevious`;
 
 const intervalsPerYear = ({ intervals }) => {

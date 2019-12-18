@@ -246,7 +246,8 @@ class Model extends Dense3DArray {
               scenario,
               row,
               row.fn,
-              row.fnArgs
+              row.fnArgs,
+              row.dependsOn
             );
             calculateRow(row, scenario, 0, intervals.count - 1, this.set);
           });
