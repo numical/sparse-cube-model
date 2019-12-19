@@ -7,7 +7,7 @@ const testFixture = require("./testFixture");
   tap.test(`${Type.name} tests: `, typeTests => {
     const { test, only } = typeTests;
     test("Delete scenario with no arg throws error", t => {
-      const { model } = testFixture(Type);
+      const model = testFixture(Type);
       t.throws(
         () => model.deleteScenario(),
         new Error("A scenario name is required.")
@@ -16,7 +16,7 @@ const testFixture = require("./testFixture");
     });
 
     test("Delete scenario with unknown scenario name throws error", t => {
-      const { model } = testFixture(Type);
+      const model = testFixture(Type);
       t.throws(
         () => model.deleteScenario("unknown scenario"),
         new Error("Unknown scenario 'unknown scenario'")
@@ -25,7 +25,7 @@ const testFixture = require("./testFixture");
     });
 
     test("Delete only scenario throws error", t => {
-      const { model } = testFixture(Type);
+      const model = testFixture(Type);
       t.throws(
         () => model.deleteScenario("defaultScenario"),
         new Error("Cannot delete only scenario 'defaultScenario'.")
@@ -34,12 +34,20 @@ const testFixture = require("./testFixture");
     });
 
     test("Delete scenario", t => {
-      const { intervals, model, rows } = testFixture(Type);
-      const scenarioName = "ssecond scenario";
+      const model = testFixture(Type);
+      const scenarioName = "second scenario";
       model.addScenario({ scenarioName });
-      t.same(model.lengths, { x: intervals.count, y: rows.length, z: 2 });
+      t.same(model.lengths, {
+        x: testFixture.meta.intervals.count,
+        y: testFixture.rows.length,
+        z: 2
+      });
       model.deleteScenario(scenarioName);
-      t.same(model.lengths, { x: intervals.count, y: rows.length, z: 1 });
+      t.same(model.lengths, {
+        x: testFixture.meta.intervals.count,
+        y: testFixture.rows.length,
+        z: 1
+      });
       t.throws(
         () => model.addRow({ rowName: "test row", scenarioName }),
         new Error(`Unknown scenario '${scenarioName}'`)
@@ -48,11 +56,15 @@ const testFixture = require("./testFixture");
     });
 
     test("Can delete default scenario if another is available", t => {
-      const { intervals, model, rows } = testFixture(Type);
+      const model = testFixture(Type);
       model.addScenario({ scenarioName: "second scenario" });
       const scenarioName = "defaultScenario";
       model.deleteScenario(scenarioName);
-      t.same(model.lengths, { x: intervals.count, y: rows.length, z: 1 });
+      t.same(model.lengths, {
+        x: testFixture.meta.intervals.count,
+        y: testFixture.rows.length,
+        z: 1
+      });
       t.throws(
         () => model.addRow({ rowName: "test row" }),
         new Error(`Unknown scenario '${scenarioName}'`)
@@ -61,7 +73,7 @@ const testFixture = require("./testFixture");
     });
 
     test("Can re-add default scenario", t => {
-      const { intervals, model, rows } = testFixture(Type);
+      const model = testFixture(Type);
       model.addScenario({ scenarioName: "second scenario" });
       t.doesNotThrow(() =>
         model.addScenario({

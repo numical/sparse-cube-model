@@ -29,16 +29,22 @@ const rows = [
   }
 ];
 
-const intervals = {
-  count: 10
+const meta = {
+  intervals: {
+    count: 10
+  }
 };
 
-module.exports = (constructorFn = Model) => {
-  const model = new constructorFn({
-    intervals
-  });
+const testFixture = (constructorFn = Model) => {
+  const model = new constructorFn(meta);
   rows.forEach(row => {
     model.addRow(row);
   });
-  return { intervals, rows, model };
+  return model;
 };
+
+testFixture.rows = rows;
+testFixture.rowNames = rows.map(row => row.rowName);
+testFixture.meta = meta;
+
+module.exports = testFixture;

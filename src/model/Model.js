@@ -5,6 +5,7 @@ const getRow = require("./util/getRow");
 const calculateRow = require("./util/calculateRow");
 const bindFnToRow = require("./util/bindFnToRow");
 const compareByIndex = require("./util/compareByIndex");
+const linkAllDependentRows = require("./util/linkAllDependentRows");
 const linkDependentRows = require("./util/linkDependentRows");
 const unlinkDependentRows = require("./util/unlinkDependentRows");
 const serializer = require("./util/serializer");
@@ -23,6 +24,7 @@ class Model extends Dense3DArray {
   constructor(meta = {}) {
     super({ defaultValue });
     this.#meta = modelMetadata(meta);
+    linkAllDependentRows(this.#meta.scenarios);
     this.recalculate();
   }
 

@@ -9,7 +9,7 @@ const testFixture = require("./testFixture");
     test("Delete row with unknown scenario throws error", t => {
       const rowName = "test row";
       const scenarioName = "unknown test scenario";
-      const { model } = testFixture(Type);
+      const model = testFixture(Type);
       t.throws(
         () => model.deleteRow({ rowName, scenarioName }),
         new Error("Unknown scenario 'unknown test scenario'")
@@ -19,7 +19,7 @@ const testFixture = require("./testFixture");
 
     test("Delete row with unknown row name throws error", t => {
       const rowName = "test row";
-      const { model } = testFixture(Type);
+      const model = testFixture(Type);
       t.throws(
         () => model.deleteRow({ rowName }),
         new Error("Unknown row 'test row'")
@@ -28,7 +28,7 @@ const testFixture = require("./testFixture");
     });
 
     test("Delete independent row", t => {
-      const { model } = testFixture(Type);
+      const model = testFixture(Type);
       t.same(model.lengths, { x: 10, y: 4, z: 1 });
       const rowName = "independent row";
       model.deleteRow({
@@ -44,7 +44,7 @@ const testFixture = require("./testFixture");
     });
 
     test("Delete independent row, default scenario", t => {
-      const { model } = testFixture(Type);
+      const model = testFixture(Type);
       t.same(model.lengths, { x: 10, y: 4, z: 1 });
       const rowName = "independent row";
       model.deleteRow({
@@ -59,7 +59,7 @@ const testFixture = require("./testFixture");
     });
 
     test("Delete dependent row", t => {
-      const { model } = testFixture(Type);
+      const model = testFixture(Type);
       t.same(model.lengths, { x: 10, y: 4, z: 1 });
       const rowName = "first lookup row";
       model.deleteRow({
@@ -75,7 +75,7 @@ const testFixture = require("./testFixture");
     });
 
     test("Delete row with dependencies fails", t => {
-      const { model } = testFixture(Type);
+      const model = testFixture(Type);
       const rowName = "increment row";
       t.throws(
         () => model.deleteRow({ rowName }),
@@ -87,7 +87,7 @@ const testFixture = require("./testFixture");
     });
 
     test("Delete multiple rows", t => {
-      const { model } = testFixture(Type);
+      const model = testFixture(Type);
       const rowNames = ["first lookup row", "independent row"];
       model.deleteRows({ rowNames });
       t.same(model.lengths, { x: 10, y: 2, z: 1 });
@@ -101,7 +101,7 @@ const testFixture = require("./testFixture");
     });
 
     test("Delete multiple linked rows", t => {
-      const { model } = testFixture(Type);
+      const model = testFixture(Type);
       const rowNames = [
         "increment row",
         "first lookup row",
@@ -119,7 +119,7 @@ const testFixture = require("./testFixture");
     });
 
     test("Delete multiple linked rows errors if other rows also linked", t => {
-      const { model } = testFixture(Type);
+      const model = testFixture(Type);
       const rowNames = ["increment row", "second lookup row"];
       t.throws(
         () => model.deleteRows({ rowNames }),

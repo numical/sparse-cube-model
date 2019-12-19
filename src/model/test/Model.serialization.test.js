@@ -15,19 +15,19 @@ test("Blank model stringify returns a string", t => {
 });
 
 test("Populated model stringify does not error", t => {
-  const { model } = testFixture();
+  const model = testFixture();
   t.doesNotThrow(() => model.stringify());
   t.end();
 });
 
 test("Populated model stringify returns a string", t => {
-  const { model } = testFixture();
+  const model = testFixture();
   t.type(model.stringify(), "string");
   t.end();
 });
 
 test("Can pass blank object args to no effect", t => {
-  const { model } = testFixture();
+  const model = testFixture();
   const args = {};
   t.doesNotThrow(() => model.stringify(args));
   t.type(model.stringify(args), "string");
@@ -35,7 +35,7 @@ test("Can pass blank object args to no effect", t => {
 });
 
 test("Can pass unrecognised object args to no effect", t => {
-  const { model } = testFixture();
+  const model = testFixture();
   const args = { wibble: true };
   t.doesNotThrow(() => model.stringify(args));
   t.type(model.stringify(args), "string");
@@ -43,7 +43,7 @@ test("Can pass unrecognised object args to no effect", t => {
 });
 
 test("Can pretty print", t => {
-  const { model } = testFixture();
+  const model = testFixture();
   const compact = model.stringify();
   t.notOk(compact.includes("\n"));
   const pretty = model.stringify({ pretty: true });
@@ -60,7 +60,7 @@ test("Empty model can be serialized and deserialized", t => {
 });
 
 test("Populated model can be serialized and deserialized", t => {
-  const { model } = testFixture();
+  const model = testFixture();
   const serialized = model.stringify();
   const deserialized = Model.parse(serialized);
   t.same(deserialized, model);
@@ -68,8 +68,8 @@ test("Populated model can be serialized and deserialized", t => {
 });
 
 test("Populated model with row of constants correctly deserializes", t => {
-  const { intervals, model } = testFixture();
-  const constants = Array(intervals.count).fill(5);
+  const model = testFixture();
+  const constants = Array(testFixture.meta.intervals.count).fill(5);
   model.addRow({ rowName: "constants row", constants });
   const serialized = model.stringify();
   const deserialized = Model.parse(serialized);

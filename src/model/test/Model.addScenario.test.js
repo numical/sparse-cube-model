@@ -14,7 +14,7 @@ const testFixture = require("./testFixture");
   tap.test(`${Type.name} tests: `, typeTests => {
     const { test, only } = typeTests;
     test("Add scenario with no args throws error", t => {
-      const { model } = testFixture(Type);
+      const model = testFixture(Type);
       t.throws(
         () => model.addScenario(),
         new Error("A scenario name is required.")
@@ -23,7 +23,7 @@ const testFixture = require("./testFixture");
     });
 
     test("Add scenario with no scenario name throws error", t => {
-      const { model } = testFixture(Type);
+      const model = testFixture(Type);
       t.throws(
         () => model.addScenario({}),
         new Error("A scenario name is required.")
@@ -34,7 +34,7 @@ const testFixture = require("./testFixture");
     test("Add scenario copying unknown scenario throws error", t => {
       const scenarioName = "test scenario";
       const copyOf = "unknown scenario";
-      const { model } = testFixture(Type);
+      const model = testFixture(Type);
       t.throws(
         () => model.addScenario({ scenarioName, copyOf }),
         new Error(`Unknown scenario '${copyOf}'`)
@@ -51,7 +51,7 @@ const testFixture = require("./testFixture");
 
     test("Add scenario based on populated default", t => {
       const scenarioName = "test scenario";
-      const { model } = testFixture(Type);
+      const model = testFixture(Type);
       t.same(model.lengths, { x: 10, y: 4, z: 1 });
       model.addScenario({ scenarioName });
       t.same(model.lengths, { x: 10, y: 4, z: 2 });
@@ -63,7 +63,7 @@ const testFixture = require("./testFixture");
 
     test("updateRow of a single scenario works", t => {
       const scenarioName = "test scenario";
-      const { model } = testFixture(Type);
+      const model = testFixture(Type);
       model.updateRow({
         rowName: "increment row",
         constants: [100],
@@ -82,7 +82,7 @@ const testFixture = require("./testFixture");
 
     test("Adding a scenario does not affect updates of the original scenario", t => {
       const scenarioName = "test scenario";
-      const { model } = testFixture(Type);
+      const model = testFixture(Type);
       model.addScenario({ scenarioName });
       model.updateRow({
         rowName: "increment row",
@@ -102,7 +102,7 @@ const testFixture = require("./testFixture");
 
     test("Ensure added scenario is independent", t => {
       const scenarioName = "test scenario";
-      const { model } = testFixture(Type);
+      const model = testFixture(Type);
       model.addScenario({ scenarioName });
       model.updateRow({
         rowName: "increment row",
@@ -137,7 +137,7 @@ const testFixture = require("./testFixture");
 
     test("Add scenario based on another scenario", t => {
       const scenarioNames = ["test scenario 1", "test scenario 2"];
-      const { model } = testFixture(Type);
+      const model = testFixture(Type);
       t.same(model.lengths, { x: 10, y: 4, z: 1 });
       scenarioNames.forEach(scenarioName => {
         model.addScenario({ scenarioName });
@@ -153,7 +153,7 @@ const testFixture = require("./testFixture");
     test("Mutator operations work on new scenario", t => {
       const scenarioName = "test scenario";
       const rowName = "test row";
-      const { model } = testFixture(Type);
+      const model = testFixture(Type);
       model.addScenario({ scenarioName });
       model.updateRow({
         rowName: "increment row",
@@ -181,7 +181,7 @@ const testFixture = require("./testFixture");
     test("Delete row affects only the passed scenario", t => {
       const scenarioName = "test scenario";
       const rowName = "second lookup row";
-      const { model } = testFixture(Type);
+      const model = testFixture(Type);
       model.addScenario({ scenarioName });
       model.deleteRow({ rowName, scenarioName });
       t.same(model.range({ y: 3, z: 0 }), [1000, 0, 1, 2, 3, 4, 5, 6, 7, 8]);

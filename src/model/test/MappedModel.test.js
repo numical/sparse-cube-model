@@ -11,13 +11,13 @@ test("MappedModel instanceof Model", t => {
 });
 
 test("testFixture can return a MappedModel", t => {
-  const { model } = testFixture(MappedModel);
+  const model = testFixture(MappedModel);
   t.type(model, MappedModel);
   t.end();
 });
 
 test("Function args without 'reference' key do not cause error", t => {
-  const { model } = testFixture(MappedModel);
+  const model = testFixture(MappedModel);
   const args = {
     rowName: "test row",
     fn: interval,

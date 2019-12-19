@@ -22,19 +22,19 @@ test("Blank model stringify returns an array of 2 Strings", t => {
 });
 
 test("Populated model stringify does not error", t => {
-  const { model } = testFixture(MappedModel);
+  const model = testFixture(MappedModel);
   t.doesNotThrow(() => model.stringify());
   t.end();
 });
 
 test("Populated model stringify returns an array of 2 strings", t => {
-  const { model } = testFixture(MappedModel);
+  const model = testFixture(MappedModel);
   assertStringifiedForm(t, model.stringify());
   t.end();
 });
 
 test("Can pass blank object args to no effect", t => {
-  const { model } = testFixture(MappedModel);
+  const model = testFixture(MappedModel);
   const args = {};
   t.doesNotThrow(() => model.stringify(args));
   assertStringifiedForm(t, model.stringify(args));
@@ -42,7 +42,7 @@ test("Can pass blank object args to no effect", t => {
 });
 
 test("Can pass unrecognised object args to no effect", t => {
-  const { model } = testFixture(MappedModel);
+  const model = testFixture(MappedModel);
   const args = { wibble: true };
   t.doesNotThrow(() => model.stringify(args));
   assertStringifiedForm(t, model.stringify());
@@ -50,7 +50,7 @@ test("Can pass unrecognised object args to no effect", t => {
 });
 
 test("Can pretty print", t => {
-  const { model } = testFixture(MappedModel);
+  const model = testFixture(MappedModel);
   const compact = model.stringify();
   t.notOk(compact.includes("\n"));
   const pretty = model.stringify({ pretty: true });
@@ -69,7 +69,7 @@ test("Empty model can be serialized and deserialized", t => {
 });
 
 test("Populated model can be serialized and deserialized", t => {
-  const { model } = testFixture(MappedModel);
+  const model = testFixture(MappedModel);
   const serialized = model.stringify();
   const deserialized = MappedModel.parse(serialized);
   t.same(model, deserialized);
@@ -77,8 +77,8 @@ test("Populated model can be serialized and deserialized", t => {
 });
 
 test("Populated model with row of constants correctly deserializes", t => {
-  const { intervals, model } = testFixture(MappedModel);
-  const constants = Array(intervals.count).fill(5);
+  const model = testFixture(MappedModel);
+  const constants = Array(testFixture.meta.intervals.count).fill(5);
   model.addRow({ rowName: "constants row", constants });
   const serialized = model.stringify();
   const deserialized = MappedModel.parse(serialized);
