@@ -6,6 +6,7 @@ const calculateRow = require("./util/calculateRow");
 const bindFnToRow = require("./util/bindFnToRow");
 const compareByIndex = require("./util/compareByIndex");
 const linkDependentRows = require("./util/linkDependentRows");
+const unlinkDependentRows = require("./util/unlinkDependentRows");
 const serializer = require("./util/serializer");
 const defaultValue = require("./util/defaultValue");
 
@@ -101,10 +102,12 @@ class Model extends Dense3DArray {
       dependsOn
     );
     row.constants = rowConstants;
+    unlinkDependentRows(scenario, rowName, row.dependsOn);
+    linkDependentRows(scenario, rowName, dependsOn);
     const rowstoUpdate = [row];
     if (row.dependents) {
       rowstoUpdate.push(
-        ...row.dependents.map(
+        ...Object.keys(row.dependents).map(
           dependencyRowName =>
             getRow(dependencyRowName, scenarioName, scenarios).row
         )
@@ -119,13 +122,14 @@ class Model extends Dense3DArray {
     const { scenarios } = this.#meta;
     const { row, scenario } = getRow(rowName, scenarioName, scenarios);
     const { x: lenX, z: lenZ } = this.lengths;
-    if (row.dependents && row.dependents.length > 0) {
+    if (row.dependents) {
       throw new Error(
-        `Cannot delete row '${rowName}' as rows '${row.dependents.join(
-          ", "
-        )}' depend on it.`
+        `Cannot delete row '${rowName}' as rows '${Object.keys(
+          row.dependents
+        ).join(", ")}' depend on it.`
       );
     }
+    unlinkDependentRows(scenario, rowName, row.dependsOn);
     delete scenario.rows[rowName];
     if (lenZ === 1) {
       this.delete({ y: row.index });
@@ -152,8 +156,8 @@ class Model extends Dense3DArray {
     );
     // can delete all if they are dependent only on each other
     rows.forEach(row => {
-      if (row.dependents && row.dependents.length > 0) {
-        row.dependents.forEach(dependent => {
+      if (row.dependents) {
+        Object.keys(row.dependents).forEach(dependent => {
           if (!rowNames.includes(dependent)) {
             throw new Error(
               `Cannot delete row '${mappedRowNames.get(
@@ -168,8 +172,10 @@ class Model extends Dense3DArray {
     rows
       .sort((r1, r2) => r2.index - r1.index)
       .forEach(row => {
+        const rowName = mappedRowNames.get(row);
         this.delete({ y: row.index });
-        delete scenario.rows[mappedRowNames.get(row)];
+        delete scenario.rows[rowName];
+        unlinkDependentRows(scenario, rowName, row.dependsOn);
       });
   }
 
