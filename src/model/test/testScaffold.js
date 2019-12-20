@@ -2,23 +2,32 @@ const tap = require("tap");
 const Model = require("../Model");
 const MappedModel = require("../MappedModel");
 const testFixture = require("./testFixture");
-const { increment, lookup } = require("../../fns/coreFunctions");
 
 const setupDescriptions = [":", "after serialisation:"];
+
 const setupFns = [
   Type => testFixture(Type),
   Type => Type.parse(testFixture(Type).stringify())
 ];
 
-const multiTest = fn => {
+const emptyScenarios = fn => {
+  [Model, MappedModel].forEach(Type => {
+    tap.test(`${Type.name} tests:`, typeTests => {
+      const { test } = typeTests;
+      fn(test, Type);
+      typeTests.end();
+    });
+  });
+};
+
+const populatedScenarios = fn => {
   setupFns.forEach((setupFn, setupIndex) => {
     [Model, MappedModel].forEach(Type => {
       tap.test(
         `${Type.name} tests ${setupDescriptions[setupIndex]}`,
         typeTests => {
           const { test } = typeTests;
-          const setUpModel = setupFn.bind(null, Type);
-          fn(test, setUpModel);
+          fn(test, setupFn.bind(null, Type));
           typeTests.end();
         }
       );
@@ -26,4 +35,4 @@ const multiTest = fn => {
   });
 };
 
-module.exports = multiTest;
+module.exports = { emptyScenarios, populatedScenarios };
