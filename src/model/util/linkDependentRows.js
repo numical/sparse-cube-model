@@ -8,8 +8,7 @@ const linkDependentRows = (scenario, rowName, dependsOn) => {
       } else {
         if (provider.dependents) {
           const count = provider.dependents[rowName];
-          const incrementedCount = count ? count + 1 : 1;
-          provider.dependents[rowName] = incrementedCount;
+          provider.dependents[rowName] = count ? count + 1 : 1;
         } else {
           provider.dependents = {};
           provider.dependents[rowName] = 1;

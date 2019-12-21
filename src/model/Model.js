@@ -5,6 +5,7 @@ const getRow = require("./util/getRow");
 const calculateRow = require("./util/calculateRow");
 const bindFnToRow = require("./util/bindFnToRow");
 const compareByIndex = require("./util/compareByIndex");
+const deleteSingleRow = require("./util/deleteSingleRow");
 const linkAllDependentRows = require("./util/linkAllDependentRows");
 const linkDependentRows = require("./util/linkDependentRows");
 const unlinkDependentRows = require("./util/unlinkDependentRows");
@@ -123,7 +124,6 @@ class Model extends Dense3DArray {
   deleteRow({ rowName, scenarioName = defaultScenario }) {
     const { scenarios } = this.#meta;
     const { row, scenario } = getRow(rowName, scenarioName, scenarios);
-    const { x: lenX, z: lenZ } = this.lengths;
     if (row.dependents) {
       throw new Error(
         `Cannot delete row '${rowName}' as rows '${Object.keys(
@@ -131,15 +131,7 @@ class Model extends Dense3DArray {
         ).join(", ")}' depend on it.`
       );
     }
-    unlinkDependentRows(scenario, rowName, row.dependsOn);
-    delete scenario.rows[rowName];
-    if (lenZ === 1) {
-      this.delete({ y: row.index });
-    } else {
-      for (let x = 0; x < lenX; x++) {
-        this.set(x, row.index, scenario.index, defaultValue);
-      }
-    }
+    deleteSingleRow(this, scenario, row, rowName);
   }
 
   deleteRows({ rowNames, scenarioName = defaultScenario }) {
@@ -175,9 +167,7 @@ class Model extends Dense3DArray {
       .sort((r1, r2) => r2.index - r1.index)
       .forEach(row => {
         const rowName = mappedRowNames.get(row);
-        this.delete({ y: row.index });
-        delete scenario.rows[rowName];
-        unlinkDependentRows(scenario, rowName, row.dependsOn);
+        deleteSingleRow(this, scenario, row, rowName);
       });
   }
 

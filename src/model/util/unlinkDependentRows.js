@@ -8,7 +8,10 @@ const unlinkDependentRows = (scenario, rowName, dependsOn) => {
         if (count && count > 1) {
           provider.dependents[rowName] = count - 1;
         } else {
-          delete provider.dependents;
+          delete provider.dependents[rowName];
+          if (Object.keys(provider.dependents).length === 0) {
+            delete provider.dependents;
+          }
         }
       }
     });
