@@ -95,7 +95,39 @@ populatedScenarios((test, setUp) => {
     t.end();
   });
 
-  test("Delete multiple linked rows", t => {
+  test("Delete multiple linked rows one at a time, latest first", t => {
+    const model = setUp();
+    const rowNames = ["second lookup row", "first lookup row", "increment row"];
+    rowNames.forEach(rowName => {
+      model.deleteRow({ rowName });
+    });
+    t.same(model.lengths, { x: 10, y: 1, z: 1 });
+    rowNames.forEach(rowName => {
+      t.throws(
+        () => model.row({ rowName }),
+        new Error(`Unknown row '${rowName}'`)
+      );
+    });
+    t.end();
+  });
+
+  test("Delete multiple linked rows one at a time, earliest first", t => {
+    const model = setUp();
+    const rowNames = ["first lookup row", "second lookup row", "increment row"];
+    rowNames.forEach(rowName => {
+      model.deleteRow({ rowName });
+    });
+    t.same(model.lengths, { x: 10, y: 1, z: 1 });
+    rowNames.forEach(rowName => {
+      t.throws(
+        () => model.row({ rowName }),
+        new Error(`Unknown row '${rowName}'`)
+      );
+    });
+    t.end();
+  });
+
+  test("Delete multiple linked rows in one go", t => {
     const model = setUp();
     const rowNames = ["increment row", "first lookup row", "second lookup row"];
     model.deleteRows({ rowNames });

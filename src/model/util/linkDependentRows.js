@@ -7,12 +7,9 @@ const linkDependentRows = (scenario, rowName, dependsOn) => {
         throw new Error(`Depends on unknown row '${rowName}'`);
       } else {
         if (provider.dependents) {
-          const count = provider.dependents[rowName];
-          const incrementedCount = count ? count + 1 : 1;
-          provider.dependents[rowName] = incrementedCount;
+          provider.dependents.push(rowName);
         } else {
-          provider.dependents = {};
-          provider.dependents[rowName] = 1;
+          provider.dependents = [rowName];
         }
       }
     });
