@@ -2,6 +2,27 @@ const { memoizeWith } = require("ramda");
 const { intervalsPerYear, lookup, previous } = require("./coreFunctions");
 const { add, divide, multiply, power } = require("../maths/coreOperations");
 
+const getInterest = (rowContext, interval) => {
+  const context = Array.isArray(rowContext.dependsOn)
+    ? {
+        ...rowContext,
+        dependsOn: rowContext.dependsOn[0]
+      }
+    : rowContext;
+  return lookup(context, interval);
+};
+
+const getIncrement = (rowContext, interval) =>
+  Array.isArray(rowContext.dependsOn)
+    ? lookup(
+        {
+          ...rowContext,
+          dependsOn: rowContext.dependsOn[1]
+        },
+        interval
+      )
+    : 0;
+
 const cacheKey = (annualPercent, { intervals }) =>
   String(annualPercent) + intervals.duration;
 
@@ -25,27 +46,31 @@ const getAnnualisedCompoundIntervalMultiplier = memoizeWith(
 
 const applyInterest = (...args) => {
   const amount = previous(...args);
-  const percent = lookup(...args);
-  return add(amount, multiply(amount, divide(percent, 100)));
+  const percent = getInterest(...args);
+  const increment = getIncrement(...args);
+  const incremented = add(amount, increment);
+  return add(incremented, multiply(incremented, divide(percent, 100)));
 };
 applyInterest.key = "applyInterest";
 
 const applyAnnualisedInterest = (...args) => {
   const amount = previous(...args);
-  const annualPercent = lookup(...args);
+  const annualPercent = getInterest(...args);
   const percent = getAnnualisedIntervalMultiplier(annualPercent, ...args);
-  return multiply(amount, percent);
+  const increment = getIncrement(...args);
+  return multiply(add(amount, increment), percent);
 };
 applyAnnualisedInterest.key = "applyAnnualisedInterest";
 
 const applyAnnualisedCompoundInterest = (...args) => {
   const amount = previous(...args);
-  const annualPercent = lookup(...args);
+  const annualPercent = getInterest(...args);
   const percent = getAnnualisedCompoundIntervalMultiplier(
     annualPercent,
     ...args
   );
-  return multiply(amount, percent);
+  const increment = getIncrement(...args);
+  return multiply(add(amount, increment), percent);
 };
 applyAnnualisedCompoundInterest.key = "applyAnnualisedCompoundInterest";
 
