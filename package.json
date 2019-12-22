@@ -1,19 +1,19 @@
 {
   "name": "sparse-cube-model",
   "version": "0.0.1",
-  "description": "Experiment in scenario-based functional modellng",
+  "description": "Experiment in scenario-based functional modelling",
   "main": "index.js",
   "dependencies": {
-    "as-table": "^1.0.55",
-    "debug": "^4.1.1",
-    "nanoid": "^2.1.7",
-    "ramda": "^0.26.1"
+    "as-table": "1.0.55",
+    "debug": "4.1.1",
+    "nanoid": "2.1.8",
+    "ramda": "0.26.1"
   },
   "devDependencies": {
     "faucet": "0.0.1",
-    "prettier": "^1.19.1",
-    "tap": "^14.10.2",
-    "testdouble": "^3.12.4"
+    "prettier": "1.19.1",
+    "tap": "14.10.5",
+    "testdouble": "3.12.4"
   },
   "scripts": {
     "test": "tap src/**/*.test.js --100",
