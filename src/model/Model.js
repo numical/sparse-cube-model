@@ -110,7 +110,7 @@ class Model extends Dense3DArray {
     const rowstoUpdate = [row];
     if (row.dependents) {
       rowstoUpdate.push(
-        ...Object.keys(row.dependents).map(
+        ...row.dependents.map(
           dependencyRowName =>
             getRow(dependencyRowName, scenarioName, scenarios).row
         )
@@ -126,9 +126,9 @@ class Model extends Dense3DArray {
     const { row, scenario } = getRow(rowName, scenarioName, scenarios);
     if (row.dependents) {
       throw new Error(
-        `Cannot delete row '${rowName}' as rows '${Object.keys(
-          row.dependents
-        ).join(", ")}' depend on it.`
+        `Cannot delete row '${rowName}' as rows '${row.dependents.join(
+          ", "
+        )}' depend on it.`
       );
     }
     deleteSingleRow(this, scenario, row, rowName);
@@ -151,7 +151,7 @@ class Model extends Dense3DArray {
     // can delete all if they are dependent only on each other
     rows.forEach(row => {
       if (row.dependents) {
-        Object.keys(row.dependents).forEach(dependent => {
+        row.dependents.forEach(dependent => {
           if (!rowNames.includes(dependent)) {
             throw new Error(
               `Cannot delete row '${mappedRowNames.get(

@@ -1,16 +1,21 @@
+/*
+ IF statements with ignored else are for the case of multiple row delete
+ */
+
 const unlinkDependentRows = (scenario, rowName, dependsOn) => {
   if (dependsOn) {
     const array = Array.isArray(dependsOn) ? dependsOn : [dependsOn];
     array.forEach(providerName => {
       const provider = scenario.rows[providerName];
+      /* istanbul ignore else */
       if (provider && provider.dependents) {
-        const count = provider.dependents[rowName];
-        if (count && count > 1) {
-          provider.dependents[rowName] = count - 1;
-        } else {
-          delete provider.dependents[rowName];
-          if (Object.keys(provider.dependents).length === 0) {
+        const index = provider.dependents.indexOf(rowName);
+        /* istanbul ignore else */
+        if (index > -1) {
+          if (provider.dependents.length === 1) {
             delete provider.dependents;
+          } else {
+            provider.dependents.splice(index, 1);
           }
         }
       }
