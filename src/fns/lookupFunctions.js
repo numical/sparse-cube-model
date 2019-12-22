@@ -1,4 +1,4 @@
-const keyPrefix = "core.";
+const keyPrefix = "lookup.";
 
 const increment = ({ model, scenario, row }, interval) =>
   model[interval - 1][row.index][scenario.index] + 1;

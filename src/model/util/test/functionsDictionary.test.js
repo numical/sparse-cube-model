@@ -1,6 +1,6 @@
 const { test, only } = require("tap");
 const fnsDictionary = require("../functionsDictionary");
-const coreFunctions = require("../../../fns/coreFunctions");
+const coreFunctions = require("../../../fns/lookupFunctions");
 
 test("model function singleton has all core functions", t => {
   Object.values(coreFunctions).forEach(coreFn => {

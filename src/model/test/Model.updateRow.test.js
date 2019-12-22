@@ -1,5 +1,5 @@
 const { populatedScenarios } = require("./testScaffold");
-const { increment } = require("../../fns/coreFunctions");
+const { increment } = require("../../fns/lookupFunctions");
 
 const rowName = "increment row";
 

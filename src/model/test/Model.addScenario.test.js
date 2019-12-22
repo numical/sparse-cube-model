@@ -4,7 +4,7 @@ const {
   interval,
   lookup,
   previous
-} = require("../../fns/coreFunctions");
+} = require("../../fns/lookupFunctions");
 const iterate2D = require("../../data-structures/iterate2D");
 const testFixture = require("./testFixture");
 

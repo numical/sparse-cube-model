@@ -1,4 +1,7 @@
-const coreFns = require("../../fns/coreFunctions");
+const lookupFns = require("../../fns/lookupFunctions");
+const interestFns = require("../../fns/interestFunctions");
+
+const allFns = { ...lookupFns, ...interestFns };
 
 class FunctionsDictionary {
   constructor() {
@@ -25,6 +28,6 @@ class FunctionsDictionary {
 }
 
 const singleton = new FunctionsDictionary();
-Object.keys(coreFns).forEach(key => singleton.add(coreFns[key]));
+Object.keys(allFns).forEach(key => singleton.add(allFns[key]));
 
 module.exports = singleton;

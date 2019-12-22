@@ -1,5 +1,5 @@
 const { test } = require("tap");
-const { intervalsPerYear } = require("../coreFunctions");
+const { intervalsPerYear } = require("../lookupFunctions");
 
 test("intervals per year - month", t => {
   t.same(intervalsPerYear({ intervals: { duration: "month" } }), 12);

@@ -1,5 +1,5 @@
 const { emptyScenarios } = require("./testScaffold");
-const { increment, interval, previous } = require("../../fns/coreFunctions");
+const { increment, interval, previous } = require("../../fns/lookupFunctions");
 
 const sequence = (length, mapFn = (_, i) => i) => Array.from({ length }, mapFn);
 

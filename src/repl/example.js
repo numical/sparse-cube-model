@@ -1,6 +1,6 @@
 const Model = require("../model/Model");
 const MappedModel = require("../model/MappedModel");
-const { interval, previous } = require("../fns/coreFunctions");
+const { interval, previous } = require("../fns/lookupFunctions");
 const {
   applyAnnualisedInterest,
   applyAnnualisedCompoundInterest

@@ -2,7 +2,7 @@ const { test } = require("tap");
 const Model = require("../Model");
 const MappedModel = require("../MappedModel");
 const testFixture = require("./testFixture");
-const { interval } = require("../../fns/coreFunctions");
+const { interval } = require("../../fns/lookupFunctions");
 
 test("MappedModel instanceof Model", t => {
   const model = new MappedModel();

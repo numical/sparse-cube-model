@@ -1,5 +1,5 @@
 const testFixture = require("./testFixture");
-const { increment, lookup } = require("../../fns/coreFunctions");
+const { increment, lookup } = require("../../fns/lookupFunctions");
 const { populatedScenarios } = require("./testScaffold");
 
 populatedScenarios((test, setUp) => {

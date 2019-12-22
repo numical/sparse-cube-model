@@ -1,5 +1,5 @@
 const { memoizeWith } = require("ramda");
-const { intervalsPerYear, lookup, previous } = require("./coreFunctions");
+const { intervalsPerYear, lookup, previous } = require("./lookupFunctions");
 const { add, divide, multiply, power } = require("../maths/coreOperations");
 
 const getInterest = (rowContext, interval) => {

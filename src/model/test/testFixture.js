@@ -3,7 +3,7 @@ const {
   increment,
   lookup,
   lookupPrevious
-} = require("../../fns/coreFunctions");
+} = require("../../fns/lookupFunctions");
 
 const rows = [
   {

@@ -57,8 +57,8 @@ const yearIntervalWithIncrementArgs = {
 const interval = 1;
 
 try {
-  const coreFunctions = td.replace("../coreFunctions");
-  const { lookup, previous, intervalsPerYear } = coreFunctions;
+  const lookupFunctions = td.replace("../lookupFunctions");
+  const { lookup, previous, intervalsPerYear } = lookupFunctions;
   const anything = td.matchers.anything();
   const {
     applyInterest,

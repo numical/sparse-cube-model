@@ -1,5 +1,5 @@
 const { emptyScenarios } = require("./testScaffold");
-const { interval } = require("../../fns/coreFunctions");
+const { interval } = require("../../fns/lookupFunctions");
 
 const count = 10;
 const testDefaults = {
