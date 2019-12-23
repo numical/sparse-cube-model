@@ -1,5 +1,9 @@
 const { test } = require("tap");
-const { intervalsPerYear } = require("../lookupFunctions");
+const {
+  intervalsPerYear,
+  lookup,
+  lookupPrevious
+} = require("../lookupFunctions");
 
 test("intervals per year - month", t => {
   t.same(intervalsPerYear({ intervals: { duration: "month" } }), 12);
@@ -15,6 +19,31 @@ test("intervals per year - other", t => {
   t.throws(
     () => intervalsPerYear({ intervals: { duration: "other" } }),
     new Error("Unknown duration 'other'.")
+  );
+  t.end();
+});
+
+test("lookup reports unknown row", t => {
+  const args = {
+    scenario: {
+      rows: {}
+    },
+    dependsOn: "unknown row"
+  };
+  t.throws(() => lookup(args), new Error("Unknown row 'unknown row'"));
+  t.end();
+});
+
+test("lookupPrevious reports unknown row", t => {
+  const args = {
+    scenario: {
+      rows: {}
+    },
+    dependsOn: "another unknown row"
+  };
+  t.throws(
+    () => lookupPrevious(args),
+    new Error("Unknown row 'another unknown row'")
   );
   t.end();
 });

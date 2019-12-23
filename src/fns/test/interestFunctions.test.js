@@ -1,150 +1,229 @@
 const { test } = require("tap");
-const td = require("testdouble");
+const interestFunctions = require("../interestFunctions");
 
-const noIncrementTestCases = [
-  [100, 5, 105],
-  [60, 5, 63],
-  [10, 5, 10.5],
-  [1000, 3.05, 1030.5]
-];
-
-const interestTestCases = [
-  [100, 5, 0, 105],
-  [60, 5, 40, 105],
-  [10, 5, 0, 10.5],
-  [1000, 3.5, 0, 1035],
-  [1234.56, 3.05, 0, 1272.21408],
-  [1000, 3.05, 234.56, 1272.21408]
-];
-
-const annualisedTestCases = [
-  [100, 60, 0, 105],
-  [60, 60, 40, 105],
-  [100, 12, 0, 101],
-  [1234.56, 3.05, 0, 1237.69784],
-  [1000, 3.05, 234.56, 1237.69784]
-];
-
-const annualisedCompoundTestCases = [
-  [100, 60, 0, 103.99441076905043],
-  [60, 60, 40, 103.99441076905043],
-  [100, 12, 0, 100.9488792934583],
-  [1234.56, 3.05, 0, 1237.6548117919046],
-  [1000, 3.05, 234.56, 1237.6548117919046]
-];
-
-const monthIntervalArgs = {
-  intervals: {
-    duration: "month"
+const testCases = [
+  {
+    subject: "applyInterest",
+    duration: "year",
+    amount: 100,
+    interest: 5,
+    expected: 105
   },
-  dependsOn: ""
-};
-
-const monthIntervalWithIncrementArgs = {
-  intervals: {
-    duration: "month"
+  {
+    subject: "applyInterest",
+    duration: "year",
+    amount: 60,
+    interest: 5,
+    expected: 63
   },
-  dependsOn: []
-};
-
-const yearIntervalWithIncrementArgs = {
-  intervals: {
-    duration: "year"
+  {
+    subject: "applyInterest",
+    duration: "year",
+    amount: 10,
+    interest: 5,
+    expected: 10.5
   },
-  dependsOn: []
-};
+  {
+    subject: "applyInterest",
+    duration: "year",
+    amount: 1000,
+    interest: 3.05,
+    expected: 1030.5
+  },
+  {
+    subject: "applyInterest",
+    duration: "year",
+    amount: 1234.56,
+    interest: 3.05,
+    expected: 1272.21408
+  },
+  {
+    subject: "applyInterest",
+    duration: "year",
+    amount: 1000,
+    interest: 3.05,
+    expected: 1272.21408,
+    increment: 235,
+    decrement: 0.44
+  },
+  {
+    subject: "applyInterest",
+    duration: "month",
+    amount: 100,
+    interest: 5,
+    expected: 105
+  },
+  {
+    subject: "applyInterest",
+    duration: "month",
+    amount: 60,
+    interest: 5,
+    expected: 63
+  },
+  {
+    subject: "applyInterest",
+    duration: "month",
+    amount: 10,
+    interest: 5,
+    expected: 10.5
+  },
+  {
+    subject: "applyInterest",
+    duration: "month",
+    amount: 1000,
+    interest: 3.05,
+    expected: 1030.5
+  },
+  {
+    subject: "applyInterest",
+    duration: "month",
+    amount: 1234.56,
+    interest: 3.05,
+    expected: 1272.21408
+  },
+  {
+    subject: "applyInterest",
+    duration: "month",
+    amount: 1000,
+    interest: 3.05,
+    expected: 1272.21408,
+    increment: 235,
+    decrement: 0.44
+  },
+  {
+    subject: "applyAnnualisedInterest",
+    duration: "month",
+    amount: 100,
+    interest: 60,
+    expected: 105
+  },
+  {
+    subject: "applyAnnualisedInterest",
+    duration: "month",
+    amount: 60,
+    interest: 60,
+    expected: 105,
+    increment: 40
+  },
+  {
+    subject: "applyAnnualisedInterest",
+    duration: "month",
+    amount: 120,
+    interest: 12,
+    expected: 101,
+    decrement: 20
+  },
+  {
+    subject: "applyAnnualisedInterest",
+    duration: "month",
+    amount: 1234.56,
+    interest: 3.05,
+    expected: 1237.69784
+  },
+  {
+    subject: "applyAnnualisedCompoundInterest",
+    duration: "month",
+    amount: 100,
+    interest: 60,
+    expected: 103.99441076905043
+  },
+  {
+    subject: "applyAnnualisedCompoundInterest",
+    duration: "month",
+    amount: 70,
+    interest: 60,
+    expected: 103.99441076905043,
+    increment: 50,
+    decrement: 20
+  },
+  {
+    subject: "applyAnnualisedCompoundInterest",
+    duration: "month",
+    amount: 100,
+    interest: 12,
+    expected: 100.9488792934583
+  },
+  {
+    subject: "applyAnnualisedCompoundInterest",
+    duration: "month",
+    amount: 1000,
+    interest: 3.05,
+    expected: 1237.6548117919046,
+    increment: 234.56
+  }
+];
 
 const interval = 1;
 
-try {
-  const lookupFunctions = td.replace("../lookupFunctions");
-  const { lookup, previous, intervalsPerYear } = lookupFunctions;
-  const anything = td.matchers.anything();
-  const {
-    applyInterest,
-    applyAnnualisedInterest,
-    applyAnnualisedCompoundInterest
-  } = require("../interestFunctions");
+const generateDescription = ({
+  subject,
+  amount,
+  duration,
+  interest,
+  increment,
+  decrement,
+  expected
+}) =>
+  `${subject} (${duration}): expect (${amount} + ${increment ||
+    "no increment"} - ${decrement ||
+    "no decrement"} ) * ${interest}% to be ${expected}`;
 
-  noIncrementTestCases.forEach(([amount, percent, expected]) => {
-    test(`applyInterest: expect ${amount} * ${percent}% to be ${expected}`, t => {
-      td.when(previous(anything, interval)).thenReturn(amount);
-      td.when(lookup(anything, interval)).thenReturn(percent);
-      td.when(intervalsPerYear(anything, interval)).thenReturn(12);
-      t.same(applyInterest(monthIntervalArgs, interval), expected);
-      t.end();
-    });
+const generateArgs = ({ amount, duration, interest, increment, decrement }) => {
+  const dependsOn = {
+    interest: "interestRow",
+    increment: increment ? "incrementRow" : undefined,
+    decrement: decrement ? "decrementRow" : undefined
+  };
+  return {
+    model: {
+      0: {
+        0: {
+          0: amount
+        }
+      },
+      1: {
+        1: {
+          0: interest
+        },
+        2: {
+          0: increment
+        },
+        3: {
+          0: decrement
+        }
+      }
+    },
+    scenario: {
+      index: 0,
+      rows: {
+        interestRow: {
+          index: 1
+        },
+        incrementRow: {
+          index: 2
+        },
+        decrementRow: {
+          index: 3
+        }
+      }
+    },
+    row: {
+      index: 0
+    },
+    intervals: {
+      duration
+    },
+    dependsOn
+  };
+};
+
+testCases.forEach(testCase => {
+  test(generateDescription(testCase), t => {
+    const args = generateArgs(testCase);
+    t.same(
+      interestFunctions[testCase.subject](args, interval),
+      testCase.expected
+    );
+    t.end();
   });
-
-  interestTestCases.forEach(([amount, percent, increment, expected]) => {
-    test(`applyInterest: expect ${increment} + ${amount} * ${percent}% to be ${expected}`, t => {
-      td.when(previous(anything, interval)).thenReturn(amount);
-      td.when(lookup(anything, interval)).thenReturn(percent, increment);
-      td.when(intervalsPerYear(anything, interval)).thenReturn(12);
-      t.same(applyInterest(monthIntervalWithIncrementArgs, interval), expected);
-      t.end();
-    });
-  });
-
-  annualisedTestCases.forEach(([amount, percent, increment, expected]) => {
-    test(`applyAnnualisedInterest: expect ${increment} + ${amount} * an annualised ${percent}% to be ${expected} after one month`, t => {
-      td.when(previous(anything, interval)).thenReturn(amount);
-      td.when(lookup(anything, interval)).thenReturn(percent, increment);
-      td.when(intervalsPerYear(anything, interval)).thenReturn(12);
-      t.same(
-        applyAnnualisedInterest(monthIntervalWithIncrementArgs, interval),
-        expected
-      );
-      t.end();
-    });
-  });
-
-  interestTestCases.forEach(([amount, percent, increment, expected]) => {
-    test(`applyAnnualisedInterest: expect ${increment} + ${amount} * an annual ${percent}% to be ${expected}`, t => {
-      td.when(previous(anything, interval)).thenReturn(amount);
-      td.when(lookup(anything, interval)).thenReturn(percent, increment);
-      td.when(intervalsPerYear(anything, interval)).thenReturn(1);
-      t.same(
-        applyAnnualisedInterest(yearIntervalWithIncrementArgs, interval),
-        expected
-      );
-      t.end();
-    });
-  });
-
-  annualisedCompoundTestCases.forEach(
-    ([amount, percent, increment, expected]) => {
-      test(`applyAnnualisedCompoundInterest: expect ${increment} + ${amount} * a compound annualised ${percent}% to be ${expected} after one month`, t => {
-        td.when(previous(anything, interval)).thenReturn(amount);
-        td.when(lookup(anything, interval)).thenReturn(percent, increment);
-        td.when(intervalsPerYear(anything, interval)).thenReturn(12);
-        t.same(
-          applyAnnualisedCompoundInterest(
-            monthIntervalWithIncrementArgs,
-            interval
-          ),
-          expected
-        );
-        t.end();
-      });
-    }
-  );
-
-  interestTestCases.forEach(([amount, percent, increment, expected]) => {
-    test(`applyAnnualisedCompoundInterest: expect ${increment} + ${amount} * an annual ${percent}% to be ${expected}`, t => {
-      td.when(previous(anything, interval)).thenReturn(amount);
-      td.when(lookup(anything, interval)).thenReturn(percent, increment);
-      td.when(intervalsPerYear(anything, interval)).thenReturn(1);
-      t.same(
-        applyAnnualisedCompoundInterest(
-          yearIntervalWithIncrementArgs,
-          interval
-        ),
-        expected
-      );
-      t.end();
-    });
-  });
-} finally {
-  td.reset();
-}
+});

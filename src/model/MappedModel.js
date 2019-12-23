@@ -36,7 +36,11 @@ const fromKey = (type, fromMap, callMappings, key, doNotMap) => {
     } else if (Array.isArray(key)) {
       return key.map(fromKey.bind(null, type, fromMap, callMappings));
     } else if (typeof key === "object") {
-      return key;
+      return Object.entries(key).reduce((mapped, [key, value]) => {
+        // keep unmapped values for error messages
+        mapped[key] = fromMap[type][value] ? fromMap[type][value] : value;
+        return mapped;
+      }, {});
     } else {
       const mapped = fromMap[type][key];
       if (!mapped) {
@@ -97,6 +101,7 @@ class MappedModel extends Model {
     dependsOn
   }) {
     unmapError(callMappings => {
+      const d = fromKey("row", this.#fromMap, callMappings, dependsOn);
       super.addRow({
         scenarioName: fromKey(
           "scenario",

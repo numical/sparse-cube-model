@@ -1,23 +1,41 @@
 const { memoizeWith } = require("ramda");
 const { intervalsPerYear, lookup, previous } = require("./lookupFunctions");
-const { add, divide, multiply, power } = require("../maths/coreOperations");
+const {
+  add,
+  divide,
+  multiply,
+  subtract,
+  power
+} = require("../maths/coreOperations");
 
 const getInterest = (rowContext, interval) => {
-  const context = Array.isArray(rowContext.dependsOn)
-    ? {
-        ...rowContext,
-        dependsOn: rowContext.dependsOn[0]
-      }
-    : rowContext;
-  return lookup(context, interval);
+  if (rowContext.dependsOn && rowContext.dependsOn.interest) {
+    return lookup(
+      { ...rowContext, dependsOn: rowContext.dependsOn.interest },
+      interval
+    );
+  } else {
+    throw new Error("Missing 'interest' dependsOn value.");
+  }
 };
 
 const getIncrement = (rowContext, interval) =>
-  Array.isArray(rowContext.dependsOn)
+  rowContext.dependsOn.increment
     ? lookup(
         {
           ...rowContext,
-          dependsOn: rowContext.dependsOn[1]
+          dependsOn: rowContext.dependsOn.increment
+        },
+        interval
+      )
+    : 0;
+
+const getDecrement = (rowContext, interval) =>
+  rowContext.dependsOn.decrement
+    ? lookup(
+        {
+          ...rowContext,
+          dependsOn: rowContext.dependsOn.decrement
         },
         interval
       )
@@ -48,8 +66,9 @@ const applyInterest = (...args) => {
   const amount = previous(...args);
   const percent = getInterest(...args);
   const increment = getIncrement(...args);
-  const incremented = add(amount, increment);
-  return add(incremented, multiply(incremented, divide(percent, 100)));
+  const decrement = getDecrement(...args);
+  const total = subtract(add(amount, increment), decrement);
+  return add(total, multiply(total, divide(percent, 100)));
 };
 applyInterest.key = "applyInterest";
 
@@ -58,7 +77,9 @@ const applyAnnualisedInterest = (...args) => {
   const annualPercent = getInterest(...args);
   const percent = getAnnualisedIntervalMultiplier(annualPercent, ...args);
   const increment = getIncrement(...args);
-  return multiply(add(amount, increment), percent);
+  const decrement = getDecrement(...args);
+  const total = subtract(add(amount, increment), decrement);
+  return multiply(total, percent);
 };
 applyAnnualisedInterest.key = "applyAnnualisedInterest";
 
@@ -70,7 +91,9 @@ const applyAnnualisedCompoundInterest = (...args) => {
     ...args
   );
   const increment = getIncrement(...args);
-  return multiply(add(amount, increment), percent);
+  const decrement = getDecrement(...args);
+  const total = subtract(add(amount, increment), decrement);
+  return multiply(total, percent);
 };
 applyAnnualisedCompoundInterest.key = "applyAnnualisedCompoundInterest";
 

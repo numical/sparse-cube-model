@@ -25,7 +25,7 @@ const rows = [
     rowName: "second lookup row",
     fn: lookupPrevious,
     constants: [1000],
-    dependsOn: ["increment row"] // note: deliberate array
+    dependsOn: "increment row"
   }
 ];
 

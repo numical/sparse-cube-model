@@ -4,8 +4,9 @@
 
 const unlinkDependentRows = (scenario, rowName, dependsOn) => {
   if (dependsOn) {
-    const array = Array.isArray(dependsOn) ? dependsOn : [dependsOn];
-    array.forEach(providerName => {
+    const obj = typeof dependsOn === "string" ? { dependsOn } : dependsOn;
+    // const array = Array.isArray(dependsOn) ? dependsOn : [dependsOn];
+    Object.values(obj).forEach(providerName => {
       const provider = scenario.rows[providerName];
       /* istanbul ignore else */
       if (provider && provider.dependents) {

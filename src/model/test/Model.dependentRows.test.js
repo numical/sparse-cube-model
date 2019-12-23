@@ -1,5 +1,6 @@
 const testFixture = require("./testFixture");
 const { increment, lookup } = require("../../fns/lookupFunctions");
+const { applyInterest } = require("../../fns/interestFunctions");
 const { populatedScenarios } = require("./testScaffold");
 
 populatedScenarios((test, setUp) => {
@@ -56,6 +57,53 @@ populatedScenarios((test, setUp) => {
     const expected = [1000, 11, 12, 13, 14, 15, 16, 17, 18, 19];
     const model = setUp();
     const rowName = "second lookup row";
+    model.updateRow({
+      rowName,
+      fn: lookup,
+      dependsOn: "independent row"
+    });
+    t.same(model.row({ rowName }), expected);
+    t.end();
+  });
+
+  test("Update row with function with mandatory dependents", t => {
+    const expected = [
+      1000,
+      1110,
+      1243.2,
+      1404.816,
+      1601.49024,
+      1841.713776,
+      2136.38798016,
+      2499.5739367872002,
+      2949.4972454088963,
+      3509.9017220365863
+    ];
+    const model = setUp();
+    const rowName = "second lookup row";
+    model.updateRow({
+      rowName,
+      fn: applyInterest,
+      dependsOn: {
+        interest: "independent row"
+      }
+    });
+    t.same(model.row({ rowName }), expected);
+    t.end();
+  });
+
+  test("Reset row which had function with mandatory dependents", t => {
+    const expected = [100, 11, 12, 13, 14, 15, 16, 17, 18, 19];
+    const model = setUp();
+    const rowName = "second lookup row";
+    model.updateRow({
+      rowName,
+      fn: applyInterest,
+      dependsOn: {
+        interest: "independent row"
+      },
+      constants: [100]
+    });
     model.updateRow({
       rowName,
       fn: lookup,

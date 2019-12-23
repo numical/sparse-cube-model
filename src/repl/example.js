@@ -9,7 +9,7 @@ const tablePrint = require("./tablePrint");
 
 const model = new Model({
   intervals: {
-    count: 13
+    count: 301
   }
 });
 
@@ -42,6 +42,25 @@ model.addRow({
   fn: applyAnnualisedCompoundInterest,
   dependsOn: ["interest rate", "contributions"],
   constants: [10000]
+});
+
+model.addRow({
+  rowName: "separator",
+  fn: previous,
+  constants: [0]
+});
+
+model.addRow({
+  rowName: "mortgage payments",
+  fn: previous,
+  constants: [-1000]
+});
+
+model.addRow({
+  rowName: "mortgage balance",
+  fn: applyAnnualisedCompoundInterest,
+  dependsOn: ["interest rate", "mortgage payments"],
+  constants: [250000]
 });
 
 tablePrint(model);
