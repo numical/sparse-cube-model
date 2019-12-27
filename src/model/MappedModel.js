@@ -100,7 +100,7 @@ class MappedModel extends Model {
     end,
     dependsOn
   }) {
-    unmapError(callMappings => {
+    return unmapError(callMappings => {
       const d = fromKey("row", this.#fromMap, callMappings, dependsOn);
       super.addRow({
         scenarioName: fromKey(
@@ -129,7 +129,7 @@ class MappedModel extends Model {
     constants,
     dependsOn
   }) {
-    unmapError(callMappings => {
+    return unmapError(callMappings => {
       super.updateRow({
         scenarioName: fromKey(
           "scenario",
@@ -148,7 +148,7 @@ class MappedModel extends Model {
   }
 
   deleteRow({ rowName, scenarioName = defaultScenario }) {
-    unmapError(callMappings => {
+    return unmapError(callMappings => {
       super.deleteRow({
         scenarioName: fromKey(
           "scenario",
@@ -164,7 +164,7 @@ class MappedModel extends Model {
   }
 
   deleteRows({ rowNames, scenarioName = defaultScenario }) {
-    unmapError(callMappings => {
+    return unmapError(callMappings => {
       super.deleteRows({
         scenarioName: fromKey(
           "scenario",
@@ -209,7 +209,7 @@ class MappedModel extends Model {
   }
 
   addScenario({ scenarioName, copyOf = defaultScenario } = {}) {
-    unmapError(callMappings => {
+    return unmapError(callMappings => {
       super.addScenario({
         scenarioName: addKey(
           "scenario",
@@ -230,7 +230,7 @@ class MappedModel extends Model {
   }
 
   deleteScenario(scenarioName) {
-    unmapError(callMappings => {
+    return unmapError(callMappings => {
       const mapped = fromKey(
         "scenario",
         this.#fromMap,

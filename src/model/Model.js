@@ -1,3 +1,4 @@
+const { clone } = require("ramda");
 const Dense3DArray = require("../data-structures/Dense3DArray");
 const modelMetadata = require("./util/modelMetadata");
 const prepareRowConstants = require("./util/prepareRowConstants");
@@ -88,6 +89,7 @@ class Model extends Dense3DArray {
   }) {
     const { intervals, scenarios } = this.#meta;
     const { row, scenario } = getRow(rowName, scenarioName, scenarios);
+    const original = clone(row);
     const { rowConstants, startInterval } = prepareRowConstants({
       fn,
       constants,
@@ -119,6 +121,7 @@ class Model extends Dense3DArray {
     rowstoUpdate.forEach(row => {
       calculateRow(row, scenario, startInterval, intervals.count - 1, this.set);
     });
+    return original;
   }
 
   deleteRow({ rowName, scenarioName = defaultScenario }) {
@@ -132,6 +135,7 @@ class Model extends Dense3DArray {
       );
     }
     deleteSingleRow(this, scenario, row, rowName);
+    return row;
   }
 
   deleteRows({ rowNames, scenarioName = defaultScenario }) {
@@ -169,6 +173,7 @@ class Model extends Dense3DArray {
         const rowName = mappedRowNames.get(row);
         deleteSingleRow(this, scenario, row, rowName);
       });
+    return rows.reverse;
   }
 
   row({ rowName, scenarioName = defaultScenario }) {
@@ -191,7 +196,8 @@ class Model extends Dense3DArray {
     if (!scenarioName) {
       throw new Error("A scenario name is required.");
     }
-    const scenarioToCopy = scenarios[copyOf];
+    const scenarioToCopy =
+      typeof copyOf === "string" ? scenarios[copyOf] : copyOf;
     if (!scenarioToCopy) {
       throw new Error(`Unknown scenario '${copyOf}'`);
     }
@@ -226,6 +232,7 @@ class Model extends Dense3DArray {
     }
     delete scenarios[scenarioName];
     this.delete({ z: scenario.index });
+    return scenario;
   }
 
   recalculate({ scenarioName } = {}) {
