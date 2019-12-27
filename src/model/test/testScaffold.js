@@ -1,6 +1,7 @@
 const tap = require("tap");
 const Model = require("../Model");
 const MappedModel = require("../MappedModel");
+const InteractiveModel = require("../InteractiveModel");
 const testFixture = require("./testFixture");
 
 const setupDescriptions = [":", "after serialisation:"];
@@ -11,7 +12,7 @@ const setupFns = [
 ];
 
 const emptyScenarios = fn => {
-  [Model, MappedModel].forEach(Type => {
+  [Model, MappedModel, InteractiveModel].forEach(Type => {
     tap.test(`${Type.name} tests:`, typeTests => {
       const { test } = typeTests;
       fn(test, Type);
@@ -22,7 +23,7 @@ const emptyScenarios = fn => {
 
 const populatedScenarios = fn => {
   setupFns.forEach((setupFn, setupIndex) => {
-    [Model, MappedModel].forEach(Type => {
+    [Model, MappedModel, InteractiveModel].forEach(Type => {
       tap.test(
         `${Type.name} tests ${setupDescriptions[setupIndex]}`,
         typeTests => {

@@ -5,17 +5,15 @@
   "main": "index.js",
   "dependencies": {
     "as-table": "1.0.55",
-    "debug": "4.1.1",
     "nanoid": "2.1.8",
     "ramda": "0.26.1"
   },
   "devDependencies": {
-    "faucet": "0.0.1",
     "prettier": "1.19.1",
-    "tap": "14.10.5",
-    "testdouble": "3.12.4"
+    "tap": "14.10.5"
   },
   "scripts": {
+    "lint": "prettier --check src/**/*.js",
     "test": "tap src/**/*.test.js --100",
     "test:debug": "DEBUG=sparse-cube-model:* tap --only --timeout=600 --no-coverage src/**/*.test.js",
     "test:only": "tap --only --timeout=600 --no-coverage src/**/*.test.js",
