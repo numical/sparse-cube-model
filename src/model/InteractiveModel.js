@@ -38,11 +38,11 @@ class InteractiveModel extends MappedModel {
         ? `add row '${rowName}' to scenario '${scenarioName}'`
         : `add row '${rowName}'`,
       redo: {
-        fn: this.addRow,
+        fn: "addRow",
         args
       },
       undo: {
-        fn: this.deleteRow,
+        fn: "deleteRow",
         args: {
           rowName,
           scenarioName
@@ -59,11 +59,11 @@ class InteractiveModel extends MappedModel {
         ? `update row '${rowName}' on scenario '${scenarioName}'`
         : `update row '${rowName}'`,
       redo: {
-        fn: this.updateRow,
+        fn: "updateRow",
         args
       },
       undo: {
-        fn: this.updateRow,
+        fn: "updateRow",
         args: { rowName, scenarioName, ...original }
       }
     });
@@ -77,11 +77,11 @@ class InteractiveModel extends MappedModel {
         ? `delete row '${rowName}' on scenario '${scenarioName}'`
         : `delete row '${rowName}'`,
       redo: {
-        fn: this.deleteRow,
+        fn: "deleteRow",
         args
       },
       undo: {
-        fn: this.addRow,
+        fn: "addRow",
         args: { rowName, scenarioName, ...original }
       }
     });
@@ -95,13 +95,13 @@ class InteractiveModel extends MappedModel {
         ? `delete rows '${rowNames.join(", ")}' on scenario '${scenarioName}'`
         : `delete row '${rowNames.join(", ")}'`,
       redo: {
-        fn: this.deleteRows,
+        fn: "deleteRows",
         args
       },
       undo: {
         fn: () => {
           originals.forEach(row => {
-            this.addRow({ rowName: row.name, scenarioName, ...row });
+            super.addRow({ rowName: row.name, scenarioName, ...row });
           });
         }
       }
@@ -114,11 +114,11 @@ class InteractiveModel extends MappedModel {
     addToHistory(this.#history, {
       description: `add scenario '${scenarioName}'`,
       redo: {
-        fn: this.addScenario,
+        fn: "addScenario",
         args
       },
       undo: {
-        fn: this.deleteScenario,
+        fn: "deleteScenario",
         args: {
           scenarioName
         }
@@ -131,11 +131,11 @@ class InteractiveModel extends MappedModel {
     addToHistory(this.#history, {
       description: `delete scenario '${scenarioName}'`,
       redo: {
-        fn: this.deleteScenario,
+        fn: "deleteScenario",
         scenarioName
       },
       undo: {
-        fn: this.addScenario,
+        fn: "addScenario",
         args: {
           scenarioName,
           copyOf: original
@@ -160,6 +160,9 @@ class InteractiveModel extends MappedModel {
     if (this.#history.current < 0) {
       throw new Error("Nothing to undo.");
     }
+    const { undo } = this.#history[this.#history.current];
+    const { fn, args } = undo;
+    super[fn](args);
     this.#history.current = this.#history.current - 1;
   }
 
@@ -167,6 +170,9 @@ class InteractiveModel extends MappedModel {
     if (this.#history.current === this.#history.length - 1) {
       throw new Error("Nothing to redo.");
     }
+    const { redo } = this.#history[this.#history.current + 1];
+    const { fn, args } = redo;
+    super[fn](args);
     this.#history.current = this.#history.current + 1;
   }
 }

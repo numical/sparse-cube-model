@@ -1,6 +1,15 @@
 const defaultValue = require("./defaultValue");
 const getIntervalFromDate = require("./getIntervalFromDate");
 
+const isEmpty = constants =>
+  !constants
+    ? true
+    : Array.isArray(constants)
+    ? constants.length === 0
+    : constants instanceof Map
+    ? constants.keys().length === 0
+    : Object.keys(constants).length === 0;
+
 const prepareRowConstants = ({
   fn,
   constants,
@@ -9,7 +18,7 @@ const prepareRowConstants = ({
   existingConstants,
   intervals
 }) => {
-  if (!fn && !constants) {
+  if (!fn && isEmpty(constants)) {
     throw new Error("No function or constants passed.");
   }
   if (fn && !fn.key) {
@@ -26,7 +35,7 @@ const prepareRowConstants = ({
   if (end instanceof Date) {
     end = calcIntervalFromDate(end);
   }
-  if (!constants) {
+  if (isEmpty(constants)) {
     const rowConstants =
       end < maxInterval
         ? Array(maxInterval + 1)

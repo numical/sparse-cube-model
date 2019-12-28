@@ -33,14 +33,14 @@ model.addRow({
 model.addRow({
   rowName: "total",
   fn: applyAnnualisedInterest,
-  dependsOn: ["interest rate", "contributions"],
+  dependsOn: { interest: "interest rate", increment: "contributions" },
   constants: [10000]
 });
 
 model.addRow({
   rowName: "compound total",
   fn: applyAnnualisedCompoundInterest,
-  dependsOn: ["interest rate", "contributions"],
+  dependsOn: { interest: "interest rate", increment: "contributions" },
   constants: [10000]
 });
 
@@ -59,10 +59,11 @@ model.addRow({
 model.addRow({
   rowName: "mortgage balance",
   fn: applyAnnualisedCompoundInterest,
-  dependsOn: ["interest rate", "mortgage payments"],
+  dependsOn: { interest: "interest rate", increment: "mortgage payments" },
   constants: [250000]
 });
 
 tablePrint(model);
 
+// console.log();
 // console.log(model.stringify());
