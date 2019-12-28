@@ -1,7 +1,7 @@
 {
   "name": "sparse-cube-model",
   "version": "0.0.1",
-  "description": "Experiment in scenario-based functional modelling",
+  "description": "Experiment in scenario-based financial modelling",
   "main": "index.js",
   "dependencies": {
     "as-table": "1.0.55",
@@ -18,7 +18,7 @@
     "test:debug": "DEBUG=sparse-cube-model:* tap --only --timeout=600 --no-coverage src/**/*.test.js",
     "test:only": "tap --only --timeout=600 --no-coverage src/**/*.test.js",
     "test:focus": "tap --timeout=600 --no-coverage src/**/InteractiveModel.deleteRow.test.js",
-    "test:model": "tap --timeout=600 --no-coverage src/**/Model.**.test.js",
+    "test:model": "tap --timeout=600 --no-coverage src/**/*Model.**.test.js",
     "test:d3da": "tap --timeout=600 --no-coverage src/**/Dense3DArray.**.test.js"
   },
   "repository": {

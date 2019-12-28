@@ -1,5 +1,5 @@
-const Model = require("../model/Model");
-const MappedModel = require("../model/MappedModel");
+const Model = require("../models/model/Model");
+const MappedModel = require("../models/mappedModel/MappedModel");
 const { interval, previous } = require("../fns/lookupFunctions");
 const {
   applyAnnualisedInterest,
