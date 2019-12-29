@@ -63,6 +63,7 @@ class Model extends Dense3DArray {
     });
     linkDependentRows(scenario, rowName, dependsOn);
     const row = {
+      name: rowName,
       index: y,
       constants: rowConstants
     };
@@ -140,27 +141,18 @@ class Model extends Dense3DArray {
 
   deleteRows({ rowNames, scenarioName = defaultScenario }) {
     const { scenarios } = this.#meta;
-    const { rows, mappedRowNames, scenario } = rowNames.reduce(
-      ({ rows, mappedRowNames, scenario }, rowName) => {
-        const { row: r, scenario: s } = getRow(
-          rowName,
-          scenarioName,
-          scenarios
-        );
-        mappedRowNames.set(r, rowName);
-        return { rows: [...rows, r], mappedRowNames, scenario: s };
-      },
-      { rows: [], mappedRowNames: new Map() }
+    const scenario = getRow(rowNames[0], scenarioName, scenarios).scenario;
+    const rows = rowNames.map(
+      rowName => getRow(rowName, scenarioName, scenarios).row
     );
+
     // can delete all if they are dependent only on each other
     rows.forEach(row => {
       if (row.dependents) {
         row.dependents.forEach(dependent => {
           if (!rowNames.includes(dependent)) {
             throw new Error(
-              `Cannot delete row '${mappedRowNames.get(
-                row
-              )}' as row '${dependent}' depends on it.`
+              `Cannot delete row '${row.name}' as row '${dependent}' depends on it.`
             );
           }
         });
@@ -170,10 +162,9 @@ class Model extends Dense3DArray {
     rows
       .sort((r1, r2) => r2.index - r1.index)
       .forEach(row => {
-        const rowName = mappedRowNames.get(row);
-        deleteSingleRow(this, scenario, row, rowName);
+        deleteSingleRow(this, scenario, row, row.name);
       });
-    return rows.reverse;
+    return rows.reverse();
   }
 
   row({ rowName, scenarioName = defaultScenario }) {

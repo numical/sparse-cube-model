@@ -99,11 +99,12 @@ class InteractiveModel extends MappedModel {
         args
       },
       undo: {
-        fn: () => {
-          originals.forEach(row => {
+        fn: rows => {
+          rows.forEach(row => {
             super.addRow({ rowName: row.name, scenarioName, ...row });
           });
-        }
+        },
+        args: originals
       }
     });
   }
@@ -162,7 +163,8 @@ class InteractiveModel extends MappedModel {
     }
     const { undo } = this.#history[this.#history.current];
     const { fn, args } = undo;
-    super[fn](args);
+    const undoFn = typeof fn === "string" ? super[fn] : fn;
+    undoFn(args);
     this.#history.current = this.#history.current - 1;
   }
 

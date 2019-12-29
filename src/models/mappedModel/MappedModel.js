@@ -93,21 +93,28 @@ class MappedModel extends Model {
         scenarioName: this.#fns.fromScenarioKey(scenarioName, callMappings),
         rowName: this.#fns.fromRowKey(rowName, callMappings)
       });
-      this.#fns.removeRowKey(rowName, callMappings);
-      return {
+      const mapped = {
         ...deletedRow,
+        name: this.#fns.toRowKey(deletedRow.name),
         dependsOn: this.#fns.toRowKey(deletedRow.dependsOn)
       };
-      return deletedRow;
+      this.#fns.removeRowKey(rowName, callMappings);
+      return mapped;
     });
   }
 
   deleteRows({ rowNames, scenarioName = defaultScenario }) {
     return this.#fns.unmapError(callMappings => {
-      const deletedRows = super.deleteRows({
-        scenarioName: this.#fns.fromScenarioKey(scenarioName, callMappings),
-        rowNames: this.#fns.fromRowKey(rowNames, callMappings)
-      });
+      const deletedRows = super
+        .deleteRows({
+          scenarioName: this.#fns.fromScenarioKey(scenarioName, callMappings),
+          rowNames: this.#fns.fromRowKey(rowNames, callMappings)
+        })
+        .map(deletedRow => ({
+          ...deletedRow,
+          name: this.#fns.toRowKey(deletedRow.name),
+          dependsOn: this.#fns.toRowKey(deletedRow.dependsOn)
+        }));
       this.#fns.removeRowKey(rowNames, callMappings);
       return deletedRows;
     });
