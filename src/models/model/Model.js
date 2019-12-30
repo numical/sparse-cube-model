@@ -5,6 +5,7 @@ const prepareRowConstants = require("./internal/prepareRowConstants");
 const getRow = require("./internal/getRow");
 const calculateRow = require("./internal/calculateRow");
 const bindFnToRow = require("./internal/bindFnToRow");
+const editRow = require("./internal/editRow");
 const compareByIndex = require("./internal/compareByIndex");
 const deleteSingleRow = require("./internal/deleteSingleRow");
 const linkAllDependentRows = require("./internal/linkAllDependentRows");
@@ -90,39 +91,16 @@ class Model extends Dense3DArray {
   }) {
     const { intervals, scenarios } = this.#meta;
     const { row, scenario } = getRow(rowName, scenarioName, scenarios);
-    const original = clone(row);
-    const { rowConstants, startInterval } = prepareRowConstants({
-      fn,
-      constants,
-      existingConstants: row.constants,
-      intervals
-    });
-    linkDependentRows(scenario, rowName, dependsOn);
-    bindFnToRow(
-      this,
-      this.#meta.intervals,
-      scenario,
+    return editRow({
+      model: this,
       row,
+      scenario,
+      intervals,
       fn,
       fnArgs,
+      constants,
       dependsOn
-    );
-    row.constants = rowConstants;
-    unlinkDependentRows(scenario, rowName, row.dependsOn);
-    linkDependentRows(scenario, rowName, dependsOn);
-    const rowstoUpdate = [row];
-    if (row.dependents) {
-      rowstoUpdate.push(
-        ...row.dependents.map(
-          dependencyRowName =>
-            getRow(dependencyRowName, scenarioName, scenarios).row
-        )
-      );
-    }
-    rowstoUpdate.forEach(row => {
-      calculateRow(row, scenario, startInterval, intervals.count - 1, this.set);
     });
-    return original;
   }
 
   deleteRow({ rowName, scenarioName = defaultScenario }) {
