@@ -77,6 +77,28 @@ class InteractiveModel extends MappedModel {
     });
   }
 
+  patchRow(args = {}) {
+    const { historyDescription, ...rest } = args;
+    const { rowName, scenarioName } = rest;
+    const original = super.patchRow(rest);
+    const description = historyDescription
+      ? historyDescription
+      : scenarioName
+      ? `patch row '${rowName}' on scenario '${scenarioName}'`
+      : `patch row '${rowName}'`;
+    addToHistory(this.#history, {
+      description,
+      redo: {
+        fn: "patchRow",
+        args: rest
+      },
+      undo: {
+        fn: "patchRow",
+        args: { rowName, scenarioName, ...original }
+      }
+    });
+  }
+
   deleteRow(args = {}) {
     const { historyDescription, ...rest } = args;
     const { rowName, scenarioName } = rest;

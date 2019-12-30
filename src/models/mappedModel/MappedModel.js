@@ -87,6 +87,27 @@ class MappedModel extends Model {
     });
   }
 
+  patchRow({
+    rowName,
+    scenarioName = defaultScenario,
+    fn,
+    fnArgs,
+    constants,
+    dependsOn
+  }) {
+    return this.#fns.unmapError(callMappings => {
+      const originalRow = super.patchRow({
+        scenarioName: this.#fns.fromScenarioKey(scenarioName, callMappings),
+        rowName: this.#fns.fromRowKey(rowName, callMappings),
+        fn,
+        fnArgs: this.#fns.fromRowKey(fnArgs, callMappings),
+        constants,
+        dependsOn: this.#fns.fromRowKey(dependsOn, callMappings)
+      });
+      return originalRow;
+    });
+  }
+
   deleteRow({ rowName, scenarioName = defaultScenario }) {
     return this.#fns.unmapError(callMappings => {
       const deletedRow = super.deleteRow({

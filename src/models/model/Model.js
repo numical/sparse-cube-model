@@ -103,6 +103,28 @@ class Model extends Dense3DArray {
     });
   }
 
+  patchRow({
+    rowName,
+    scenarioName = defaultScenario,
+    fn,
+    fnArgs,
+    constants,
+    dependsOn
+  }) {
+    const { intervals, scenarios } = this.#meta;
+    const { row, scenario } = getRow(rowName, scenarioName, scenarios);
+    return editRow({
+      model: this,
+      row,
+      scenario,
+      intervals,
+      fn: fn || row.fn,
+      fnArgs: fnArgs || row.fnArgs,
+      constants: constants || row.constants,
+      dependsOn: dependsOn || row.dependsOn
+    });
+  }
+
   deleteRow({ rowName, scenarioName = defaultScenario }) {
     const { scenarios } = this.#meta;
     const { row, scenario } = getRow(rowName, scenarioName, scenarios);
