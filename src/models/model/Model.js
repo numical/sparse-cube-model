@@ -209,7 +209,7 @@ class Model extends Dense3DArray {
     this.recalculate({ scenarioName });
   }
 
-  deleteScenario(scenarioName) {
+  deleteScenario({ scenarioName } = {}) {
     const { scenarios } = this.#meta;
     if (!scenarioName) {
       throw new Error("A scenario name is required.");
@@ -222,7 +222,9 @@ class Model extends Dense3DArray {
       throw new Error(`Cannot delete only scenario '${scenarioName}'.`);
     }
     delete scenarios[scenarioName];
-    this.delete({ z: scenario.index });
+    if (!this.isEmpty()) {
+      this.delete({ z: scenario.index });
+    }
     return scenario;
   }
 

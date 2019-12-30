@@ -1,5 +1,8 @@
 const testFixture = require("../../test/testFixture");
-const { populatedScenarios } = require("../../test/testScaffold");
+const {
+  emptyScenarios,
+  populatedScenarios
+} = require("../../test/testScaffold");
 
 populatedScenarios((test, setUp) => {
   test("Delete scenario with no arg throws error", t => {
@@ -14,7 +17,7 @@ populatedScenarios((test, setUp) => {
   test("Delete scenario with unknown scenario name throws error", t => {
     const model = setUp();
     t.throws(
-      () => model.deleteScenario("unknown scenario"),
+      () => model.deleteScenario({ scenarioName: "unknown scenario" }),
       new Error("Unknown scenario 'unknown scenario'")
     );
     t.end();
@@ -23,7 +26,7 @@ populatedScenarios((test, setUp) => {
   test("Delete only scenario throws error", t => {
     const model = setUp();
     t.throws(
-      () => model.deleteScenario("defaultScenario"),
+      () => model.deleteScenario({ scenarioName: "defaultScenario" }),
       new Error("Cannot delete only scenario 'defaultScenario'.")
     );
     t.end();
@@ -38,7 +41,7 @@ populatedScenarios((test, setUp) => {
       y: testFixture.rows.length,
       z: 2
     });
-    model.deleteScenario(scenarioName);
+    model.deleteScenario({ scenarioName });
     t.same(model.lengths, {
       x: testFixture.meta.intervals.count,
       y: testFixture.rows.length,
@@ -55,7 +58,7 @@ populatedScenarios((test, setUp) => {
     const model = setUp();
     model.addScenario({ scenarioName: "second scenario" });
     const scenarioName = "defaultScenario";
-    model.deleteScenario(scenarioName);
+    model.deleteScenario({ scenarioName });
     t.same(model.lengths, {
       x: testFixture.meta.intervals.count,
       y: testFixture.rows.length,
@@ -76,6 +79,21 @@ populatedScenarios((test, setUp) => {
         scenarioName: "defaultScenario",
         copyOf: "second scenario"
       })
+    );
+    t.end();
+  });
+});
+
+emptyScenarios((test, Type) => {
+  test("Can delete non-default scenario on empty model", t => {
+    const model = new Type();
+    const scenarioName = "test scenario";
+    model.addScenario({ scenarioName });
+    t.same(model.scenario({ scenarioName }), []);
+    model.deleteScenario({ scenarioName });
+    t.throws(
+      () => model.deleteScenario({ scenarioName }),
+      new Error(`Unknown scenario '${scenarioName}'`)
     );
     t.end();
   });

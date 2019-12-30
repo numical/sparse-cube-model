@@ -146,12 +146,13 @@ class MappedModel extends Model {
     });
   }
 
-  deleteScenario(scenarioName) {
-    return this.#fns.unmapError(callMappings => {
+  deleteScenario({ scenarioName } = {}) {
+    this.#fns.unmapError(callMappings => {
       const mapped = this.#fns.fromScenarioKey(scenarioName, callMappings);
-      const deletedScenario = super.deleteScenario(mapped);
+      super.deleteScenario({
+        scenarioName: mapped
+      });
       this.#fns.removeScenarioKey(mapped, callMappings);
-      return deletedScenario;
     });
   }
 

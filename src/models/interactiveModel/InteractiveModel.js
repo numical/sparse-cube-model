@@ -127,13 +127,14 @@ class InteractiveModel extends MappedModel {
     });
   }
 
-  deleteScenario(scenarioName) {
-    const original = super.deleteScenario(scenarioName);
+  deleteScenario(args) {
+    const original = super.deleteScenario(args);
+    const { scenarioName } = args;
     addToHistory(this.#history, {
       description: `delete scenario '${scenarioName}'`,
       redo: {
         fn: "deleteScenario",
-        scenarioName
+        args
       },
       undo: {
         fn: "addScenario",
@@ -163,8 +164,11 @@ class InteractiveModel extends MappedModel {
     }
     const { undo } = this.#history[this.#history.current];
     const { fn, args } = undo;
-    const undoFn = typeof fn === "string" ? super[fn] : fn;
-    undoFn(args);
+    if (typeof fn === "string") {
+      super[fn](args);
+    } else {
+      fn(args);
+    }
     this.#history.current = this.#history.current - 1;
   }
 
