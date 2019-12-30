@@ -1,11 +1,10 @@
 const { emptyScenarios } = require("../../test/testScaffold");
+const sequence = require("../../test/sequenceArray");
 const {
   increment,
   interval,
   previous
 } = require("../../../fns/lookupFunctions");
-
-const sequence = (length, mapFn = (_, i) => i) => Array.from({ length }, mapFn);
 
 const count = 10;
 const testDefaults = {
