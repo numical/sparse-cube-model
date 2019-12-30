@@ -249,3 +249,25 @@ test("adding new ops after undo clears redo items", t => {
   t.same(model.redoOps(), []);
   t.end();
 });
+
+test("history displays custom history descriptions", t => {
+  const model = new InteractiveModel(testMeta);
+  model.addRow({
+    rowName: "test row",
+    fn: interval,
+    historyDescription: "first op"
+  });
+  model.updateRow({
+    rowName: "test row",
+    fn: increment,
+    constants: [100],
+    historyDescription: "second op"
+  });
+  model.addScenario({
+    scenarioName: "second scenario",
+    historyDescription: "third op"
+  });
+  t.same(model.undoOps(), ["first op", "second op", "third op"]);
+  t.same(model.redoOps(), []);
+  t.end();
+});
