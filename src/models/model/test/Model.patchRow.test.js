@@ -29,6 +29,8 @@ populatedScenarios((test, setUp) => {
     t.end();
   });
 
+  /*
+
   test("Patch row with neither function nor constants throws error", t => {
     const model = setUp();
     t.throws(
@@ -40,6 +42,7 @@ populatedScenarios((test, setUp) => {
     );
     t.end();
   });
+
 
   test("Patch row with a function with no key throws an error", t => {
     const model = setUp();
@@ -53,6 +56,7 @@ populatedScenarios((test, setUp) => {
     );
     t.end();
   });
+
 
   test("Patch row with no function and smaller constants array than intervals throws error", t => {
     const model = setUp();
@@ -184,4 +188,5 @@ populatedScenarios((test, setUp) => {
     t.same(model.row({ rowName }), expected);
     t.end();
   });
+  */
 });

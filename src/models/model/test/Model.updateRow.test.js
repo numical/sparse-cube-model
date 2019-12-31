@@ -96,6 +96,21 @@ populatedScenarios((test, setUp) => {
     t.end();
   });
 
+  test("Update row with fn args but no fn throws error", t => {
+    const rowName = "increment row";
+    const model = setUp();
+    t.throws(
+      () =>
+        model.updateRow({
+          rowName,
+          constants: [0],
+          fnArgs: { foo: "bar" }
+        }),
+      new Error("Function args passed but no function.")
+    );
+    t.end();
+  });
+
   test("Update row updates all with constants", t => {
     const rowName = "increment row";
     const constants = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18];

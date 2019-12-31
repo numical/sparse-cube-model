@@ -1,8 +1,6 @@
-const { clone } = require("ramda");
 const Dense3DArray = require("../../data-structures/Dense3DArray");
 const modelMetadata = require("./internal/modelMetadata");
 const prepareRowConstants = require("./internal/prepareRowConstants");
-const getRow = require("./internal/getRow");
 const calculateRow = require("./internal/calculateRow");
 const bindFnToRow = require("./internal/bindFnToRow");
 const editRow = require("./internal/editRow");
@@ -10,7 +8,10 @@ const compareByIndex = require("./internal/compareByIndex");
 const deleteSingleRow = require("./internal/deleteSingleRow");
 const linkAllDependentRows = require("./internal/linkAllDependentRows");
 const linkDependentRows = require("./internal/linkDependentRows");
-const unlinkDependentRows = require("./internal/unlinkDependentRows");
+const validateFn = require("./internal/validateFn");
+const validateFnArgs = require("./internal/validateFnArgs");
+const validateRow = require("./internal/validateRow");
+const validateScenario = require("./internal/validateScenario");
 const serializer = require("./internal/serializer");
 const defaultValue = require("./internal/defaultValue");
 
@@ -43,18 +44,10 @@ class Model extends Dense3DArray {
   }) {
     const { intervals, scenarios } = this.#meta;
     const { y } = this.lengths;
-    const scenario = scenarios[scenarioName];
-    if (!scenario) {
-      throw new Error(`Unknown scenario '${scenarioName}'`);
-    }
-    if (!rowName) {
-      throw new Error(`A row name is required`);
-    }
-    if (scenario.rows[rowName]) {
-      throw new Error(
-        `Scenario '${scenarioName}' already has row '${rowName}'`
-      );
-    }
+    const scenario = validateScenario({ scenarioName, scenarios });
+    validateRow({ rowName, scenario, shouldExist: false });
+    validateFn({ fn, constants });
+    validateFnArgs({ fn, fnArgs });
     const { rowConstants } = prepareRowConstants({
       fn,
       constants,
@@ -90,7 +83,10 @@ class Model extends Dense3DArray {
     dependsOn
   }) {
     const { intervals, scenarios } = this.#meta;
-    const { row, scenario } = getRow(rowName, scenarioName, scenarios);
+    const scenario = validateScenario({ scenarioName, scenarios });
+    const row = validateRow({ rowName, scenario });
+    validateFn({ fn, constants });
+    validateFnArgs({ fn, fnArgs });
     return editRow({
       model: this,
       row,
@@ -113,7 +109,10 @@ class Model extends Dense3DArray {
     dependsOn
   }) {
     const { intervals, scenarios } = this.#meta;
-    const { row, scenario } = getRow(rowName, scenarioName, scenarios);
+    const scenario = validateScenario({ scenarioName, scenarios });
+    const row = validateRow({ rowName, scenario });
+    validateFn({ fn, constants });
+    validateFnArgs({ fn: fn || row.fn, fnArgs });
     return editRow({
       model: this,
       row,
@@ -129,7 +128,8 @@ class Model extends Dense3DArray {
 
   deleteRow({ rowName, scenarioName = defaultScenario }) {
     const { scenarios } = this.#meta;
-    const { row, scenario } = getRow(rowName, scenarioName, scenarios);
+    const scenario = validateScenario({ scenarioName, scenarios });
+    const row = validateRow({ rowName, scenario });
     if (row.dependents) {
       throw new Error(
         `Cannot delete row '${rowName}' as rows '${row.dependents.join(
@@ -143,11 +143,8 @@ class Model extends Dense3DArray {
 
   deleteRows({ rowNames, scenarioName = defaultScenario }) {
     const { scenarios } = this.#meta;
-    const scenario = getRow(rowNames[0], scenarioName, scenarios).scenario;
-    const rows = rowNames.map(
-      rowName => getRow(rowName, scenarioName, scenarios).row
-    );
-
+    const scenario = validateScenario({ scenarioName, scenarios });
+    const rows = rowNames.map(rowName => validateRow({ rowName, scenario }));
     // can delete all if they are dependent only on each other
     rows.forEach(row => {
       if (row.dependents) {
@@ -171,24 +168,20 @@ class Model extends Dense3DArray {
 
   row({ rowName, scenarioName = defaultScenario }) {
     const { scenarios } = this.#meta;
-    const { row, scenario } = getRow(rowName, scenarioName, scenarios);
+    const scenario = validateScenario({ scenarioName, scenarios });
+    const row = validateRow({ rowName, scenario });
     return this.range({ y: row.index, z: scenario.index });
   }
 
   scenario({ scenarioName = defaultScenario } = {}) {
     const { scenarios } = this.#meta;
-    const scenario = scenarios[scenarioName];
-    if (!scenario) {
-      throw new Error(`Unknown scenario '${scenarioName}'`);
-    }
+    const scenario = validateScenario({ scenarioName, scenarios });
     return this.isEmpty() ? [] : this.range({ z: scenario.index });
   }
 
   addScenario({ scenarioName, copyOf = defaultScenario } = {}) {
     const { scenarios } = this.#meta;
-    if (!scenarioName) {
-      throw new Error("A scenario name is required.");
-    }
+    validateScenario({ scenarioName, scenarios, shouldExist: false });
     const scenarioToCopy =
       typeof copyOf === "string" ? scenarios[copyOf] : copyOf;
     if (!scenarioToCopy) {
@@ -213,13 +206,7 @@ class Model extends Dense3DArray {
 
   deleteScenario({ scenarioName } = {}) {
     const { scenarios } = this.#meta;
-    if (!scenarioName) {
-      throw new Error("A scenario name is required.");
-    }
-    const scenario = scenarios[scenarioName];
-    if (!scenario) {
-      throw new Error(`Unknown scenario '${scenarioName}'`);
-    }
+    const scenario = validateScenario({ scenarioName, scenarios });
     if (Object.keys(scenarios).length === 1) {
       throw new Error(`Cannot delete only scenario '${scenarioName}'.`);
     }

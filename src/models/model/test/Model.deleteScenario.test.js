@@ -74,6 +74,7 @@ populatedScenarios((test, setUp) => {
   test("Can re-add default scenario", t => {
     const model = setUp();
     model.addScenario({ scenarioName: "second scenario" });
+    model.deleteScenario({ scenarioName: "defaultScenario" });
     t.doesNotThrow(() =>
       model.addScenario({
         scenarioName: "defaultScenario",

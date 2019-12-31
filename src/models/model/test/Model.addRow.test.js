@@ -51,7 +51,7 @@ emptyScenarios((test, Type) => {
     model.addRow(args);
     t.throws(
       () => model.addRow(args),
-      new Error("Scenario 'defaultScenario' already has row 'test row'")
+      new Error("Row 'test row' already exists.")
     );
     t.end();
   });
