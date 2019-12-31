@@ -170,7 +170,7 @@ populatedScenarios((test, setUp) => {
 
     t.throws(
       () => model.patchRow({ rowName, constants, fn: increment }),
-      new Error("Constants must be an array or an object.")
+      new Error("Constants must be an array or a dictionary or a map. ")
     );
     t.end();
   });

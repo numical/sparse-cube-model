@@ -54,7 +54,7 @@ populatedScenarios((test, setUp) => {
   });
 
   test("Update row dependsOn", t => {
-    const expected = [1000, 11, 12, 13, 14, 15, 16, 17, 18, 19];
+    const expected = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
     const model = setUp();
     const rowName = "second lookup row";
     model.updateRow({
@@ -86,14 +86,15 @@ populatedScenarios((test, setUp) => {
       fn: applyInterest,
       dependsOn: {
         interest: "independent row"
-      }
+      },
+      constants: [1000]
     });
     t.same(model.row({ rowName }), expected);
     t.end();
   });
 
   test("Reset row which had function with mandatory dependents", t => {
-    const expected = [100, 11, 12, 13, 14, 15, 16, 17, 18, 19];
+    const expected = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
     const model = setUp();
     const rowName = "second lookup row";
     model.updateRow({
@@ -102,7 +103,7 @@ populatedScenarios((test, setUp) => {
       dependsOn: {
         interest: "independent row"
       },
-      constants: [100]
+      constants: [123]
     });
     model.updateRow({
       rowName,

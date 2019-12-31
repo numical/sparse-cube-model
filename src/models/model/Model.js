@@ -99,6 +99,7 @@ class Model extends Dense3DArray {
       fn,
       fnArgs,
       constants,
+      existingConstants: undefined,
       dependsOn
     });
   }
@@ -120,7 +121,8 @@ class Model extends Dense3DArray {
       intervals,
       fn: fn || row.fn,
       fnArgs: fnArgs || row.fnArgs,
-      constants: constants || row.constants,
+      constants: constants,
+      existingConstants: row.constants,
       dependsOn: dependsOn || row.dependsOn
     });
   }

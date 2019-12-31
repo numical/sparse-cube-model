@@ -59,7 +59,7 @@ const prepareRowConstants = ({
     };
   }
   if (typeof constants !== "object") {
-    throw new Error("Constants must be an array or an object.");
+    throw new Error("Constants must be an array or a dictionary or a map.");
   }
   if (constants instanceof Map) {
     constants = Array.from(constants.entries()).reduce(

@@ -13,13 +13,14 @@ const editRow = ({
   fn,
   fnArgs,
   constants,
+  existingConstants,
   dependsOn
 }) => {
   const original = clone(row);
   const { rowConstants, startInterval } = prepareRowConstants({
     fn,
     constants,
-    existingConstants: row.constants,
+    existingConstants,
     intervals
   });
   linkDependentRows(scenario, row.name, dependsOn);
