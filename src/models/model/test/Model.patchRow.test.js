@@ -1,7 +1,9 @@
-const { populatedScenarios } = require("../../test/testScaffold");
+const {
+  emptyScenarios,
+  populatedScenarios
+} = require("../../test/testScaffold");
 const { increment } = require("../../../fns/lookupFunctions");
-
-const rowName = "increment row";
+const sequence = require("../../test/sequenceArray");
 
 populatedScenarios((test, setUp) => {
   test("Patch unknown row throws error", t => {
@@ -21,15 +23,25 @@ populatedScenarios((test, setUp) => {
     t.throws(
       () =>
         model.patchRow({
-          rowName,
+          rowName: "increment row",
           scenarioName: "unknown scenario"
         }),
       new Error("Unknown scenario 'unknown scenario'")
     );
     t.end();
   });
+});
 
-  /*
+/*
+emptyScenarios((test, setupFn) => {
+  test("Patch row errors if no fn but fnArgs", t => {
+    const rowName = "test row";
+    const model = setupFn();
+    model.addRow({ rowName, constants: sequence(10, 0) });
+    model.patchRow({ rowName, fnArgs: { foo: "bar" } });
+    t.end();
+  });
+});
 
   test("Patch row with neither function nor constants throws error", t => {
     const model = setUp();
@@ -188,5 +200,5 @@ populatedScenarios((test, setUp) => {
     t.same(model.row({ rowName }), expected);
     t.end();
   });
-  */
 });
+   */

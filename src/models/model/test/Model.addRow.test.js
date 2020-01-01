@@ -6,21 +6,14 @@ const {
   previous
 } = require("../../../fns/lookupFunctions");
 
-const count = 10;
-const testDefaults = {
-  intervals: {
-    count
-  }
-};
-
-emptyScenarios((test, Type) => {
+emptyScenarios((test, setupFn) => {
   test("Add row with unknown scenario throws error", t => {
     const rowName = "test row";
     const fn = () => {};
     const scenarioName = "unknown test scenario";
     const args = { rowName, fn, scenarioName };
 
-    const model = new Type(testDefaults);
+    const model = setupFn();
     t.throws(
       () => model.addRow(args),
       new Error("Unknown scenario 'unknown test scenario'")
@@ -33,7 +26,7 @@ emptyScenarios((test, Type) => {
     const fn = () => {};
     const args = { rowName, fn };
 
-    const model = new Type(testDefaults);
+    const model = setupFn();
     t.throws(
       () => model.addRow(args),
       new Error("function 'fn' must have a 'key' property.")
@@ -47,7 +40,7 @@ emptyScenarios((test, Type) => {
     fn.key = "test fn";
     const args = { rowName, fn };
 
-    const model = new Type(testDefaults);
+    const model = setupFn();
     model.addRow(args);
     t.throws(
       () => model.addRow(args),
@@ -61,13 +54,13 @@ emptyScenarios((test, Type) => {
     fn.key = "test fn";
     const args = { fn };
 
-    const model = new Type(testDefaults);
+    const model = setupFn();
     t.throws(() => model.addRow(args), new Error("A row name is required"));
     t.end();
   });
 
   test("Add row with no function and smaller constants array than intervals throws error", t => {
-    const model = new Type(testDefaults);
+    const model = setupFn();
     const args = { rowName: "test row", constants: [0] };
     t.throws(
       () => model.addRow(args),
@@ -77,7 +70,7 @@ emptyScenarios((test, Type) => {
   });
 
   test("Add row with no function and fewer constants that intervals throws error", t => {
-    const model = new Type(testDefaults);
+    const model = setupFn();
     const args = { rowName: "test row", constants: { 0: 5 } };
     t.throws(
       () => model.addRow(args),
@@ -87,7 +80,7 @@ emptyScenarios((test, Type) => {
   });
 
   test("Add row with no function and undefined constants", t => {
-    const model = new Type(testDefaults);
+    const model = setupFn();
     const constants = [0, 1, 2, 3, 4, 5, 6, undefined, 8, 9];
     const args = { rowName: "test row", constants };
     t.throws(
@@ -99,13 +92,13 @@ emptyScenarios((test, Type) => {
 
   test("Add row of constants", t => {
     const rowName = "test row";
-    const constants = sequence(count);
-    const model = new Type(testDefaults);
+    const constants = sequence(test.meta.intervals.count);
+    const model = setupFn();
     model.addRow({
       rowName,
       constants
     });
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < test.meta.intervals.count; i++) {
       t.equal(model[i][0][0], constants[i]);
     }
     t.end();
@@ -113,8 +106,8 @@ emptyScenarios((test, Type) => {
 
   test("retrieve added row of constants", t => {
     const rowName = "test row";
-    const constants = sequence(count);
-    const model = new Type(testDefaults);
+    const constants = sequence(test.meta.intervals.count);
+    const model = setupFn();
     model.addRow({
       rowName,
       constants
@@ -132,7 +125,7 @@ emptyScenarios((test, Type) => {
       7: 10
     };
     const expected = [0, 10, 2, 10, 4, 5, 6, 10, 8, 9];
-    const model = new Type(testDefaults);
+    const model = setupFn();
     model.addRow({
       rowName,
       constants,
@@ -151,7 +144,7 @@ emptyScenarios((test, Type) => {
       [7, 10]
     ]);
     const expected = [0, 10, 2, 10, 4, 5, 6, 10, 8, 9];
-    const model = new Type(testDefaults);
+    const model = setupFn();
     model.addRow({
       rowName,
       constants,
@@ -169,7 +162,7 @@ emptyScenarios((test, Type) => {
       a: 10,
       7: 10
     };
-    const model = new Type(testDefaults);
+    const model = setupFn();
     const args = { rowName: "test row", constants, fn: interval };
     t.throws(() => {
       model.addRow(args);
@@ -184,7 +177,7 @@ emptyScenarios((test, Type) => {
       ["a", 10],
       [7, 10]
     ]);
-    const model = new Type(testDefaults);
+    const model = setupFn();
     const args = { rowName: "test row", constants, fn: interval };
     t.throws(() => {
       model.addRow(args);
@@ -199,7 +192,7 @@ emptyScenarios((test, Type) => {
       11: 10,
       7: 10
     };
-    const model = new Type(testDefaults);
+    const model = setupFn();
     const args = { rowName: "test row", constants, fn: interval };
     t.throws(() => {
       model.addRow(args);
@@ -214,7 +207,7 @@ emptyScenarios((test, Type) => {
       [11, 10],
       [7, 10]
     ]);
-    const model = new Type(testDefaults);
+    const model = setupFn();
     const args = { rowName: "test row", constants, fn: interval };
     t.throws(() => {
       model.addRow(args);
@@ -224,8 +217,8 @@ emptyScenarios((test, Type) => {
 
   test("retrieve row fails if unknown row name", t => {
     const rowName = "test row";
-    const constants = sequence(count);
-    const model = new Type(testDefaults);
+    const constants = sequence(test.meta.intervals.count);
+    const model = setupFn();
     model.addRow({
       rowName,
       constants
@@ -239,8 +232,8 @@ emptyScenarios((test, Type) => {
 
   test("retrieve row fails if unknown scenario name", t => {
     const rowName = "test row";
-    const constants = sequence(count);
-    const model = new Type(testDefaults);
+    const constants = sequence(test.meta.intervals.count);
+    const model = setupFn();
     model.addRow({
       rowName,
       constants
@@ -254,7 +247,7 @@ emptyScenarios((test, Type) => {
 
   test("Add sequence row using zero initial constant", t => {
     const rowName = "test row";
-    const model = new Type(testDefaults);
+    const model = setupFn();
     model.addRow({
       rowName,
       fn: increment,
@@ -267,7 +260,7 @@ emptyScenarios((test, Type) => {
 
   test("Add fixed value row using initial constant", t => {
     const rowName = "test row";
-    const model = new Type(testDefaults);
+    const model = setupFn();
     model.addRow({
       rowName,
       fn: previous,
@@ -281,7 +274,7 @@ emptyScenarios((test, Type) => {
   test("Add sequence row using custom initial constant", t => {
     const rowName = "test row";
     const initialValue = 500;
-    const model = new Type(testDefaults);
+    const model = setupFn();
     model.addRow({
       rowName,
       fn: increment,
@@ -294,7 +287,7 @@ emptyScenarios((test, Type) => {
 
   test("Add sequence row using multiple constants", t => {
     const rowName = "test row";
-    const model = new Type(testDefaults);
+    const model = setupFn();
     const constants = new Array(5);
     constants[0] = 3;
     constants[2] = 13;
@@ -312,7 +305,7 @@ emptyScenarios((test, Type) => {
 
   test("Add sequence row using multiple constants via Map", t => {
     const rowName = "test row";
-    const model = new Type(testDefaults);
+    const model = setupFn();
     const constants = new Map([
       [0, 3],
       [2, 13],
@@ -331,7 +324,7 @@ emptyScenarios((test, Type) => {
 
   test("Add row of functions", t => {
     const rowName = "test row";
-    const model = new Type(testDefaults);
+    const model = setupFn();
     model.addRow({
       rowName,
       fn: interval
@@ -346,7 +339,7 @@ emptyScenarios((test, Type) => {
     const start = 5;
     const end = 7;
     const fn = interval;
-    const model = new Type(testDefaults);
+    const model = setupFn();
     model.addRow({
       rowName,
       fn,
@@ -359,7 +352,7 @@ emptyScenarios((test, Type) => {
   });
 
   test("Add multiple rows", t => {
-    const model = new Type(testDefaults);
+    const model = setupFn();
     const rowNames = ["row 0", "row 1", "row2"];
     rowNames.forEach((rowName, index) => {
       model.addRow({

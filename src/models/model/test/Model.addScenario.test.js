@@ -1,4 +1,7 @@
-const { emptyScenarios } = require("../../test/testScaffold");
+const {
+  emptyScenarios,
+  populatedScenarios
+} = require("../../test/testScaffold");
 const {
   increment,
   interval,
@@ -6,11 +9,10 @@ const {
   previous
 } = require("../../../fns/lookupFunctions");
 const iterate2D = require("../../../data-structures/iterate2D");
-const testFixture = require("../../test/testFixture");
 
-emptyScenarios((test, Type) => {
+populatedScenarios((test, setupFn) => {
   test("Add scenario with no args throws error", t => {
-    const model = testFixture(Type);
+    const model = setupFn();
     t.throws(
       () => model.addScenario(),
       new Error("A scenario name is required.")
@@ -19,7 +21,7 @@ emptyScenarios((test, Type) => {
   });
 
   test("Add scenario with no scenario name throws error", t => {
-    const model = testFixture(Type);
+    const model = setupFn();
     t.throws(
       () => model.addScenario({}),
       new Error("A scenario name is required.")
@@ -30,7 +32,7 @@ emptyScenarios((test, Type) => {
   test("Add scenario copying unknown scenario throws error", t => {
     const scenarioName = "test scenario";
     const copyOf = "unknown scenario";
-    const model = testFixture(Type);
+    const model = setupFn();
     t.throws(
       () => model.addScenario({ scenarioName, copyOf }),
       new Error(`Unknown scenario '${copyOf}'`)
@@ -38,16 +40,9 @@ emptyScenarios((test, Type) => {
     t.end();
   });
 
-  test("Add scenario based on empty default", t => {
-    const scenarioName = "test scenario";
-    const model = new Type();
-    model.addScenario({ scenarioName });
-    t.end();
-  });
-
   test("Add scenario based on populated default", t => {
     const scenarioName = "test scenario";
-    const model = testFixture(Type);
+    const model = setupFn();
     t.same(model.lengths, { x: 10, y: 4, z: 1 });
     model.addScenario({ scenarioName });
     t.same(model.lengths, { x: 10, y: 4, z: 2 });
@@ -59,7 +54,7 @@ emptyScenarios((test, Type) => {
 
   test("updateRow of a single scenario works", t => {
     const scenarioName = "test scenario";
-    const model = testFixture(Type);
+    const model = setupFn();
     model.updateRow({
       rowName: "increment row",
       constants: [100],
@@ -78,7 +73,7 @@ emptyScenarios((test, Type) => {
 
   test("Adding a scenario does not affect updates of the original scenario", t => {
     const scenarioName = "test scenario";
-    const model = testFixture(Type);
+    const model = setupFn();
     model.addScenario({ scenarioName });
     model.updateRow({
       rowName: "increment row",
@@ -98,7 +93,7 @@ emptyScenarios((test, Type) => {
 
   test("Ensure added scenario is independent", t => {
     const scenarioName = "test scenario";
-    const model = testFixture(Type);
+    const model = setupFn();
     model.addScenario({ scenarioName });
     model.updateRow({
       rowName: "increment row",
@@ -133,7 +128,7 @@ emptyScenarios((test, Type) => {
 
   test("Add scenario based on another scenario", t => {
     const scenarioNames = ["test scenario 1", "test scenario 2"];
-    const model = testFixture(Type);
+    const model = setupFn();
     t.same(model.lengths, { x: 10, y: 4, z: 1 });
     scenarioNames.forEach(scenarioName => {
       model.addScenario({ scenarioName });
@@ -149,7 +144,7 @@ emptyScenarios((test, Type) => {
   test("Mutator operations work on new scenario", t => {
     const scenarioName = "test scenario";
     const rowName = "test row";
-    const model = testFixture(Type);
+    const model = setupFn();
     model.addScenario({ scenarioName });
     model.updateRow({
       rowName: "increment row",
@@ -177,16 +172,25 @@ emptyScenarios((test, Type) => {
   test("Delete row affects only the passed scenario", t => {
     const scenarioName = "test scenario";
     const rowName = "second lookup row";
-    const model = testFixture(Type);
+    const model = setupFn();
     model.addScenario({ scenarioName });
     model.deleteRow({ rowName, scenarioName });
     t.same(model.range({ y: 3, z: 0 }), [1000, 0, 1, 2, 3, 4, 5, 6, 7, 8]);
     t.same(model.range({ y: 3, z: 1 }), [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
     t.end();
   });
+});
+
+emptyScenarios((test, setupFn) => {
+  test("Add scenario based on empty default", t => {
+    const scenarioName = "test scenario";
+    const model = setupFn();
+    model.addScenario({ scenarioName });
+    t.end();
+  });
 
   test("scenario with unknown name errors", t => {
-    const model = new Type({ intervals: { count: 3 } });
+    const model = setupFn({ intervals: { count: 3 } });
     t.throws(
       () => model.scenario({ scenarioName: "unknown" }),
       new Error("Unknown scenario 'unknown'")
@@ -195,20 +199,20 @@ emptyScenarios((test, Type) => {
   });
 
   test("scenario with default scenario returns OK", t => {
-    const model = new Type({ intervals: { count: 3 } });
+    const model = setupFn({ intervals: { count: 3 } });
     model.addRow({ rowName: "default scenario row", fn: interval });
     t.same(model.scenario(), [[0, 1, 2]]);
     t.end();
   });
 
   test("scenario with default empty scenario returns empty array", t => {
-    const model = new Type({ intervals: { count: 3 } });
+    const model = setupFn({ intervals: { count: 3 } });
     t.same(model.scenario(), []);
     t.end();
   });
 
   test("scenario returns scenario values", t => {
-    const model = new Type({ intervals: { count: 3 } });
+    const model = setupFn({ intervals: { count: 3 } });
     model.addRow({ rowName: "default scenario row", fn: interval });
     const scenarioName = "scenario 1";
     const rowNames = ["row 0", "row 1", "row 2"];
@@ -237,7 +241,7 @@ emptyScenarios((test, Type) => {
 
   test("Add scenario based on empty default", t => {
     const scenarioName = "test scenario";
-    const model = new Type({ intervals: { count: 3 } });
+    const model = setupFn({ intervals: { count: 3 } });
     model.addScenario({ scenarioName });
     t.same(model.scenario({ scenarioName }), []);
     t.end();
@@ -245,7 +249,7 @@ emptyScenarios((test, Type) => {
 
   test("Mutating a scenario based on an empty default is fine", t => {
     const scenarioName = "test scenario";
-    const model = new Type({ intervals: { count: 3 } });
+    const model = setupFn({ intervals: { count: 3 } });
     model.addScenario({ scenarioName });
     model.addRow({
       scenarioName,
@@ -273,7 +277,7 @@ emptyScenarios((test, Type) => {
 
   test("Mutating then updating a scenario based on an empty default is fine", t => {
     const scenarioName = "test scenario";
-    const model = new Type({ intervals: { count: 3 } });
+    const model = setupFn({ intervals: { count: 3 } });
     model.addScenario({ scenarioName });
     model.addRow({
       scenarioName,
@@ -306,7 +310,7 @@ emptyScenarios((test, Type) => {
   });
 
   test("scenario returns scenario values with multiple scenarios", t => {
-    const model = new Type({ intervals: { count: 3 } });
+    const model = setupFn({ intervals: { count: 3 } });
     model.addRow({ rowName: "default scenario row", fn: interval });
     const rowNames = ["row 0", "row 1", "row 2"];
     const fn = ({ scenario, row }, index) =>
@@ -342,7 +346,7 @@ emptyScenarios((test, Type) => {
   });
 
   test("scenario returns scenario values with multiple scenarios, empty default scenario", t => {
-    const model = new Type({ intervals: { count: 3 } });
+    const model = setupFn({ intervals: { count: 3 } });
     const rowNames = ["row 0", "row 1", "row 2"];
     const fn = ({ scenario, row }, index) =>
       `${index},${row.index},${scenario.index}`;
@@ -370,7 +374,6 @@ emptyScenarios((test, Type) => {
       ["0,1,2", "1,1,2", "2,1,2"],
       ["0,2,2", "1,2,2", "2,2,2"]
     ]);
-
     t.end();
   });
 });

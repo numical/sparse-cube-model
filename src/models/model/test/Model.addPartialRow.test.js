@@ -1,19 +1,12 @@
 const { emptyScenarios } = require("../../test/testScaffold");
 const { interval } = require("../../../fns/lookupFunctions");
 
-const count = 10;
-const testDefaults = {
-  intervals: {
-    count
-  }
-};
-
-emptyScenarios((test, Type) => {
+emptyScenarios((test, setupFn) => {
   test("Add partial row of functions, no end", t => {
     const rowName = "test row";
     const start = 5;
     const fn = interval;
-    const model = new Type(testDefaults);
+    const model = setupFn();
     model.addRow({
       rowName,
       fn,
@@ -28,7 +21,7 @@ emptyScenarios((test, Type) => {
     const rowName = "test row";
     const end = 5;
     const fn = interval;
-    const model = new Type(testDefaults);
+    const model = setupFn();
     model.addRow({
       rowName,
       fn,
@@ -44,7 +37,7 @@ emptyScenarios((test, Type) => {
     const start = 5;
     const end = 7;
     const fn = interval;
-    const model = new Type(testDefaults);
+    const model = setupFn();
     model.addRow({
       rowName,
       fn,
@@ -61,7 +54,7 @@ emptyScenarios((test, Type) => {
     const start = 5;
     const end = 7;
     const constants = [50, 60, 70];
-    const model = new Type(testDefaults);
+    const model = setupFn();
     model.addRow({
       rowName,
       constants,
@@ -77,7 +70,7 @@ emptyScenarios((test, Type) => {
     const rowName = "test row";
     const start = 5;
     const constants = [50, 60, 70, 80];
-    const model = new Type(testDefaults);
+    const model = setupFn();
     t.throws(
       () =>
         model.addRow({
@@ -94,7 +87,7 @@ emptyScenarios((test, Type) => {
     const rowName = "test row";
     const start = 5;
     const constants = [50, 60, 70, 80, 90];
-    const model = new Type(testDefaults);
+    const model = setupFn();
     model.addRow({
       rowName,
       constants,
@@ -109,7 +102,7 @@ emptyScenarios((test, Type) => {
     const rowName = "test row";
     const end = 5;
     const constants = [0, 10, 20];
-    const model = new Type(testDefaults);
+    const model = setupFn();
     t.throws(
       () =>
         model.addRow({
@@ -126,7 +119,7 @@ emptyScenarios((test, Type) => {
     const rowName = "test row";
     const end = 5;
     const constants = [0, 10, 20, 30, 40, 50];
-    const model = new Type(testDefaults);
+    const model = setupFn();
     model.addRow({
       rowName,
       constants,
@@ -141,7 +134,7 @@ emptyScenarios((test, Type) => {
     const rowName = "test row";
     const start = 5;
     const constants = [50, 60, 70];
-    const model = new Type(testDefaults);
+    const model = setupFn();
     model.addRow({
       rowName,
       constants,
@@ -157,7 +150,7 @@ emptyScenarios((test, Type) => {
     const rowName = "test row";
     const end = 5;
     const constants = [0, 10, 20];
-    const model = new Type(testDefaults);
+    const model = setupFn();
     model.addRow({
       rowName,
       constants,
@@ -174,7 +167,7 @@ emptyScenarios((test, Type) => {
     const start = 3;
     const end = 7;
     const constants = [30, 40, 50];
-    const model = new Type(testDefaults);
+    const model = setupFn();
     model.addRow({
       rowName,
       constants,

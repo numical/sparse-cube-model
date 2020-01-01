@@ -4,6 +4,12 @@ const MappedModel = require("../mappedModel/MappedModel");
 const InteractiveModel = require("../interactiveModel/InteractiveModel");
 const testFixture = require("./testFixture");
 
+const testMeta = {
+  intervals: {
+    count: 10
+  }
+};
+
 const setupDescriptions = [":", "after serialisation:"];
 
 const setupFns = [
@@ -15,7 +21,11 @@ const emptyScenarios = fn => {
   [Model, MappedModel, InteractiveModel].forEach(Type => {
     tap.test(`${Type.name} tests:`, typeTests => {
       const { test } = typeTests;
-      fn(test, Type);
+      const setupFn = (meta = testMeta) => {
+        test.meta = meta; // yuk, impure
+        return new Type(meta);
+      };
+      fn(test, setupFn);
       typeTests.end();
     });
   });
@@ -28,6 +38,7 @@ const populatedScenarios = fn => {
         `${Type.name} tests ${setupDescriptions[setupIndex]}`,
         typeTests => {
           const { test } = typeTests;
+          test.meta = testFixture.meta;
           fn(test, setupFn.bind(null, Type));
           typeTests.end();
         }

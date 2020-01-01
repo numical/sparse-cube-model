@@ -85,9 +85,9 @@ populatedScenarios((test, setUp) => {
   });
 });
 
-emptyScenarios((test, Type) => {
+emptyScenarios((test, setupFn) => {
   test("Can delete non-default scenario on empty model", t => {
-    const model = new Type();
+    const model = setupFn();
     const scenarioName = "test scenario";
     model.addScenario({ scenarioName });
     t.same(model.scenario({ scenarioName }), []);

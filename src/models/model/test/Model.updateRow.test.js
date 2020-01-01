@@ -4,12 +4,6 @@ const {
 } = require("../../test/testScaffold");
 const { increment, interval } = require("../../../fns/lookupFunctions");
 
-const testMeta = {
-  intervals: {
-    count: 10
-  }
-};
-
 populatedScenarios((test, setUp) => {
   test("Update unknown row throws error", t => {
     const model = setUp();
@@ -220,10 +214,10 @@ populatedScenarios((test, setUp) => {
   });
 });
 
-emptyScenarios((test, Type) => {
+emptyScenarios((test, setupFn) => {
   test("Update row - overwrite behaviour - fn", t => {
     const rowName = "test row";
-    const model = new Type(testMeta);
+    const model = setupFn();
     model.addRow({
       rowName,
       fn: increment,
@@ -249,7 +243,7 @@ emptyScenarios((test, Type) => {
 
   test("Update row - remove behaviour - fn", t => {
     const rowName = "test row";
-    const model = new Type(testMeta);
+    const model = setupFn();
     model.addRow({
       rowName,
       fn: increment,
@@ -273,7 +267,7 @@ emptyScenarios((test, Type) => {
 
   test("Update row - overwrite behaviour - fnArgs", t => {
     const rowName = "test row";
-    const model = new Type(testMeta);
+    const model = setupFn();
     model.addRow({
       rowName,
       fn: increment,
@@ -305,7 +299,7 @@ emptyScenarios((test, Type) => {
 
   test("Update row - remove behaviour - fnArgs", t => {
     const rowName = "test row";
-    const model = new Type(testMeta);
+    const model = setupFn();
     model.addRow({
       rowName,
       fn: increment,
@@ -334,7 +328,7 @@ emptyScenarios((test, Type) => {
 
   test("Update row - overwite behaviour - constants", t => {
     const rowName = "test row";
-    const model = new Type(testMeta);
+    const model = setupFn();
     model.addRow({
       rowName,
       fn: interval,
@@ -359,7 +353,7 @@ emptyScenarios((test, Type) => {
 
   test("Update row - remove behaviour - constants", t => {
     const rowName = "test row";
-    const model = new Type(testMeta);
+    const model = setupFn();
     model.addRow({
       rowName,
       fn: interval,

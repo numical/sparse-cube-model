@@ -6,9 +6,9 @@ const {
 } = require("../../../fns/lookupFunctions");
 const { applyInterest } = require("../../../fns/interestFunctions");
 
-emptyScenarios((test, Type) => {
+emptyScenarios((test, setupFn) => {
   test("Add row with complex function missing dependency throws error", t => {
-    const model = new Type();
+    const model = setupFn();
     t.throws(
       () =>
         model.addRow({
@@ -22,7 +22,7 @@ emptyScenarios((test, Type) => {
   });
 
   test("Add row with complex function with incorrect dependency throws error", t => {
-    const model = new Type();
+    const model = setupFn();
     model.addRow({
       rowName: "interestRow",
       fn: previous,
@@ -44,7 +44,7 @@ emptyScenarios((test, Type) => {
   });
 
   test("Add row with complex function works", t => {
-    const model = new Type({
+    const model = setupFn({
       intervals: {
         count: 20
       }

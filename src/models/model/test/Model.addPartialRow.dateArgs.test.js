@@ -11,10 +11,10 @@ const testDefaults = {
   }
 };
 
-emptyScenarios((test, Type) => {
+emptyScenarios((test, setupFn) => {
   test("Start date too early", t => {
     const start = new Date(2019, 11, 31);
-    const model = new Type(testDefaults);
+    const model = setupFn(testDefaults);
     t.throws(
       () => model.addRow({ rowName, fn: interval, start }),
       new Error("'Tue Dec 31 2019' earlier than model start.")
@@ -24,7 +24,7 @@ emptyScenarios((test, Type) => {
 
   test("End date too late", t => {
     const end = new Date(2021, 0, 1);
-    const model = new Type(testDefaults);
+    const model = setupFn(testDefaults);
     t.throws(
       () => model.addRow({ rowName, fn: interval, end }),
       new Error("'Fri Jan 01 2021' later than model end.")
@@ -34,7 +34,7 @@ emptyScenarios((test, Type) => {
 
   test("Add partial row of functions, date start", t => {
     const start = new Date(2020, 5, 1);
-    const model = new Type(testDefaults);
+    const model = setupFn(testDefaults);
     model.addRow({
       rowName,
       fn: interval,
@@ -47,7 +47,7 @@ emptyScenarios((test, Type) => {
 
   test("Add partial row of functions, end date", t => {
     const end = new Date(2020, 5, 30);
-    const model = new Type(testDefaults);
+    const model = setupFn(testDefaults);
     model.addRow({
       rowName,
       fn: interval,
@@ -61,7 +61,7 @@ emptyScenarios((test, Type) => {
   test("Add partial row of functions with start and end", t => {
     const start = new Date(2020, 5, 1);
     const end = new Date(2020, 7, 31);
-    const model = new Type(testDefaults);
+    const model = setupFn(testDefaults);
     model.addRow({
       rowName,
       fn: interval,
@@ -77,7 +77,7 @@ emptyScenarios((test, Type) => {
     const start = new Date(2020, 5, 1);
     const end = new Date(2020, 7, 31);
     const constants = [50, 60, 70];
-    const model = new Type(testDefaults);
+    const model = setupFn(testDefaults);
     model.addRow({
       rowName,
       constants,
@@ -97,7 +97,7 @@ emptyScenarios((test, Type) => {
       [new Date(2020, 6, 1), 60],
       [new Date(2020, 7, 30), 70]
     ]);
-    const model = new Type(testDefaults);
+    const model = setupFn(testDefaults);
     model.addRow({
       rowName,
       constants,
@@ -117,7 +117,7 @@ emptyScenarios((test, Type) => {
       [new Date(2020, 5, 1), 60],
       [new Date(2020, 7, 30), 70]
     ]);
-    const model = new Type(testDefaults);
+    const model = setupFn(testDefaults);
     model.addRow({
       rowName,
       constants,
@@ -138,7 +138,7 @@ emptyScenarios((test, Type) => {
       [new Date(2020, 5, 1), 60],
       [new Date(2020, 7, 30), 70]
     ]);
-    const model = new Type(testDefaults);
+    const model = setupFn(testDefaults);
     t.throws(
       () =>
         model.addRow({

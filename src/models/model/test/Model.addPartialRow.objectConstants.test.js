@@ -1,19 +1,12 @@
 const { emptyScenarios } = require("../../test/testScaffold");
 const { increment } = require("../../../fns/lookupFunctions");
 
-const count = 10;
-const testDefaults = {
-  intervals: {
-    count
-  }
-};
-
-emptyScenarios((test, Type) => {
+emptyScenarios((test, setupFn) => {
   test("Add partial row of constants via object with too few values", t => {
     const rowName = "test row";
     const start = 5;
     const constants = { 8: 8, 9: 9 };
-    const model = new Type(testDefaults);
+    const model = setupFn();
     t.throws(
       () =>
         model.addRow({
@@ -30,7 +23,7 @@ emptyScenarios((test, Type) => {
     const rowName = "test row";
     const start = 7;
     const constants = { 3: 3, 8: 8, 9: 9 };
-    const model = new Type(testDefaults);
+    const model = setupFn();
     t.throws(
       () =>
         model.addRow({
@@ -48,7 +41,7 @@ emptyScenarios((test, Type) => {
     const start = 3;
     const end = 5;
     const constants = { 3: 3, 4: 4, 9: 9 };
-    const model = new Type(testDefaults);
+    const model = setupFn();
     t.throws(
       () =>
         model.addRow({
@@ -66,7 +59,7 @@ emptyScenarios((test, Type) => {
     const rowName = "test row";
     const start = 7;
     const constants = { 7: 70, 8: 80, 9: 90 };
-    const model = new Type(testDefaults);
+    const model = setupFn();
     model.addRow({
       rowName,
       constants,
@@ -81,7 +74,7 @@ emptyScenarios((test, Type) => {
     const rowName = "test row";
     const end = 3;
     const constants = { 0: 0, 1: 1, 2: 2, 3: 3 };
-    const model = new Type(testDefaults);
+    const model = setupFn();
     model.addRow({
       rowName,
       constants,
@@ -97,7 +90,7 @@ emptyScenarios((test, Type) => {
     const start = 3;
     const end = 6;
     const constants = { 3: 30, 4: 40, 5: 50, 6: 60 };
-    const model = new Type(testDefaults);
+    const model = setupFn();
     model.addRow({
       rowName,
       constants,
@@ -113,7 +106,7 @@ emptyScenarios((test, Type) => {
     const rowName = "test row";
     const start = 4;
     const constants = { 7: 70, 8: 80 };
-    const model = new Type(testDefaults);
+    const model = setupFn();
     model.addRow({
       rowName,
       constants,
@@ -129,7 +122,7 @@ emptyScenarios((test, Type) => {
     const rowName = "test row";
     const end = 3;
     const constants = { 0: 100, 2: 200 };
-    const model = new Type(testDefaults);
+    const model = setupFn();
     model.addRow({
       rowName,
       constants,
@@ -146,7 +139,7 @@ emptyScenarios((test, Type) => {
     const start = 3;
     const end = 6;
     const constants = { 4: 40, 6: 60 };
-    const model = new Type(testDefaults);
+    const model = setupFn();
     model.addRow({
       rowName,
       constants,
