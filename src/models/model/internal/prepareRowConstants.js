@@ -1,6 +1,6 @@
 const defaultValue = require("./defaultValue");
 const getIntervalFromDate = require("./getIntervalFromDate");
-const isEmpty = require("./constantsIsEmpty");
+const { isEmpty } = require("./validateConstants");
 
 const prepareRowConstants = ({
   fn,

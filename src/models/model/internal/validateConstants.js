@@ -1,4 +1,4 @@
-const constantsIsEmpty = constants => {
+const isEmpty = constants => {
   if (constants) {
     if (Array.isArray(constants)) {
       return constants.length === 0;
@@ -14,4 +14,14 @@ const constantsIsEmpty = constants => {
   }
 };
 
-module.exports = constantsIsEmpty;
+const validateConstants = ({ fn, constants }) => {
+  const empty = isEmpty(constants);
+  if (!fn && empty) {
+    throw new Error("No function or constants passed.");
+  }
+};
+
+module.exports = {
+  isEmpty,
+  validateConstants
+};

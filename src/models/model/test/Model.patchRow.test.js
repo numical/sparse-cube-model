@@ -2,7 +2,12 @@ const {
   emptyScenarios,
   populatedScenarios
 } = require("../../test/testScaffold");
-const { increment } = require("../../../fns/lookupFunctions");
+const {
+  increment,
+  interval,
+  lookup,
+  lookupPrevious
+} = require("../../../fns/lookupFunctions");
 const sequence = require("../../test/sequenceArray");
 
 populatedScenarios((test, setUp) => {
@@ -30,175 +35,210 @@ populatedScenarios((test, setUp) => {
     );
     t.end();
   });
+
+  test("Patch row accepts single dependOn argument", t => {
+    const rowName = "second lookup row";
+    const model = setUp();
+    t.same(model.row({ rowName }), [1000, 0, 1, 2, 3, 4, 5, 6, 7, 8]);
+    model.patchRow({ rowName, dependsOn: "independent row" });
+    t.same(model.row({ rowName }), [1000, 10, 11, 12, 13, 14, 15, 16, 17, 18]);
+    t.end();
+  });
 });
 
-/*
 emptyScenarios((test, setupFn) => {
   test("Patch row errors if no fn but fnArgs", t => {
     const rowName = "test row";
     const model = setupFn();
-    model.addRow({ rowName, constants: sequence(10, 0) });
-    model.patchRow({ rowName, fnArgs: { foo: "bar" } });
-    t.end();
-  });
-});
-
-  test("Patch row with neither function nor constants throws error", t => {
-    const model = setUp();
+    model.addRow({ rowName, constants: sequence(test.meta.intervals.count) });
     t.throws(
-      () =>
-        model.patchRow({
-          rowName
-        }),
-      new Error("No function or constants passed.")
+      () => model.patchRow({ rowName, fnArgs: { foo: "bar" } }),
+      new Error("Function args passed but no function.")
     );
     t.end();
   });
 
-
-  test("Patch row with a function with no key throws an error", t => {
-    const model = setUp();
-    t.throws(
-      () =>
-        model.patchRow({
-          rowName,
-          fn: () => 2
-        }),
-      new Error("function 'fn' must have a 'key' property.")
-    );
+  test("Patch row accepts single fn argument", t => {
+    const rowName = "test row";
+    const model = setupFn();
+    model.addRow({ rowName, fn: increment, constants: [10] });
+    t.same(model.row({ rowName }), [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]);
+    model.patchRow({ rowName, fn: interval });
+    t.same(model.row({ rowName }), [10, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
     t.end();
   });
 
-
-  test("Patch row with no function and smaller constants array than intervals throws error", t => {
-    const model = setUp();
-    t.throws(
-      () => model.patchRow({ rowName, constants: [0] }),
-      new Error("Row has no function, but less constants than intervals.")
-    );
+  test("Patch row accepts single fnArgs argument if there is a fn", t => {
+    const rowName = "test row";
+    const model = setupFn();
+    model.addRow({ rowName, fn: increment, constants: [10] });
+    t.same(model.row({ rowName }), [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]);
+    model.patchRow({ rowName, fnArgs: { step: 2 } });
+    t.same(model.row({ rowName }), [10, 12, 14, 16, 18, 20, 22, 24, 26, 28]);
     t.end();
   });
 
-  test("Patch row with no function and fewer constants than intervals throws error", t => {
-    const model = setUp();
-    const constants = [
-      0,
-      2,
-      4,
-      undefined,
-      undefined,
-      undefined,
-      12,
-      14,
-      16,
-      18
-    ];
-    t.throws(
-      () => model.patchRow({ rowName, constants }),
-      new Error("Row has no function, but undefined constants.")
-    );
-    t.end();
-  });
-
-  test("Patch row updates all with constants", t => {
-    const constants = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18];
-    const expected = constants;
-    const model = setUp();
-    model.patchRow({ rowName, constants });
-    t.same(model.row({ rowName }), expected);
-    t.end();
-  });
-
-  test("Patch row updates some with sparse constants array", t => {
-    const constants = [
-      0,
-      2,
-      4,
-      undefined,
-      undefined,
-      undefined,
-      12,
-      14,
-      16,
-      18
-    ];
-    const expected = [0, 2, 4, 5, 6, 7, 12, 14, 16, 18];
-    const model = setUp();
-    model.patchRow({ rowName, constants, fn: increment });
-    t.same(model.row({ rowName }), expected);
-    t.end();
-  });
-
-  test("Patch row updates some with constants object", t => {
-    const constants = {
-      0: 0,
-      1: 2,
-      2: 4,
-      6: 12,
-      7: 14,
-      8: 16,
-      9: 18
-    };
-    const expected = [0, 2, 4, 5, 6, 7, 12, 14, 16, 18];
-    const model = setUp();
-    model.patchRow({ rowName, constants, fn: increment });
-    t.same(model.row({ rowName }), expected);
-    t.end();
-  });
-
-  test("Patch row updates some with constants Map", t => {
-    const constants = new Map([
-      [0, 0],
-      [1, 2],
-      [2, 4],
-      [6, 12],
-      [7, 14],
-      [8, 16],
-      [9, 18]
+  test("Patch row accepts an overwriting constants array argument", t => {
+    const rowName = "test row";
+    const model = setupFn();
+    model.addRow({ rowName, fn: increment, constants: [10, undefined, 20] });
+    t.same(model.row({ rowName }), [10, 11, 20, 21, 22, 23, 24, 25, 26, 27]);
+    model.patchRow({ rowName, constants: [100, undefined, 200] });
+    t.same(model.row({ rowName }), [
+      100,
+      101,
+      200,
+      201,
+      202,
+      203,
+      204,
+      205,
+      206,
+      207
     ]);
-    const expected = [0, 2, 4, 5, 6, 7, 12, 14, 16, 18];
-    const model = setUp();
-    model.patchRow({ rowName, constants, fn: increment });
-    t.same(model.row({ rowName }), expected);
     t.end();
   });
 
-  test("Patch row updates some with constants Map of Dates", t => {
-    const constants = new Map([
-      [new Date(2020, 0, 31), 0],
-      [new Date(2020, 1, 29), 2],
-      [new Date(2020, 2, 1), 4],
-      [new Date(2020, 6, 31), 12],
-      [new Date(2020, 7, 31), 14],
-      [new Date(2020, 8, 30), 16],
-      [new Date(2020, 9, 31), 18]
+  test("Patch row accepts an overwriting constants dictionary argument", t => {
+    const rowName = "test row";
+    const model = setupFn();
+    model.addRow({ rowName, fn: increment, constants: [10, undefined, 20] });
+    t.same(model.row({ rowName }), [10, 11, 20, 21, 22, 23, 24, 25, 26, 27]);
+    model.patchRow({
+      rowName,
+      constants: {
+        0: 100,
+        2: 200
+      }
+    });
+    t.same(model.row({ rowName }), [
+      100,
+      101,
+      200,
+      201,
+      202,
+      203,
+      204,
+      205,
+      206,
+      207
     ]);
-    const expected = [0, 2, 4, 5, 6, 7, 12, 14, 16, 18];
-    const model = setUp();
-    model.patchRow({ rowName, constants, fn: increment });
-    t.same(model.row({ rowName }), expected);
     t.end();
   });
 
-  test("Patch row with a non-array, non-object constants fails", t => {
-    const constants = "should fail";
-    const model = setUp();
-
-    t.throws(
-      () => model.patchRow({ rowName, constants, fn: increment }),
-      new Error("Constants must be an array or a dictionary or a map. ")
-    );
+  test("Patch row accepts an overwriting constants Map argument", t => {
+    const rowName = "test row";
+    const model = setupFn();
+    model.addRow({ rowName, fn: increment, constants: [10, undefined, 20] });
+    t.same(model.row({ rowName }), [10, 11, 20, 21, 22, 23, 24, 25, 26, 27]);
+    const constants = new Map();
+    constants.set(0, 100);
+    constants.set(2, 200);
+    model.patchRow({
+      rowName,
+      constants
+    });
+    t.same(model.row({ rowName }), [
+      100,
+      101,
+      200,
+      201,
+      202,
+      203,
+      204,
+      205,
+      206,
+      207
+    ]);
     t.end();
   });
 
-  test("Patch row updates all with function", t => {
-    const expected = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18];
-    const model = setUp();
-    const fn = (_, x) => 2 * x;
-    fn.key = "test fn";
-    model.patchRow({ rowName, fn });
-    t.same(model.row({ rowName }), expected);
+  /*
+  test("Patch row accepts an appending constants array argument", t => {
+    const rowName = "test row";
+    const model = setupFn();
+    model.addRow({ rowName, fn: interval, constants: { 1: 7 } });
+    t.same(model.row({ rowName }), [0, 7, 2, 3, 4, 5, 6, 7, 8, 9]);
+    model.patchRow({
+      rowName,
+      constants: [123]
+    });
+    t.same(model.row({ rowName }), [123, 7, 2, 3, 4, 5, 6, 7, 8, 9]);
     t.end();
   });
-});
+
    */
+
+  test("Patch row accepts a merging constants array argument", t => {
+    const rowName = "test row";
+    const model = setupFn();
+    model.addRow({ rowName, fn: increment, constants: [10, undefined, 20] });
+    t.same(model.row({ rowName }), [10, 11, 20, 21, 22, 23, 24, 25, 26, 27]);
+    model.patchRow({
+      rowName,
+      constants: [undefined, 1000, 200, undefined, 2000]
+    });
+    t.same(model.row({ rowName }), [
+      10,
+      1000,
+      200,
+      201,
+      2000,
+      2001,
+      2002,
+      2003,
+      2004,
+      2005
+    ]);
+    t.end();
+  });
+
+  test("Patch row accepts a merging constants dictionary argument", t => {
+    const rowName = "test row";
+    const model = setupFn();
+    model.addRow({ rowName, fn: increment, constants: [10, undefined, 20] });
+    t.same(model.row({ rowName }), [10, 11, 20, 21, 22, 23, 24, 25, 26, 27]);
+    model.patchRow({
+      rowName,
+      constants: { 1: 1000, 2: 200, 4: 2000 }
+    });
+    t.same(model.row({ rowName }), [
+      10,
+      1000,
+      200,
+      201,
+      2000,
+      2001,
+      2002,
+      2003,
+      2004,
+      2005
+    ]);
+    t.end();
+  });
+
+  /*
+  test("Patch row accepts all arguments", t => {
+    const rowName = "testRow";
+    const model = setupFn();
+    model.addRow({ rowName: "first lookup", constants: sequence(10, 10) });
+    model.addRow({ rowName: "second lookup", constants: sequence(10, 100) });
+    model.addRow({
+      rowName,
+      fn: lookup,
+      dependsOn: "first lookup",
+      constants: { 1: 7 }
+    });
+    t.same(model.row({ rowName }), [10, 7, 12, 13, 14, 15, 16, 17, 18, 19]);
+    model.patchRow({
+      rowName,
+      fn: lookupPrevious,
+      dependsOn: "second lookup",
+      constants: [123]
+    });
+    t.same(model.row({ rowName }), [123, 7, 101, 102, 103, 104, 105, 106, 107]);
+    t.end();
+  });
+    
+   */
+});

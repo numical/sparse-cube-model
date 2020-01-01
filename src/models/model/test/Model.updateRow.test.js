@@ -272,7 +272,7 @@ emptyScenarios((test, setupFn) => {
       rowName,
       fn: increment,
       fnArgs: {
-        increment: 2
+        step: 2
       },
       constants: {
         0: 10,
@@ -285,7 +285,7 @@ emptyScenarios((test, setupFn) => {
       rowName,
       fn: increment,
       fnArgs: {
-        increment: 3
+        step: 3
       },
       constants: {
         0: 10,
@@ -304,7 +304,7 @@ emptyScenarios((test, setupFn) => {
       rowName,
       fn: increment,
       fnArgs: {
-        increment: 2
+        step: 2
       },
       constants: {
         0: 10,

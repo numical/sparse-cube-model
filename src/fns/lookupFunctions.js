@@ -1,7 +1,7 @@
 const keyPrefix = "lookup.";
 
-const increment = ({ model, scenario, row, increment = 1 }, interval) =>
-  model[interval - 1][row.index][scenario.index] + increment;
+const increment = ({ model, scenario, row, step = 1 }, interval) =>
+  model[interval - 1][row.index][scenario.index] + step;
 increment.key = `${keyPrefix}increment`;
 
 const interval = (_, interval) => interval;
