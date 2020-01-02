@@ -39,7 +39,7 @@ populatedScenarios((test, setUp) => {
         model.updateRow({
           rowName
         }),
-      new Error("No function or constants passed.")
+      new Error("Row has no function, but less constants than intervals.")
     );
     t.end();
   });
@@ -85,7 +85,7 @@ populatedScenarios((test, setUp) => {
     ];
     t.throws(
       () => model.updateRow({ rowName, constants }),
-      new Error("Row has no function, but undefined constants.")
+      new Error("Row has no function, but less constants than intervals.")
     );
     t.end();
   });

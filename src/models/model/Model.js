@@ -6,9 +6,9 @@ const bindFnToRow = require("./internal/bindFnToRow");
 const editRow = require("./internal/editRow");
 const compareByIndex = require("./internal/compareByIndex");
 const deleteSingleRow = require("./internal/deleteSingleRow");
+const ensureAllConstantsDefined = require("./internal/ensureAllConstantsDefined");
 const linkAllDependentRows = require("./internal/linkAllDependentRows");
 const linkDependentRows = require("./internal/linkDependentRows");
-const { validateConstants } = require("./internal/validateConstants");
 const validateFn = require("./internal/validateFn");
 const validateFnArgs = require("./internal/validateFnArgs");
 const validateRow = require("./internal/validateRow");
@@ -49,14 +49,15 @@ class Model extends Dense3DArray {
     validateRow({ rowName, scenario, shouldExist: false });
     validateFn({ fn, constants });
     validateFnArgs({ fn, fnArgs });
-    validateConstants({ fn, constants });
-    const { rowConstants } = prepareRowConstants({
-      fn,
+    const rowConstants = prepareRowConstants({
       constants,
       start,
       end,
       intervals
     });
+    if (!fn) {
+      ensureAllConstantsDefined(rowConstants, intervals);
+    }
     linkDependentRows(scenario, rowName, dependsOn);
     const row = {
       name: rowName,
@@ -89,7 +90,6 @@ class Model extends Dense3DArray {
     const row = validateRow({ rowName, scenario });
     validateFn({ fn, constants });
     validateFnArgs({ fn, fnArgs });
-    validateConstants({ fn, constants });
     return editRow({
       model: this,
       row,
@@ -116,10 +116,6 @@ class Model extends Dense3DArray {
     const row = validateRow({ rowName, scenario });
     validateFn({ fn, constants });
     validateFnArgs({ fn: fn || row.fn, fnArgs });
-    validateConstants({
-      fn: fn || row.fn,
-      constants: constants || row.constants
-    });
     return editRow({
       model: this,
       row,

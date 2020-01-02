@@ -2,6 +2,7 @@ const { clone } = require("ramda");
 const calculateRow = require("./calculateRow");
 const bindFnToRow = require("./bindFnToRow");
 const prepareRowConstants = require("./prepareRowConstants");
+const ensureAllConstantsDefined = require("./ensureAllConstantsDefined");
 const linkDependentRows = require("./linkDependentRows");
 const unlinkDependentRows = require("./unlinkDependentRows");
 
@@ -17,12 +18,16 @@ const editRow = ({
   dependsOn
 }) => {
   const original = clone(row);
-  const { rowConstants, startInterval } = prepareRowConstants({
+  const rowConstants = prepareRowConstants({
     fn,
     constants,
     existingConstants,
     intervals
   });
+  const startInterval = 0;
+  if (!fn) {
+    ensureAllConstantsDefined(rowConstants, intervals);
+  }
   linkDependentRows(scenario, row.name, dependsOn);
   bindFnToRow(model, intervals, scenario, row, fn, fnArgs, dependsOn);
   row.constants = rowConstants;

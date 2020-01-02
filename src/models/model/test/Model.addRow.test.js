@@ -85,7 +85,7 @@ emptyScenarios((test, setupFn) => {
     const args = { rowName: "test row", constants };
     t.throws(
       () => model.addRow(args),
-      new Error("Row has no function, but undefined constants.")
+      new Error("Row has no function, but less constants than intervals.")
     );
     t.end();
   });
