@@ -83,7 +83,12 @@ class MappedModel extends Model {
         constants,
         dependsOn: this.#fns.fromRowKey(dependsOn, callMappings)
       });
-      return originalRow;
+      return {
+        ...originalRow,
+        scenarioName,
+        rowName,
+        dependsOn: this.#fns.toRowKey(originalRow.dependsOn, callMappings)
+      };
     });
   }
 
@@ -104,7 +109,12 @@ class MappedModel extends Model {
         constants,
         dependsOn: this.#fns.fromRowKey(dependsOn, callMappings)
       });
-      return originalRow;
+      return {
+        ...originalRow,
+        scenarioName,
+        rowName,
+        dependsOn: this.#fns.toRowKey(originalRow.dependsOn, callMappings)
+      };
     });
   }
 

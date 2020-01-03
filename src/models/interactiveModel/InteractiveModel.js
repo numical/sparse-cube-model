@@ -93,7 +93,7 @@ class InteractiveModel extends MappedModel {
         args: rest
       },
       undo: {
-        fn: "patchRow",
+        fn: "updateRow",
         args: { rowName, scenarioName, ...original }
       }
     });
