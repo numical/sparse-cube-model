@@ -5,7 +5,7 @@ const ensureAllConstantsDefined = (constants, intervals) => {
   const values = Array.isArray(constants)
     ? constants
     : constants instanceof Map
-    ? constants.values
+    ? Array.from(constants.values())
     : Object.values(constants);
   if (values.length !== numRequired) {
     throw new Error(msg);

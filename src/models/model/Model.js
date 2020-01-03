@@ -185,8 +185,7 @@ class Model extends Dense3DArray {
   addScenario({ scenarioName, copyOf = defaultScenario } = {}) {
     const { scenarios } = this.#meta;
     validateScenario({ scenarioName, scenarios, shouldExist: false });
-    const scenarioToCopy =
-      typeof copyOf === "string" ? scenarios[copyOf] : copyOf;
+    const scenarioToCopy = scenarios[copyOf];
     if (!scenarioToCopy) {
       throw new Error(`Unknown scenario '${copyOf}'`);
     }

@@ -2,7 +2,8 @@ const { test } = require("tap");
 const InteractiveModel = require("../InteractiveModel");
 const comparableUnserialisedForm = require("./comparableUnserialisedForm");
 const testFixture = require("../../test/testFixture");
-const { increment, interval, lookup } = require("../../../fns/lookupFunctions");
+const { interval } = require("../../../fns/lookupFunctions");
+const { defaultScenario } = require("../../model/internal/modelMetadata");
 
 const testMeta = {
   intervals: {
@@ -13,10 +14,11 @@ const testMeta = {
 test("delete rows to blank model can be undone", t => {
   const model = new InteractiveModel(testMeta);
   const rowNames = ["test row 1", "test row 2"];
+  const historyDescription = "test operation";
   rowNames.forEach(rowName => model.addRow({ rowName, fn: interval }));
   t.same(model.lengths, { x: 10, y: 2, z: 1 });
   const pre = comparableUnserialisedForm({ model });
-  model.deleteRows({ rowNames });
+  model.deleteRows({ rowNames, historyDescription });
   t.same(model.lengths, { x: 0, y: 0, z: 0 });
   model.undo();
   t.same(model.lengths, { x: 10, y: 2, z: 1 });
@@ -30,7 +32,7 @@ test("delete rows to blank model can be redone", t => {
   const rowNames = ["test row 1", "test row 2"];
   rowNames.forEach(rowName => model.addRow({ rowName, fn: interval }));
   t.same(model.lengths, { x: 10, y: 2, z: 1 });
-  model.deleteRows({ rowNames });
+  model.deleteRows({ rowNames, scenarioName: defaultScenario });
   const pre = comparableUnserialisedForm({ model });
   model.undo();
   model.redo();

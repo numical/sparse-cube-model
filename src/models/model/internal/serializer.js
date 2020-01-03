@@ -10,7 +10,7 @@ const replacer = (key, value) =>
     : value;
 
 const reviver = (fnsRepo, key, value) =>
-  key === "fn" ? fnsRepo[value] : value === null ? undefined : value;
+  key === "fn" ? fnsRepo[value] : value;
 
 const stringify = (obj, { pretty = false } = {}) => {
   const space = pretty ? 2 : 0;

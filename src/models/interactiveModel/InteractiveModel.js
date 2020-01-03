@@ -30,7 +30,7 @@ class InteractiveModel extends MappedModel {
     this.#history.current = -1;
   }
 
-  addRow(args = {}) {
+  addRow(args) {
     const { historyDescription, ...rest } = args;
     const { rowName, scenarioName } = rest;
     super.addRow(rest);
@@ -55,7 +55,7 @@ class InteractiveModel extends MappedModel {
     });
   }
 
-  updateRow(args = {}) {
+  updateRow(args) {
     const { historyDescription, ...rest } = args;
     const { rowName, scenarioName } = rest;
     const original = super.updateRow(rest);
@@ -77,7 +77,7 @@ class InteractiveModel extends MappedModel {
     });
   }
 
-  patchRow(args = {}) {
+  patchRow(args) {
     const { historyDescription, ...rest } = args;
     const { rowName, scenarioName } = rest;
     const original = super.patchRow(rest);
@@ -99,7 +99,7 @@ class InteractiveModel extends MappedModel {
     });
   }
 
-  deleteRow(args = {}) {
+  deleteRow(args) {
     const { historyDescription, ...rest } = args;
     const { rowName, scenarioName } = rest;
     const original = super.deleteRow(rest);
@@ -121,7 +121,7 @@ class InteractiveModel extends MappedModel {
     });
   }
 
-  deleteRows(args = {}) {
+  deleteRows(args) {
     const { historyDescription, ...rest } = args;
     const { rowNames, scenarioName } = rest;
     const originals = super.deleteRows(rest);
@@ -189,13 +189,15 @@ class InteractiveModel extends MappedModel {
   undoOps() {
     return this.#history
       .slice(0, this.#history.current + 1)
-      .map(item => item.description);
+      .map(item => item.description)
+      .reverse();
   }
 
   redoOps() {
     return this.#history
       .slice(this.#history.current + 1)
-      .map(item => item.description);
+      .map(item => item.description)
+      .reverse();
   }
 
   undo() {
@@ -222,5 +224,6 @@ class InteractiveModel extends MappedModel {
     this.#history.current = this.#history.current + 1;
   }
 }
+InteractiveModel.maxHistoryItems = maxHistoryItems;
 
 module.exports = InteractiveModel;
