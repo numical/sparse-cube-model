@@ -9,6 +9,7 @@ const deleteSingleRow = require("./internal/deleteSingleRow");
 const ensureAllConstantsDefined = require("./internal/ensureAllConstantsDefined");
 const linkAllDependentRows = require("./internal/linkAllDependentRows");
 const linkDependentRows = require("./internal/linkDependentRows");
+const sortByDependency = require("./internal/sortByDependency");
 const validateFn = require("./internal/validateFn");
 const validateFnArgs = require("./internal/validateFnArgs");
 const validateRow = require("./internal/validateRow");
@@ -44,7 +45,6 @@ class Model extends Dense3DArray {
     dependsOn
   }) {
     const { intervals, scenarios } = this.#meta;
-    const { y } = this.lengths;
     const scenario = validateScenario({ scenarioName, scenarios });
     validateRow({ rowName, scenario, shouldExist: false });
     validateFn({ fn, constants });
@@ -61,7 +61,7 @@ class Model extends Dense3DArray {
     linkDependentRows(scenario, rowName, dependsOn);
     const row = {
       name: rowName,
-      index: y,
+      index: this.lengths.y,
       constants: rowConstants
     };
     bindFnToRow(
@@ -75,6 +75,38 @@ class Model extends Dense3DArray {
     );
     scenario.rows[rowName] = row;
     calculateRow(row, scenario, 0, intervals.count - 1, this.set);
+  }
+
+  addRows({ rows = [], scenarioName = defaultScenario }) {
+    const { intervals, scenarios } = this.#meta;
+    const scenario = validateScenario({ scenarioName, scenarios });
+    if (rows.length === 0) {
+      throw new Error("At least one row must be added.");
+    }
+    const rowNames = rows.map(({ rowName }) => rowName);
+    rowNames.forEach(rowName =>
+      validateRow({ rowName, scenario, shouldExist: false })
+    );
+    const allDependencies = rows.reduce((dependencies, { dependsOn }) => {
+      if (dependsOn) {
+        if (typeof dependsOn === "object") {
+          dependencies.push(...Object.values(dependsOn));
+        } else {
+          dependencies.push(dependsOn);
+        }
+      }
+      return dependencies;
+    }, []);
+    const availableRowNames = [...Object.keys(scenario.rows), ...rowNames];
+    allDependencies.forEach(dependency => {
+      if (!availableRowNames.includes(dependency)) {
+        throw new Error(`Depends on unknown row '${dependency}'`);
+      }
+    });
+    rows
+      .sort(sortByDependency)
+      .map(rowData => ({ ...rowData, scenarioName }))
+      .forEach(this.addRow);
   }
 
   updateRow({
@@ -185,8 +217,7 @@ class Model extends Dense3DArray {
   addScenario({ scenarioName, copyOf = defaultScenario } = {}) {
     const { scenarios } = this.#meta;
     validateScenario({ scenarioName, scenarios, shouldExist: false });
-    const scenarioToCopy =
-      typeof copyOf === "string" ? scenarios[copyOf] : copyOf;
+    const scenarioToCopy = scenarios[copyOf];
     if (!scenarioToCopy) {
       throw new Error(`Unknown scenario '${copyOf}'`);
     }

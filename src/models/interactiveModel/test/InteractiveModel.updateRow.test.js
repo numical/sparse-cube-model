@@ -11,10 +11,16 @@ const {
 
 test("update row - change constants only - can be undone", t => {
   const rowName = "increment row";
+  const historyDescription = "test operation";
   const model = testFixture(InteractiveModel);
   t.same(model.row({ rowName }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
   const pre = comparableUnserialisedForm({ model });
-  model.updateRow({ rowName, constants: [10], fn: increment });
+  model.updateRow({
+    rowName,
+    constants: [10],
+    fn: increment,
+    historyDescription
+  });
   t.same(model.row({ rowName }), [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]);
   model.undo();
   t.same(model.row({ rowName }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);

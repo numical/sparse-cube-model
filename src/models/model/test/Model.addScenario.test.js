@@ -29,6 +29,17 @@ populatedScenarios((test, setupFn) => {
     t.end();
   });
 
+  test("Add scenario with same name name as existing scenario throws error", t => {
+    const model = setupFn();
+    const scenarioName = "test scenario";
+    model.addScenario({ scenarioName });
+    t.throws(
+      () => model.addScenario({ scenarioName }),
+      new Error("Scenario 'test scenario' already exists.")
+    );
+    t.end();
+  });
+
   test("Add scenario copying unknown scenario throws error", t => {
     const scenarioName = "test scenario";
     const copyOf = "unknown scenario";

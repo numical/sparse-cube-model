@@ -39,9 +39,9 @@ test("history increments after multiple operation", t => {
   });
   model.addScenario({ scenarioName: "second scenario" });
   t.same(model.undoOps(), [
-    "add row 'test row'",
+    "add scenario 'second scenario'",
     "update row 'test row'",
-    "add scenario 'second scenario'"
+    "add row 'test row'"
   ]);
   t.same(model.redoOps(), []);
   t.end();
@@ -139,70 +139,70 @@ test("undo/redo over multiple ops updates history correctly", t => {
     dependsOn: "test row 1"
   });
   t.same(model.undoOps(), [
-    "add row 'test row 1'",
-    "update row 'test row 1'",
+    "add row 'test row 2' to scenario 'second scenario'",
     "add scenario 'second scenario'",
-    "add row 'test row 2' to scenario 'second scenario'"
+    "update row 'test row 1'",
+    "add row 'test row 1'"
   ]);
   t.same(model.redoOps(), []);
   model.undo();
   t.same(model.undoOps(), [
-    "add row 'test row 1'",
+    "add scenario 'second scenario'",
     "update row 'test row 1'",
-    "add scenario 'second scenario'"
+    "add row 'test row 1'"
   ]);
   t.same(model.redoOps(), [
     "add row 'test row 2' to scenario 'second scenario'"
   ]);
   model.undo();
-  t.same(model.undoOps(), ["add row 'test row 1'", "update row 'test row 1'"]);
+  t.same(model.undoOps(), ["update row 'test row 1'", "add row 'test row 1'"]);
   t.same(model.redoOps(), [
-    "add scenario 'second scenario'",
-    "add row 'test row 2' to scenario 'second scenario'"
+    "add row 'test row 2' to scenario 'second scenario'",
+    "add scenario 'second scenario'"
   ]);
   model.undo();
   t.same(model.undoOps(), ["add row 'test row 1'"]);
   t.same(model.redoOps(), [
-    "update row 'test row 1'",
+    "add row 'test row 2' to scenario 'second scenario'",
     "add scenario 'second scenario'",
-    "add row 'test row 2' to scenario 'second scenario'"
+    "update row 'test row 1'"
   ]);
   model.undo();
   t.same(model.undoOps(), []);
   t.same(model.redoOps(), [
-    "add row 'test row 1'",
-    "update row 'test row 1'",
+    "add row 'test row 2' to scenario 'second scenario'",
     "add scenario 'second scenario'",
-    "add row 'test row 2' to scenario 'second scenario'"
+    "update row 'test row 1'",
+    "add row 'test row 1'"
   ]);
   model.redo();
   t.same(model.undoOps(), ["add row 'test row 1'"]);
   t.same(model.redoOps(), [
-    "update row 'test row 1'",
+    "add row 'test row 2' to scenario 'second scenario'",
     "add scenario 'second scenario'",
-    "add row 'test row 2' to scenario 'second scenario'"
+    "update row 'test row 1'"
   ]);
   model.redo();
-  t.same(model.undoOps(), ["add row 'test row 1'", "update row 'test row 1'"]);
+  t.same(model.undoOps(), ["update row 'test row 1'", "add row 'test row 1'"]);
   t.same(model.redoOps(), [
-    "add scenario 'second scenario'",
-    "add row 'test row 2' to scenario 'second scenario'"
-  ]);
-  model.redo();
-  t.same(model.undoOps(), [
-    "add row 'test row 1'",
-    "update row 'test row 1'",
+    "add row 'test row 2' to scenario 'second scenario'",
     "add scenario 'second scenario'"
   ]);
+  model.redo();
+  t.same(model.undoOps(), [
+    "add scenario 'second scenario'",
+    "update row 'test row 1'",
+    "add row 'test row 1'"
+  ]);
   t.same(model.redoOps(), [
     "add row 'test row 2' to scenario 'second scenario'"
   ]);
   model.redo();
   t.same(model.undoOps(), [
-    "add row 'test row 1'",
-    "update row 'test row 1'",
+    "add row 'test row 2' to scenario 'second scenario'",
     "add scenario 'second scenario'",
-    "add row 'test row 2' to scenario 'second scenario'"
+    "update row 'test row 1'",
+    "add row 'test row 1'"
   ]);
   t.same(model.redoOps(), []);
   t.end();
@@ -227,24 +227,24 @@ test("adding new ops after undo clears redo items", t => {
     dependsOn: "test row 1"
   });
   t.same(model.undoOps(), [
-    "add row 'test row 1'",
-    "update row 'test row 1'",
+    "add row 'test row 2' to scenario 'second scenario'",
     "add scenario 'second scenario'",
-    "add row 'test row 2' to scenario 'second scenario'"
+    "update row 'test row 1'",
+    "add row 'test row 1'"
   ]);
   t.same(model.redoOps(), []);
   model.undo();
   model.undo();
-  t.same(model.undoOps(), ["add row 'test row 1'", "update row 'test row 1'"]);
+  t.same(model.undoOps(), ["update row 'test row 1'", "add row 'test row 1'"]);
   t.same(model.redoOps(), [
-    "add scenario 'second scenario'",
-    "add row 'test row 2' to scenario 'second scenario'"
+    "add row 'test row 2' to scenario 'second scenario'",
+    "add scenario 'second scenario'"
   ]);
   model.addRow({ rowName: "test row 3", fn: interval });
   t.same(model.undoOps(), [
-    "add row 'test row 1'",
+    "add row 'test row 3'",
     "update row 'test row 1'",
-    "add row 'test row 3'"
+    "add row 'test row 1'"
   ]);
   t.same(model.redoOps(), []);
   t.end();
@@ -267,7 +267,30 @@ test("history displays custom history descriptions", t => {
     scenarioName: "second scenario",
     historyDescription: "third op"
   });
-  t.same(model.undoOps(), ["first op", "second op", "third op"]);
+  t.same(model.undoOps(), ["third op", "second op", "first op"]);
   t.same(model.redoOps(), []);
+  t.end();
+});
+
+test("history has a maximum number of items", t => {
+  const model = new InteractiveModel(testMeta);
+  for (let i = 0; i < InteractiveModel.maxHistoryItems; i++) {
+    model.addRow({
+      rowName: `row ${i}`,
+      fn: interval
+    });
+  }
+  let undoOps = model.undoOps();
+  t.same(undoOps.length, 100);
+  t.same(undoOps[0], "add row 'row 99'");
+  t.same(undoOps[99], "add row 'row 0'");
+  model.addRow({
+    rowName: "test row",
+    fn: interval
+  });
+  undoOps = model.undoOps();
+  t.same(undoOps.length, 100);
+  t.same(undoOps[0], "add row 'test row'");
+  t.same(undoOps[99], "add row 'row 1'");
   t.end();
 });

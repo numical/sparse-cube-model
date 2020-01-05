@@ -66,6 +66,19 @@ class MappedModel extends Model {
     });
   }
 
+  addRows({ rows = [], scenarioName = defaultScenario }) {
+    this.#fns.unmapError(callMappings => {
+      const mapped = rows.map(row => ({
+        ...row,
+        rowName: this.#fns.addRowKey(row.rowName, callMappings)
+      }));
+      super.addRows({
+        scenarioName: this.#fns.fromScenarioKey(scenarioName, callMappings),
+        rows: mapped
+      });
+    });
+  }
+
   updateRow({
     rowName,
     scenarioName = defaultScenario,

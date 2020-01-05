@@ -5,9 +5,10 @@ const testFixture = require("../../test/testFixture");
 
 test("add scenario to empty model can be undone", t => {
   const model = new InteractiveModel();
+  const historyDescription = "test operation";
   const scenarioName = "test scenario";
   const pre = comparableUnserialisedForm({ model });
-  model.addScenario({ scenarioName });
+  model.addScenario({ scenarioName, historyDescription });
   t.same(model.lengths, { x: 0, y: 0, z: 0 });
   model.undo();
   t.same(model.lengths, { x: 0, y: 0, z: 0 });

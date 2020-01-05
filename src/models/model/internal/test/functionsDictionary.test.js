@@ -1,4 +1,4 @@
-const { test, only } = require("tap");
+const { test } = require("tap");
 const fnsDictionary = require("../functionsDictionary");
 const coreFunctions = require("../../../../fns/lookupFunctions");
 

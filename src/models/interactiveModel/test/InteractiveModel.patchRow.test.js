@@ -2,19 +2,16 @@ const { test } = require("tap");
 const InteractiveModel = require("../InteractiveModel");
 const comparableUnserialisedForm = require("./comparableUnserialisedForm");
 const testFixture = require("../../test/testFixture");
-const {
-  increment,
-  interval,
-  lookup,
-  lookupPrevious
-} = require("../../../fns/lookupFunctions");
+const { increment, interval, lookup } = require("../../../fns/lookupFunctions");
+const { defaultScenario } = require("../../model/internal/modelMetadata");
 
 test("patch row - change constants only - can be undone", t => {
   const rowName = "increment row";
+  const historyDescription = "test operation";
   const model = testFixture(InteractiveModel);
   t.same(model.row({ rowName }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
   const pre = comparableUnserialisedForm({ model });
-  model.patchRow({ rowName, constants: [10] });
+  model.patchRow({ rowName, constants: [10], historyDescription });
   t.same(model.row({ rowName }), [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]);
   model.undo();
   t.same(model.row({ rowName }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
@@ -26,7 +23,7 @@ test("patch row - change constants only - can be undone", t => {
 test("patch row - change constant only - can be redone", t => {
   const rowName = "increment row";
   const model = testFixture(InteractiveModel);
-  model.patchRow({ rowName, constants: [10] });
+  model.patchRow({ rowName, constants: [10], scenarioName: defaultScenario });
   const pre = comparableUnserialisedForm({ model });
   model.undo();
   model.redo();

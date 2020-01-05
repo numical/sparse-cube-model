@@ -6,7 +6,8 @@ const testFixture = require("../../test/testFixture");
 test("delete scenario to empty model can be undone", t => {
   const model = new InteractiveModel();
   const scenarioName = "test scenario";
-  model.addScenario({ scenarioName });
+  const historyDescription = "test operation";
+  model.addScenario({ scenarioName, historyDescription });
   const pre = comparableUnserialisedForm({ model });
   model.deleteScenario({ scenarioName });
   model.undo();
