@@ -55,6 +55,32 @@ class InteractiveModel extends MappedModel {
     });
   }
 
+  addRows(args) {
+    const { historyDescription, ...rest } = args;
+    const { rows = [], scenarioName } = rest;
+    super.addRows(rest);
+    const rowNames = rows.map(({ rowName }) => rowName);
+    const description = historyDescription
+      ? historyDescription
+      : scenarioName
+      ? `add rows '${rowNames.join(", ")}' to scenario '${scenarioName}'`
+      : `add rows '${rowNames.join(", ")}'`;
+    addToHistory(this.#history, {
+      description,
+      redo: {
+        fn: "addRows",
+        args: rest
+      },
+      undo: {
+        fn: "deleteRows",
+        args: {
+          rowNames,
+          scenarioName
+        }
+      }
+    });
+  }
+
   updateRow(args) {
     const { historyDescription, ...rest } = args;
     const { rowName, scenarioName } = rest;
