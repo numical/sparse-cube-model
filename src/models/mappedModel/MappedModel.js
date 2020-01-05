@@ -8,6 +8,8 @@ const mapKey = require("./internal/mapKey");
 const unmapError = require("./internal/unmapError");
 const { defaultScenario } = modelMetadata;
 
+const dependsOnErrorPrefix = "Depends on unknown row";
+
 class MappedModel extends Model {
   static parse([serializedModel, serializedMap], fnsRepo) {
     const meta = serializer.parse(serializedModel, fnsRepo);
@@ -61,7 +63,11 @@ class MappedModel extends Model {
         constants,
         start,
         end,
-        dependsOn: this.#fns.fromRowKey(dependsOn, callMappings)
+        dependsOn: this.#fns.fromRowKey(
+          dependsOn,
+          callMappings,
+          dependsOnErrorPrefix
+        )
       });
     });
   }
@@ -70,7 +76,13 @@ class MappedModel extends Model {
     this.#fns.unmapError(callMappings => {
       const mapped = rows.map(row => ({
         ...row,
-        rowName: this.#fns.addRowKey(row.rowName, callMappings)
+        rowName: this.#fns.addRowKey(row.rowName, callMappings),
+        fnArgs: this.#fns.fromRowKey(row.fnArgs, callMappings),
+        dependsOn: this.#fns.fromRowKey(
+          row.dependsOn,
+          callMappings,
+          dependsOnErrorPrefix
+        )
       }));
       super.addRows({
         scenarioName: this.#fns.fromScenarioKey(scenarioName, callMappings),
@@ -94,7 +106,11 @@ class MappedModel extends Model {
         fn,
         fnArgs: this.#fns.fromRowKey(fnArgs, callMappings),
         constants,
-        dependsOn: this.#fns.fromRowKey(dependsOn, callMappings)
+        dependsOn: this.#fns.fromRowKey(
+          dependsOn,
+          callMappings,
+          dependsOnErrorPrefix
+        )
       });
       return {
         ...originalRow,
@@ -120,7 +136,11 @@ class MappedModel extends Model {
         fn,
         fnArgs: this.#fns.fromRowKey(fnArgs, callMappings),
         constants,
-        dependsOn: this.#fns.fromRowKey(dependsOn, callMappings)
+        dependsOn: this.#fns.fromRowKey(
+          dependsOn,
+          callMappings,
+          dependsOnErrorPrefix
+        )
       });
       return {
         ...originalRow,

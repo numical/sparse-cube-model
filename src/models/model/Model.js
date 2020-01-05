@@ -103,10 +103,12 @@ class Model extends Dense3DArray {
         throw new Error(`Depends on unknown row '${dependency}'`);
       }
     });
+    // yuk - ensure that values are not double-mapped by calling explicit Model method
+    const addRow = Model.prototype.addRow.bind(this);
     rows
       .sort(sortByDependency)
       .map(rowData => ({ ...rowData, scenarioName }))
-      .forEach(this.addRow);
+      .forEach(addRow);
   }
 
   updateRow({

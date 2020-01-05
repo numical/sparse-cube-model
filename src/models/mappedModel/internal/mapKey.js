@@ -1,4 +1,4 @@
-const mapKey = (fromMap, type, doNotMap, key, callMappings) => {
+const mapKey = (fromMap, type, doNotMap, key, callMappings, errorPrefix) => {
   if (key) {
     if (key === doNotMap) {
       return key;
@@ -13,7 +13,8 @@ const mapKey = (fromMap, type, doNotMap, key, callMappings) => {
     } else {
       const mapped = fromMap[type][key];
       if (!mapped) {
-        throw new Error(`Unknown ${type} '${key}'`);
+        const prefix = errorPrefix || `Unknown ${type}`;
+        throw new Error(`${prefix} '${key}'`);
       }
       if (callMappings) {
         callMappings[mapped] = key;
