@@ -42,11 +42,11 @@ populatedScenarios((test, setupFn) => {
 
   test("Add scenario copying unknown scenario throws error", t => {
     const scenarioName = "test scenario";
-    const copyOf = "unknown scenario";
+    const baseScenario = "unknown scenario";
     const model = setupFn();
     t.throws(
-      () => model.addScenario({ scenarioName, copyOf }),
-      new Error(`Unknown scenario '${copyOf}'`)
+      () => model.addScenario({ scenarioName, baseScenario }),
+      new Error(`Unknown scenario '${baseScenario}'`)
     );
     t.end();
   });
@@ -335,7 +335,10 @@ emptyScenarios((test, setupFn) => {
         fn
       });
     });
-    model.addScenario({ scenarioName: "scenario 2", copyOf: "scenario 1" });
+    model.addScenario({
+      scenarioName: "scenario 2",
+      baseScenario: "scenario 1"
+    });
 
     const scenario1 = model.scenario({ scenarioName: "scenario 1" });
     t.same(scenario1, [
@@ -370,7 +373,10 @@ emptyScenarios((test, setupFn) => {
         fn
       });
     });
-    model.addScenario({ scenarioName: "scenario 2", copyOf: "scenario 1" });
+    model.addScenario({
+      scenarioName: "scenario 2",
+      baseScenario: "scenario 1"
+    });
 
     const scenario1 = model.scenario({ scenarioName: "scenario 1" });
     t.same(scenario1, [

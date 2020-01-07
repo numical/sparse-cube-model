@@ -206,7 +206,7 @@ class InteractiveModel extends MappedModel {
         fn: "addScenario",
         args: {
           scenarioName,
-          copyOf: original
+          baseScenario: original
         }
       }
     });

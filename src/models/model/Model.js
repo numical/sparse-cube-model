@@ -216,27 +216,36 @@ class Model extends Dense3DArray {
     return this.isEmpty() ? [] : this.range({ z: scenario.index });
   }
 
-  addScenario({ scenarioName, copyOf = defaultScenario } = {}) {
+  addScenario({
+    scenarioName,
+    baseScenario = defaultScenario,
+    transform
+  } = {}) {
     const { scenarios } = this.#meta;
     validateScenario({ scenarioName, scenarios, shouldExist: false });
-    const scenarioToCopy = scenarios[copyOf];
+    const scenarioToCopy = scenarios[baseScenario];
     if (!scenarioToCopy) {
-      throw new Error(`Unknown scenario '${copyOf}'`);
+      throw new Error(`Unknown scenario '${baseScenario}'`);
+    }
+    if (transform && typeof transform !== "function") {
+      throw new Error("Scenario transform must be a function.");
     }
     const copiedRows = Object.entries(scenarioToCopy.rows).reduce(
       (copy, [rowName, row]) => {
+        const fn = transform || row.fn.unbound;
         copy[rowName] = {
           ...row,
-          fn: row.fn.unbound
+          fn
         };
         return copy;
       },
       {}
     );
-    scenarios[scenarioName] = {
+    const scenario = {
       index: this.isEmpty() ? 1 : this.lengths.z,
       rows: copiedRows
     };
+    scenarios[scenarioName] = scenario;
     this.recalculate({ scenarioName });
   }
 

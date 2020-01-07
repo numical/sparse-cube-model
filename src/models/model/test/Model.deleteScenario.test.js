@@ -78,7 +78,7 @@ populatedScenarios((test, setUp) => {
     t.doesNotThrow(() =>
       model.addScenario({
         scenarioName: "defaultScenario",
-        copyOf: "second scenario"
+        baseScenario: "second scenario"
       })
     );
     t.end();

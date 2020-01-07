@@ -201,11 +201,11 @@ class MappedModel extends Model {
     });
   }
 
-  addScenario({ scenarioName, copyOf = defaultScenario } = {}) {
+  addScenario({ scenarioName, baseScenario = defaultScenario } = {}) {
     this.#fns.unmapError(callMappings => {
       super.addScenario({
         scenarioName: this.#fns.addScenarioKey(scenarioName, callMappings),
-        copyOf: this.#fns.fromScenarioKey(copyOf, callMappings)
+        baseScenario: this.#fns.fromScenarioKey(baseScenario, callMappings)
       });
     });
   }
