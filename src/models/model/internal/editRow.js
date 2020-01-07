@@ -18,13 +18,12 @@ const editRow = ({
   dependsOn
 }) => {
   const original = clone(row);
-  const rowConstants = prepareRowConstants({
+  const { rowConstants, startInterval } = prepareRowConstants({
     fn,
     constants,
     existingConstants,
     intervals
   });
-  const startInterval = 0;
   if (!fn) {
     ensureAllConstantsDefined(rowConstants, intervals);
   }

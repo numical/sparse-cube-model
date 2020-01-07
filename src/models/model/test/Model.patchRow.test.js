@@ -153,22 +153,6 @@ emptyScenarios((test, setupFn) => {
     t.end();
   });
 
-  /*
-  test("Patch row accepts an appending constants array argument", t => {
-    const rowName = "test row";
-    const model = setupFn();
-    model.addRow({ rowName, fn: interval, constants: { 1: 7 } });
-    t.same(model.row({ rowName }), [0, 7, 2, 3, 4, 5, 6, 7, 8, 9]);
-    model.patchRow({
-      rowName,
-      constants: [123]
-    });
-    t.same(model.row({ rowName }), [123, 7, 2, 3, 4, 5, 6, 7, 8, 9]);
-    t.end();
-  });
-
-   */
-
   test("Patch row accepts a merging constants array argument", t => {
     const rowName = "test row";
     const model = setupFn();
@@ -190,6 +174,23 @@ emptyScenarios((test, setupFn) => {
       2004,
       2005
     ]);
+    t.end();
+  });
+
+  test("Patch row accepts a merging constants array argument - earlier constants", t => {
+    const rowName = "test row";
+    const model = setupFn();
+    model.addRow({
+      rowName,
+      fn: interval,
+      constants: [undefined, undefined, undefined, 20]
+    });
+    t.same(model.row({ rowName }), [0, 1, 2, 20, 4, 5, 6, 7, 8, 9]);
+    model.patchRow({
+      rowName,
+      constants: [undefined, 1000, 200, undefined, 2000]
+    });
+    t.same(model.row({ rowName }), [0, 1000, 200, 20, 2000, 5, 6, 7, 8, 9]);
     t.end();
   });
 
@@ -217,7 +218,65 @@ emptyScenarios((test, setupFn) => {
     t.end();
   });
 
-  /*
+  test("Patch row accepts a merging constants dictionary argument - earlier constants", t => {
+    const rowName = "test row";
+    const model = setupFn();
+    model.addRow({
+      rowName,
+      fn: interval,
+      constants: [undefined, undefined, undefined, 20]
+    });
+    t.same(model.row({ rowName }), [0, 1, 2, 20, 4, 5, 6, 7, 8, 9]);
+    model.patchRow({
+      rowName,
+      constants: { 1: 1000, 2: 200, 4: 2000 }
+    });
+    t.same(model.row({ rowName }), [0, 1000, 200, 20, 2000, 5, 6, 7, 8, 9]);
+    t.end();
+  });
+
+  test("Patch row accepts a merging constants Map argument - earlier constants", t => {
+    const rowName = "test row";
+    const model = setupFn();
+    model.addRow({
+      rowName,
+      fn: interval,
+      constants: [undefined, undefined, undefined, 20]
+    });
+    t.same(model.row({ rowName }), [0, 1, 2, 20, 4, 5, 6, 7, 8, 9]);
+    const constants = new Map();
+    constants.set(1, 1000);
+    constants.set(2, 200);
+    constants.set(4, 2000);
+    model.patchRow({
+      rowName,
+      constants
+    });
+    t.same(model.row({ rowName }), [0, 1000, 200, 20, 2000, 5, 6, 7, 8, 9]);
+    t.end();
+  });
+
+  test("Patch row accepts a merging constants Map argument - date constants", t => {
+    const rowName = "test row";
+    const model = setupFn();
+    model.addRow({
+      rowName,
+      fn: interval,
+      constants: [undefined, undefined, undefined, 20]
+    });
+    t.same(model.row({ rowName }), [0, 1, 2, 20, 4, 5, 6, 7, 8, 9]);
+    const constants = new Map();
+    constants.set(new Date(2020, 1, 1), 1000);
+    constants.set(new Date(2020, 2, 1), 200);
+    constants.set(4, 2000);
+    model.patchRow({
+      rowName,
+      constants
+    });
+    t.same(model.row({ rowName }), [0, 1000, 200, 20, 2000, 5, 6, 7, 8, 9]);
+    t.end();
+  });
+
   test("Patch row accepts all arguments", t => {
     const rowName = "testRow";
     const model = setupFn();
@@ -236,9 +295,18 @@ emptyScenarios((test, setupFn) => {
       dependsOn: "second lookup",
       constants: [123]
     });
-    t.same(model.row({ rowName }), [123, 7, 101, 102, 103, 104, 105, 106, 107]);
+    t.same(model.row({ rowName }), [
+      123,
+      7,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108
+    ]);
     t.end();
   });
-    
-   */
 });

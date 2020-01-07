@@ -49,7 +49,7 @@ class Model extends Dense3DArray {
     validateRow({ rowName, scenario, shouldExist: false });
     validateFn({ fn, constants });
     validateFnArgs({ fn, fnArgs });
-    const rowConstants = prepareRowConstants({
+    const { rowConstants } = prepareRowConstants({
       constants,
       start,
       end,

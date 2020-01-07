@@ -326,28 +326,74 @@ emptyScenarios((test, setupFn) => {
     t.end();
   });
 
-  test("Update row - overwite behaviour - constants", t => {
+  test("Update row - overwite behaviour - constants array", t => {
     const rowName = "test row";
     const model = setupFn();
     model.addRow({
       rowName,
       fn: interval,
       constants: {
-        0: 10,
         2: 20,
         4: 30
       }
     });
-    t.same(model.row({ rowName }), [10, 1, 20, 3, 30, 5, 6, 7, 8, 9]);
+    t.same(model.row({ rowName }), [0, 1, 20, 3, 30, 5, 6, 7, 8, 9]);
+    model.updateRow({
+      rowName,
+      fn: interval,
+      constants: [undefined, 1000, 100, undefined, 10]
+    });
+    t.same(model.row({ rowName }), [0, 1000, 100, 3, 10, 5, 6, 7, 8, 9]);
+    t.end();
+  });
+
+  test("Update row - overwite behaviour - constants dictionary", t => {
+    const rowName = "test row";
+    const model = setupFn();
+    model.addRow({
+      rowName,
+      fn: interval,
+      constants: {
+        2: 20,
+        4: 30
+      }
+    });
+    t.same(model.row({ rowName }), [0, 1, 20, 3, 30, 5, 6, 7, 8, 9]);
     model.updateRow({
       rowName,
       fn: interval,
       constants: {
+        1: 10,
         6: 10,
         8: 20
       }
     });
-    t.same(model.row({ rowName }), [0, 1, 2, 3, 4, 5, 10, 7, 20, 9]);
+    t.same(model.row({ rowName }), [0, 10, 2, 3, 4, 5, 10, 7, 20, 9]);
+    t.end();
+  });
+
+  test("Update row - overwite behaviour - constants Map", t => {
+    const rowName = "test row";
+    const model = setupFn();
+    model.addRow({
+      rowName,
+      fn: interval,
+      constants: {
+        2: 20,
+        4: 30
+      }
+    });
+    t.same(model.row({ rowName }), [0, 1, 20, 3, 30, 5, 6, 7, 8, 9]);
+    const constants = new Map();
+    constants.set(1, 10);
+    constants.set(2, 30);
+    constants.set(6, 10);
+    model.updateRow({
+      rowName,
+      fn: interval,
+      constants
+    });
+    t.same(model.row({ rowName }), [0, 10, 30, 3, 4, 5, 10, 7, 8, 9]);
     t.end();
   });
 

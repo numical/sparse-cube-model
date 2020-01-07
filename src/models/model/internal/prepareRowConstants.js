@@ -25,6 +25,14 @@ const convertToIndex = (key, start, end) => {
   return index;
 };
 
+const lowestIndex = array => {
+  for (let index = 0; index < array.length; index++) {
+    if (array[index] !== undefined) {
+      return index;
+    }
+  }
+};
+
 const defaultValuesArray = ({ start, end, maxInterval }) => {
   const array = [];
   for (let i = 0; i < start; i++) {
@@ -42,38 +50,66 @@ Two special cases here:
    indices of dictionaries and maps do not)
  - undefined values do *not* overwite as this case occures only during patch operations
  */
-const mergeArrays = ({ constants, initial, start }) =>
-  constants.reduce((array, value, key) => {
-    if (value !== undefined) {
-      array[key + start] = value;
-    }
-    return array;
-  }, initial);
+const mergeArrays = ({ constants, initial, start, startInterval }) =>
+  constants.reduce(
+    ({ rowConstants, startInterval }, value, key) => {
+      if (value !== undefined) {
+        const index = key + start;
+        if (index < startInterval) {
+          startInterval = index;
+        }
+        rowConstants[key + start] = value;
+      }
+      return { rowConstants, startInterval };
+    },
+    { rowConstants: initial, startInterval }
+  );
 
-const convertDictionaryToArray = ({ constants, start, end, initial }) =>
-  Object.entries(constants).reduce((array, [key, value]) => {
-    const index = convertToIndex(key, start, end);
-    array[index] = value;
-    return array;
-  }, initial);
+const convertDictionaryToArray = ({
+  constants,
+  start,
+  end,
+  initial,
+  startInterval
+}) =>
+  Object.entries(constants).reduce(
+    ({ rowConstants, startInterval }, [key, value]) => {
+      const index = convertToIndex(key, start, end);
+      if (index < startInterval) {
+        startInterval = index;
+      }
+      rowConstants[index] = value;
+      return { rowConstants, startInterval };
+    },
+    { rowConstants: initial, startInterval }
+  );
 
 const convertMapToArray = ({
   constants,
   start,
   end,
   calcIntervalFromDate,
-  initial: array
+  initial: rowConstants,
+  startInterval
 }) => {
   for ([key, value] of constants.entries()) {
     if (key instanceof Date) {
       const index = calcIntervalFromDate(key);
-      array[index] = array[index] ? array[index] + value : value;
+      if (index < startInterval) {
+        startInterval = index;
+      }
+      rowConstants[index] = rowConstants[index]
+        ? rowConstants[index] + value
+        : value;
     } else {
       const index = convertToIndex(key, start, end);
-      array[index] = value;
+      if (index < startInterval) {
+        startInterval = index;
+      }
+      rowConstants[index] = value;
     }
   }
-  return array;
+  return { rowConstants, startInterval };
 };
 
 const prepareRowConstants = ({
@@ -93,18 +129,33 @@ const prepareRowConstants = ({
   } else if (!end) {
     end = maxInterval;
   }
-  const initial =
-    existingConstants || defaultValuesArray({ start, end, maxInterval });
+  let initial;
+  let startInterval;
+  if (existingConstants) {
+    initial = existingConstants;
+    startInterval = lowestIndex(existingConstants);
+  } else {
+    initial = defaultValuesArray({ start, end, maxInterval });
+    startInterval = start;
+  }
   if (constants) {
     validateConstantsType(constants);
-    const args = { constants, initial, start, end, calcIntervalFromDate };
+    const args = {
+      constants,
+      initial,
+      startInterval,
+      start,
+      end,
+      calcIntervalFromDate
+    };
     return Array.isArray(constants)
       ? mergeArrays(args)
       : constants instanceof Map
       ? convertMapToArray(args)
       : convertDictionaryToArray(args);
   } else {
-    return initial;
+    // if no constants then function must non-null so must recalc from start
+    return { rowConstants: initial, startInterval: 0 };
   }
 };
 
