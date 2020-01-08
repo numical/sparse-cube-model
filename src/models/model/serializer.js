@@ -1,4 +1,4 @@
-const fnsDictionary = require("./functionsDictionary");
+const fnsDictionary = require("../../fns/functionsDictionary");
 
 const replacer = (key, value) =>
   key === "fn"

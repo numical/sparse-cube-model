@@ -1,6 +1,6 @@
 const { test } = require("tap");
 const getIntervalFromDate = require("../getIntervalFromDate");
-const { defaults } = require("../modelMetadata");
+const { defaults } = require("../../../modelMetadata");
 
 const epoch = new Date(2020, 0).getTime();
 const count = 12;

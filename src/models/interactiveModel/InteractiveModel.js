@@ -1,6 +1,6 @@
 const MappedModel = require("../mappedModel/MappedModel");
-const modelMetadata = require("../model/internal/modelMetadata");
-const serializer = require("../model/internal/serializer");
+const modelMetadata = require("../model/modelMetadata");
+const serializer = require("../model/serializer");
 
 const maxHistoryItems = 100;
 
@@ -206,7 +206,7 @@ class InteractiveModel extends MappedModel {
         fn: "addScenario",
         args: {
           scenarioName,
-          baseScenario: original
+          baseScenarioName: original
         }
       }
     });

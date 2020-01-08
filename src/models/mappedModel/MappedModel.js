@@ -1,7 +1,7 @@
 const { invertObj } = require("ramda");
 const Model = require("../model/Model");
-const modelMetadata = require("../model/internal/modelMetadata");
-const serializer = require("../model/internal/serializer");
+const modelMetadata = require("../model/modelMetadata");
+const serializer = require("../model/serializer");
 const addKey = require("./internal/addKey");
 const removeKey = require("./internal/removeKey");
 const mapKey = require("./internal/mapKey");
@@ -201,11 +201,16 @@ class MappedModel extends Model {
     });
   }
 
-  addScenario({ scenarioName, baseScenario = defaultScenario } = {}) {
+  addScenario(args = {}) {
+    const { scenarioName, baseScenarioName = defaultScenario } = args;
     this.#fns.unmapError(callMappings => {
       super.addScenario({
+        ...args,
         scenarioName: this.#fns.addScenarioKey(scenarioName, callMappings),
-        baseScenario: this.#fns.fromScenarioKey(baseScenario, callMappings)
+        baseScenarioName: this.#fns.fromScenarioKey(
+          baseScenarioName,
+          callMappings
+        )
       });
     });
   }

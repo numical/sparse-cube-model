@@ -1,4 +1,4 @@
-const serializer = require("../../model/internal/serializer");
+const serializer = require("../../model/serializer");
 
 const replaceAll = (s, toReplace, replaceWith) => {
   while (s.indexOf(toReplace) > -1) {

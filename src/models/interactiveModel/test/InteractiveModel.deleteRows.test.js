@@ -3,7 +3,7 @@ const InteractiveModel = require("../InteractiveModel");
 const comparableUnserialisedForm = require("./comparableUnserialisedForm");
 const testFixture = require("../../test/testFixture");
 const { interval } = require("../../../fns/lookupFunctions");
-const { defaultScenario } = require("../../model/internal/modelMetadata");
+const { defaultScenario } = require("../../model/modelMetadata");
 
 const testMeta = {
   intervals: {

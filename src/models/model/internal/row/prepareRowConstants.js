@@ -1,5 +1,5 @@
-const defaultValue = require("./defaultValue");
-const getIntervalFromDate = require("./getIntervalFromDate");
+const { defaultValue } = require("../../modelMetadata");
+const getIntervalFromDate = require("../date/getIntervalFromDate");
 
 const validateConstantsType = constants => {
   if (Array.isArray(constants)) {

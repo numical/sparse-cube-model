@@ -25,7 +25,7 @@ const emptyScenarios = fn => {
         test.meta = meta; // yuk, impure
         return new Type(meta);
       };
-      fn(test, setupFn);
+      fn(test, setupFn, Type);
       typeTests.end();
     });
   });

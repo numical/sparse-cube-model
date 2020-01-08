@@ -2,9 +2,9 @@ const { clone } = require("ramda");
 const calculateRow = require("./calculateRow");
 const bindFnToRow = require("./bindFnToRow");
 const prepareRowConstants = require("./prepareRowConstants");
-const ensureAllConstantsDefined = require("./ensureAllConstantsDefined");
-const linkDependentRows = require("./linkDependentRows");
-const unlinkDependentRows = require("./unlinkDependentRows");
+const ensureAllConstantsDefined = require("../validate/ensureAllConstantsDefined");
+const linkDependentRows = require("../dependent/linkDependentRows");
+const unlinkDependentRows = require("../dependent/unlinkDependentRows");
 
 const editRow = ({
   model,

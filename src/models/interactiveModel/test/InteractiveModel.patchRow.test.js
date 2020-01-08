@@ -3,7 +3,7 @@ const InteractiveModel = require("../InteractiveModel");
 const comparableUnserialisedForm = require("./comparableUnserialisedForm");
 const testFixture = require("../../test/testFixture");
 const { increment, interval, lookup } = require("../../../fns/lookupFunctions");
-const { defaultScenario } = require("../../model/internal/modelMetadata");
+const { defaultScenario } = require("../../model/modelMetadata");
 
 test("patch row - change constants only - can be undone", t => {
   const rowName = "increment row";

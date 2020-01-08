@@ -1,5 +1,5 @@
-const lookupFns = require("../../../fns/lookupFunctions");
-const interestFns = require("../../../fns/interestFunctions");
+const lookupFns = require("./lookupFunctions");
+const interestFns = require("./interestFunctions");
 
 const allFns = { ...lookupFns, ...interestFns };
 

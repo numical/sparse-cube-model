@@ -17,5 +17,6 @@ const defaults = {
 const factory = (custom = {}) => mergeDeepLeft(custom, clone(defaults));
 factory.defaults = defaults;
 factory.defaultScenario = "defaultScenario";
+factory.defaultValue = 0;
 
 module.exports = factory;

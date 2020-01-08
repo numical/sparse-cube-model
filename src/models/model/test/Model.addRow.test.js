@@ -29,7 +29,7 @@ emptyScenarios((test, setupFn) => {
     const model = setupFn();
     t.throws(
       () => model.addRow(args),
-      new Error("function 'fn' must have a 'key' property.")
+      new Error("Function 'fn' must have a 'key' property.")
     );
     t.end();
   });

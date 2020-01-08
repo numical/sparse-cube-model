@@ -1,5 +1,5 @@
-const unlinkDependentRows = require("./unlinkDependentRows");
-const defaultValue = require("./defaultValue");
+const unlinkDependentRows = require("../dependent/unlinkDependentRows");
+const { defaultValue } = require("../../modelMetadata");
 
 const deleteSingleRow = (model, scenario, row, rowName) => {
   const { x: lenX, z: lenZ } = model.lengths;
