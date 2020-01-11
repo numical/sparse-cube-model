@@ -191,7 +191,6 @@ populatedScenarios((test, setupFn) => {
     t.end();
   });
 
-  /*
   test("Delete row affects only the passed scenario", t => {
     const scenarioName = "test scenario";
     const rowName = "second lookup row";
@@ -199,22 +198,53 @@ populatedScenarios((test, setupFn) => {
     model.addScenario({ scenarioName });
     model.deleteRow({ rowName, scenarioName });
     t.same(model.row({ rowName }), [1000, 0, 1, 2, 3, 4, 5, 6, 7, 8]);
-    t.same(model.row({ rowName, scenarioName }), [
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0
-    ]);
+    t.throws(
+      () => model.row({ rowName, scenarioName }),
+      new Error("Unknown row 'second lookup row'")
+    );
     t.end();
   });
 
-   */
+  test("Delete rows affects only the passed scenario", t => {
+    const scenarioName = "test scenario";
+    const rowNames = ["independent row", "second lookup row"];
+    const model = setupFn();
+    model.addScenario({ scenarioName });
+    model.deleteRows({ rowNames, scenarioName });
+    t.same(model.row({ rowName: "independent row" }), [
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19
+    ]);
+    t.same(model.row({ rowName: "second lookup row" }), [
+      1000,
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ]);
+    t.throws(
+      () => model.row({ rowName: "independent row", scenarioName }),
+      new Error("Unknown row 'independent row'")
+    );
+    t.throws(
+      () => model.row({ rowName: "second lookup row", scenarioName }),
+      new Error("Unknown row 'second lookup row'")
+    );
+    t.end();
+  });
 });
 
 emptyScenarios((test, setupFn) => {

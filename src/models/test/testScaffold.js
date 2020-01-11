@@ -17,8 +17,8 @@ const setupFns = [
   Type => Type.parse(testFixture(Type).stringify())
 ];
 
-const emptyScenarios = fn => {
-  [Model, MappedModel, InteractiveModel].forEach(Type => {
+const emptyScenarios = (fn, Types = [Model, MappedModel, InteractiveModel]) => {
+  Types.forEach(Type => {
     tap.test(`${Type.name} tests:`, typeTests => {
       const { test } = typeTests;
       const setupFn = (meta = testMeta) => {
@@ -31,9 +31,12 @@ const emptyScenarios = fn => {
   });
 };
 
-const populatedScenarios = fn => {
+const populatedScenarios = (
+  fn,
+  Types = [Model, MappedModel, InteractiveModel]
+) => {
   setupFns.forEach((setupFn, setupIndex) => {
-    [Model, MappedModel, InteractiveModel].forEach(Type => {
+    Types.forEach(Type => {
       tap.test(
         `${Type.name} tests ${setupDescriptions[setupIndex]}`,
         typeTests => {

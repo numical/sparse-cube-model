@@ -5,6 +5,7 @@ const serializer = require("../model/serializer");
 const addKey = require("./internal/addKey");
 const removeKey = require("./internal/removeKey");
 const mapKey = require("./internal/mapKey");
+const mapRow = require("./internal/mapRow");
 const unmapError = require("./internal/unmapError");
 const { defaultScenario } = modelMetadata;
 
@@ -42,6 +43,7 @@ class MappedModel extends Model {
       unmapError: unmapError.bind(this, fromMap.row),
       serializeMap: serializer.stringify.bind(this, fromMap)
     };
+    this.#fns.mapRow = mapRow.bind(null, this.#fns.toRowKey);
   }
 
   addRow({
@@ -153,34 +155,45 @@ class MappedModel extends Model {
 
   deleteRow({ rowName, scenarioName = defaultScenario }) {
     return this.#fns.unmapError(callMappings => {
-      const deletedRow = super.deleteRow({
+      const { row, shadowRows } = super.deleteRow({
         scenarioName: this.#fns.fromScenarioKey(scenarioName, callMappings),
         rowName: this.#fns.fromRowKey(rowName, callMappings)
       });
       const mapped = {
-        ...deletedRow,
-        name: this.#fns.toRowKey(deletedRow.name),
-        dependsOn: this.#fns.toRowKey(deletedRow.dependsOn)
+        row: this.#fns.mapRow(row),
+        shadowRows: shadowRows.map(this.#fns.mapRow)
       };
-      this.#fns.removeRowKey(rowName, callMappings);
+      // has row been deleted from every scenario?
+      if (this.lengths.z === 1 + shadowRows.length) {
+        this.#fns.removeRowKey(rowName, callMappings);
+      }
       return mapped;
     });
   }
 
   deleteRows({ rowNames, scenarioName = defaultScenario }) {
+    const mapRow = row => ({
+      ...row,
+      name: this.#fns.toRowKey(row.name),
+      dependsOn: this.#fns.toRowKey(row.dependsOn)
+    });
     return this.#fns.unmapError(callMappings => {
-      const deletedRows = super
-        .deleteRows({
-          scenarioName: this.#fns.fromScenarioKey(scenarioName, callMappings),
-          rowNames: this.#fns.fromRowKey(rowNames, callMappings)
-        })
-        .map(deletedRow => ({
-          ...deletedRow,
-          name: this.#fns.toRowKey(deletedRow.name),
-          dependsOn: this.#fns.toRowKey(deletedRow.dependsOn)
-        }));
-      this.#fns.removeRowKey(rowNames, callMappings);
-      return deletedRows;
+      const { rows, shadowRows } = super.deleteRows({
+        scenarioName: this.#fns.fromScenarioKey(scenarioName, callMappings),
+        rowNames: this.#fns.fromRowKey(rowNames, callMappings)
+      });
+      const mapped = {
+        rows: rows.map(this.#fns.mapRow),
+        shadowRows: shadowRows.map(this.#fns.mapRow)
+      };
+      // have rows been deleted from every scenario?
+      if (
+        this.lengths.z * rowNames.length ===
+        rows.length + shadowRows.length
+      ) {
+        this.#fns.removeRowKey(rowNames, callMappings);
+      }
+      return mapped;
     });
   }
 

@@ -5,7 +5,7 @@ const prepareRowConstants = require("./internal/row/prepareRowConstants");
 const calculateRow = require("./internal/row/calculateRow");
 const bindFnToRow = require("./internal/row/bindFnToRow");
 const editRow = require("./internal/row/editRow");
-const deleteSingleRow = require("./internal/row/deleteSingleRow");
+const deleteRowAndShadows = require("./internal/row/deleteRowAndShadows");
 const ensureAllConstantsDefined = require("./internal/validate/ensureAllConstantsDefined");
 const linkAllDependentRows = require("./internal/dependent/linkAllDependentRows");
 const linkDependentRows = require("./internal/dependent/linkDependentRows");
@@ -201,8 +201,7 @@ class Model extends Dense3DArray {
         )}' depend on it.`
       );
     }
-    deleteSingleRow(this, scenario, row, rowName);
-    return row;
+    return deleteRowAndShadows(this, scenarios, scenario, row);
   }
 
   deleteRows({ rowNames, scenarioName = defaultScenario }) {
@@ -222,12 +221,22 @@ class Model extends Dense3DArray {
       }
     });
     // delete from largest index downwards
-    rows
+    return rows
       .sort((r1, r2) => r2.index - r1.index)
-      .forEach(row => {
-        deleteSingleRow(this, scenario, row, row.name);
-      });
-    return rows.reverse();
+      .reduce(
+        (deletedRows, toDelete) => {
+          const { row, shadowRows } = deleteRowAndShadows(
+            this,
+            scenarios,
+            scenario,
+            toDelete
+          );
+          deletedRows.rows.unshift(row);
+          deletedRows.shadowRows.unshift(...shadowRows);
+          return deletedRows;
+        },
+        { rows: [], shadowRows: [] }
+      );
   }
 
   row({ rowName, scenarioName = defaultScenario }) {
