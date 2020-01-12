@@ -1,8 +1,8 @@
-const shadowFunctionWrapper = (shadowFn, baseScenario) => {
+const shadowFunctionWrapper = ({ shadowFn, shadowFnArgs, baseScenario }) => {
   const fn = (rowContext, interval) => {
     const { model, row } = rowContext;
     const value = model[interval][row.index][baseScenario.index];
-    return shadowFn({ ...rowContext, value });
+    return shadowFn({ ...rowContext, ...shadowFnArgs, value });
   };
   fn.key = shadowFn.key;
   return fn;

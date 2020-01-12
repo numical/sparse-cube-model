@@ -4,10 +4,10 @@ const wrapAllShadowFns = scenarios => {
   Object.values(scenarios).forEach(baseScenario => {
     if (baseScenario.shadows) {
       Object.entries(baseScenario.shadows).forEach(
-        ([scenarioName, shadowFn]) => {
+        ([scenarioName, shadowArgs]) => {
           const scenario = scenarios[scenarioName];
           Object.values(scenario.rows).forEach(row => {
-            row.fn = shadowFunctionWrapper(shadowFn, baseScenario);
+            row.fn = shadowFunctionWrapper({ ...shadowArgs, baseScenario });
           });
         }
       );

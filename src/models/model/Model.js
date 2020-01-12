@@ -79,7 +79,7 @@ class Model extends Dense3DArray {
     );
     scenario.rows[rowName] = row;
     const rowsToCalculate = Object.entries(scenario.shadows || {}).reduce(
-      (rowsToCalculate, [shadowScenarioName, shadowFn]) => {
+      (rowsToCalculate, [shadowScenarioName, shadowArgs]) => {
         const shadowScenario = scenarios[shadowScenarioName];
         const shadowRow = {
           name: row.name,
@@ -91,7 +91,7 @@ class Model extends Dense3DArray {
           this.#meta.intervals,
           shadowScenario,
           shadowRow,
-          shadowFunctionWrapper(shadowFn, scenario)
+          shadowFunctionWrapper({ ...shadowArgs, baseScenario: scenario })
         );
         shadowScenario.rows[row.name] = shadowRow;
         rowsToCalculate.push({ row: shadowRow, scenario: shadowScenario });
@@ -263,7 +263,8 @@ class Model extends Dense3DArray {
   addScenario({
     scenarioName,
     baseScenarioName = defaultScenario,
-    shadowFn
+    shadowFn,
+    shadowFnArgs
   } = {}) {
     const { scenarios } = this.#meta;
     validateScenario({ scenarioName, scenarios, shouldExist: false });
@@ -273,6 +274,7 @@ class Model extends Dense3DArray {
     }
     if (shadowFn) {
       validateFn({ fn: shadowFn });
+      validateFnArgs({ fn: shadowFn, fnArgs: shadowFnArgs });
     }
     const copiedRows = Object.entries(baseScenario.rows).reduce(
       (copy, [rowName, row]) => {
@@ -292,9 +294,9 @@ class Model extends Dense3DArray {
     if (shadowFn) {
       scenario.isShadow = true;
       const shadows = baseScenario.shadows || {};
-      shadows[scenarioName] = shadowFn;
+      shadows[scenarioName] = { shadowFn, shadowFnArgs };
       baseScenario.shadows = shadows;
-      wrapShadowFns(scenario, shadowFn, baseScenario);
+      wrapShadowFns({ scenario, baseScenario, shadowFn, shadowFnArgs });
     }
     scenarios[scenarioName] = scenario;
     this.recalculate({ scenarioName });

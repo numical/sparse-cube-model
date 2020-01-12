@@ -1,8 +1,8 @@
 const shadowFunctionWrapper = require("./shadowFunctionWrapper");
 
-const wrapShadowFns = (scenario, fn, baseScenario) => {
+const wrapShadowFns = ({ scenario, ...rest }) => {
   Object.values(scenario.rows).forEach(row => {
-    row.fn = shadowFunctionWrapper(fn, baseScenario);
+    row.fn = shadowFunctionWrapper({ ...rest });
   });
 };
 

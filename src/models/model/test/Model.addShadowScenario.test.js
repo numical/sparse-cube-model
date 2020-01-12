@@ -2,13 +2,8 @@ const {
   emptyScenarios,
   populatedScenarios
 } = require("../../test/testScaffold");
-const {
-  increment,
-  interval,
-  lookup,
-  previous
-} = require("../../../fns/lookupFunctions");
-const { identity } = require("../../../fns/shadowFunctions");
+const { increment } = require("../../../fns/lookupFunctions");
+const { identity, multiplier } = require("../../../fns/shadowFunctions");
 const { defaultScenario } = require("../modelMetadata");
 
 emptyScenarios((test, setupFn, Type) => {
@@ -259,7 +254,6 @@ populatedScenarios((test, setupFn) => {
   test("can delete a base scenario after shadow deleted", t => {
     const baseScenarioName = "base scenario";
     const shadowScenarioName = "shadow scenario";
-    const standaloneScenarioName = "standalone scenario";
     const shadowFn = identity;
     const model = setupFn();
     model.addScenario({ scenarioName: baseScenarioName });
@@ -273,6 +267,51 @@ populatedScenarios((test, setupFn) => {
     t.same(model.lengths, { x: 10, y: 4, z: 2 });
     model.deleteScenario({ scenarioName: baseScenarioName });
     t.same(model.lengths, { x: 10, y: 4, z: 1 });
+    t.end();
+  });
+
+  test("shadow transform works without args", t => {
+    const scenarioName = "shadow scenario";
+    const rowName = "increment row";
+    const shadowFn = multiplier;
+    const model = setupFn();
+    model.addScenario({ scenarioName, shadowFn });
+    t.same(model.row({ rowName }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    t.same(model.row({ rowName, scenarioName }), [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ]);
+    t.end();
+  });
+
+  test("shadow transform works", t => {
+    const scenarioName = "shadow scenario";
+    const rowName = "increment row";
+    const shadowFn = multiplier;
+    const shadowFnArgs = { multiple: 2 };
+    const model = setupFn();
+    model.addScenario({ scenarioName, shadowFn, shadowFnArgs });
+    t.same(model.row({ rowName }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    t.same(model.row({ rowName, scenarioName }), [
+      0,
+      2,
+      4,
+      6,
+      8,
+      10,
+      12,
+      14,
+      16,
+      18
+    ]);
     t.end();
   });
 });
