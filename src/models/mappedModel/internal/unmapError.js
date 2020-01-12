@@ -12,7 +12,8 @@ const unmapError = (fromMap, fn) => {
   try {
     return fn(callMappings);
   } catch (error) {
-    error.message = unmapMessage(fromMap, callMappings, error.message);
+    error.message = unmapMessage(fromMap.scenario, callMappings, error.message);
+    error.message = unmapMessage(fromMap.row, callMappings, error.message);
     throw error;
   }
 };

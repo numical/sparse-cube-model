@@ -12,9 +12,10 @@ const deleteRowAndShadows = (
   const shadowRows = Object.keys(scenario.shadows || {}).reduce(
     (shadowRows, shadowScenarioName) => {
       const shadowScenario = scenarios[shadowScenarioName];
-      const shadowRow = shadowScenarioName.rows[name];
+      const shadowRow = shadowScenario.rows[name];
       shadowRows.push(
-        ...deleteRowAndShadows(model, scenarios, shadowScenario, shadowRow)
+        // shadows cannot have shadows
+        deleteRowAndShadows(model, scenarios, shadowScenario, shadowRow).row
       );
       return shadowRows;
     },

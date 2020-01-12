@@ -40,7 +40,7 @@ class MappedModel extends Model {
       fromRowKey: mapKey.bind(this, fromMap, "row", ""),
       fromScenarioKey: mapKey.bind(this, fromMap, "scenario", defaultScenario),
       toRowKey: mapKey.bind(this, toMap, "row", ""),
-      unmapError: unmapError.bind(this, fromMap.row),
+      unmapError: unmapError.bind(this, fromMap),
       serializeMap: serializer.stringify.bind(this, fromMap)
     };
     this.#fns.mapRow = mapRow.bind(null, this.#fns.toRowKey);

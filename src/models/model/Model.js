@@ -241,14 +241,22 @@ class Model extends Dense3DArray {
 
   row({ rowName, scenarioName = defaultScenario }) {
     const { scenarios } = this.#meta;
-    const scenario = validateScenario({ scenarioName, scenarios });
+    const scenario = validateScenario({
+      scenarioName,
+      scenarios,
+      toEdit: false
+    });
     const row = validateRow({ rowName, scenario });
     return this.range({ y: row.index, z: scenario.index });
   }
 
   scenario({ scenarioName = defaultScenario } = {}) {
     const { scenarios } = this.#meta;
-    const scenario = validateScenario({ scenarioName, scenarios });
+    const scenario = validateScenario({
+      scenarioName,
+      scenarios,
+      toEdit: false
+    });
     return this.isEmpty() ? [] : this.range({ z: scenario.index });
   }
 
@@ -294,13 +302,33 @@ class Model extends Dense3DArray {
 
   deleteScenario({ scenarioName } = {}) {
     const { scenarios } = this.#meta;
-    const scenario = validateScenario({ scenarioName, scenarios });
+    const scenario = validateScenario({
+      scenarioName,
+      scenarios,
+      toEdit: false
+    });
     if (Object.keys(scenarios).length === 1) {
       throw new Error(`Cannot delete only scenario '${scenarioName}'.`);
+    }
+    if (scenario.shadows) {
+      const shadowNames = Object.keys(scenario.shadows).join(", ");
+      throw new Error(
+        `Cannot delete scenario '${scenarioName}' with shadows '${shadowNames}'.`
+      );
     }
     delete scenarios[scenarioName];
     if (!this.isEmpty()) {
       this.delete({ z: scenario.index });
+    }
+    if (scenario.isShadow) {
+      Object.values(scenarios).forEach(scenario => {
+        if (scenario.shadows && scenario.shadows[scenarioName]) {
+          delete scenario.shadows[scenarioName];
+          if (Object.keys(scenario.shadows).length === 0) {
+            delete scenario.shadows;
+          }
+        }
+      });
     }
     return scenario;
   }

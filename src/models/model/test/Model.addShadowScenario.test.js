@@ -9,7 +9,7 @@ const {
   previous
 } = require("../../../fns/lookupFunctions");
 const { identity } = require("../../../fns/shadowFunctions");
-const iterate2D = require("../../../data-structures/iterate2D");
+const { defaultScenario } = require("../modelMetadata");
 
 emptyScenarios((test, setupFn, Type) => {
   test("Add shadow scenario must have a shadow function", t => {
@@ -102,7 +102,6 @@ emptyScenarios((test, setupFn, Type) => {
     t.end();
   });
 
-  /*
   test("deleting base row deletes shadow row", t => {
     const rowName = "test row";
     const scenarioName = "test scenario";
@@ -151,21 +150,42 @@ emptyScenarios((test, setupFn, Type) => {
     );
     t.end();
   });
-   */
-
-  test("cannot delete a base scenario if it has a shadow", t => {
-    t.end();
-  });
-
-  test("can delete a shadow scenario", t => {
-    t.end();
-  });
-
-  test("can delete a base scenario after shadow deleted", t => {
-    t.end();
-  });
 
   test("cannot edit a shadow scenario", t => {
+    const rowName = "test row";
+    const scenarioName = "shadow scenario";
+    const shadowFn = identity;
+    const model = setupFn();
+    model.addScenario({ scenarioName, shadowFn });
+    t.throws(
+      () =>
+        model.addRow({ scenarioName, rowName, fn: increment, constants: [0] }),
+      new Error("Shadow scenario 'shadow scenario' cannot be edited.")
+    );
+    t.throws(
+      () =>
+        model.updateRow({
+          scenarioName,
+          rowName,
+          fn: increment,
+          constants: [0]
+        }),
+      new Error("Shadow scenario 'shadow scenario' cannot be edited.")
+    );
+    t.throws(
+      () =>
+        model.patchRow({
+          scenarioName,
+          rowName,
+          fn: increment,
+          constants: [0]
+        }),
+      new Error("Shadow scenario 'shadow scenario' cannot be edited.")
+    );
+    t.throws(
+      () => model.deleteRow({ scenarioName, rowName }),
+      new Error("Shadow scenario 'shadow scenario' cannot be edited.")
+    );
     t.end();
   });
 });
@@ -176,6 +196,83 @@ populatedScenarios((test, setupFn) => {
   });
 
   test("Add multiple rows after adding a shadow scenario", t => {
+    t.end();
+  });
+
+  test("deleting base rows deletes shadow rows", t => {
+    const rowNames = ["independent row", "first lookup row"];
+    const expected = [
+      [10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    ];
+    const scenarioName = "test scenario";
+    const shadowFn = identity;
+    const model = setupFn();
+    model.addScenario({ scenarioName, shadowFn });
+    t.same(model.lengths, { x: 10, y: 4, z: 2 });
+    rowNames.forEach((rowName, index) => {
+      t.same(model.row({ rowName }), expected[index]);
+      t.same(model.row({ rowName, scenarioName }), expected[index]);
+    });
+    model.deleteRows({ rowNames });
+    t.same(model.lengths, { x: 10, y: 2, z: 2 });
+    rowNames.forEach(rowName => {
+      t.throws(
+        () => model.row({ rowName }),
+        new Error(`Unknown row '${rowName}'`)
+      );
+      t.throws(
+        () => model.row({ rowName, scenarioName }),
+        new Error(`Unknown row '${rowName}'`)
+      );
+    });
+    t.end();
+  });
+
+  test("cannot delete a base scenario if it has a shadow", t => {
+    const shadowScenarioName = "shadow scenario";
+    const standaloneScenarioName = "standalone scenario";
+    const shadowFn = identity;
+    const model = setupFn();
+    model.addScenario({ scenarioName: shadowScenarioName, shadowFn });
+    t.throws(
+      () => model.deleteScenario({ scenarioName: defaultScenario }),
+      new Error(
+        "Cannot delete scenario 'defaultScenario' with shadows 'shadow scenario'."
+      )
+    );
+    t.end();
+  });
+
+  test("can delete a shadow scenario", t => {
+    const shadowScenarioName = "shadow scenario";
+    const standaloneScenarioName = "standalone scenario";
+    const shadowFn = identity;
+    const model = setupFn();
+    model.addScenario({ scenarioName: shadowScenarioName, shadowFn });
+    t.same(model.lengths, { x: 10, y: 4, z: 2 });
+    model.deleteScenario({ scenarioName: shadowScenarioName });
+    t.same(model.lengths, { x: 10, y: 4, z: 1 });
+    t.end();
+  });
+
+  test("can delete a base scenario after shadow deleted", t => {
+    const baseScenarioName = "base scenario";
+    const shadowScenarioName = "shadow scenario";
+    const standaloneScenarioName = "standalone scenario";
+    const shadowFn = identity;
+    const model = setupFn();
+    model.addScenario({ scenarioName: baseScenarioName });
+    model.addScenario({
+      scenarioName: shadowScenarioName,
+      baseScenarioName,
+      shadowFn
+    });
+    t.same(model.lengths, { x: 10, y: 4, z: 3 });
+    model.deleteScenario({ scenarioName: shadowScenarioName });
+    t.same(model.lengths, { x: 10, y: 4, z: 2 });
+    model.deleteScenario({ scenarioName: baseScenarioName });
+    t.same(model.lengths, { x: 10, y: 4, z: 1 });
     t.end();
   });
 });

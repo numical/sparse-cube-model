@@ -36,7 +36,7 @@ populatedScenarios((test, setUp) => {
     t.end();
   });
 
-  test("Patch row accepts single dependOn argument", t => {
+  test("Patch row accepts single dependsOn argument", t => {
     const rowName = "second lookup row";
     const model = setUp();
     t.same(model.row({ rowName }), [1000, 0, 1, 2, 3, 4, 5, 6, 7, 8]);
