@@ -1,11 +1,11 @@
-const shadowFunctionWrapper = ({ shadowFn, shadowFnArgs, baseScenario }) => {
-  const fn = (rowContext, interval) => {
+const shadowFunctionWrapper = ({ fn, fnArgs, baseScenario }) => {
+  const wrapper = (rowContext, interval) => {
     const { model, row } = rowContext;
     const value = model[interval][row.index][baseScenario.index];
-    return shadowFn({ ...rowContext, ...shadowFnArgs, value });
+    return fn({ ...rowContext, ...fnArgs, value });
   };
-  fn.key = shadowFn.key;
-  return fn;
+  wrapper.key = fn.key;
+  return wrapper;
 };
 
 module.exports = shadowFunctionWrapper;

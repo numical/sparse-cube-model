@@ -294,9 +294,14 @@ class Model extends Dense3DArray {
     if (shadowFn) {
       scenario.isShadow = true;
       const shadows = baseScenario.shadows || {};
-      shadows[scenarioName] = { shadowFn, shadowFnArgs };
+      shadows[scenarioName] = { fn: shadowFn, fnArgs: shadowFnArgs };
       baseScenario.shadows = shadows;
-      wrapShadowFns({ scenario, baseScenario, shadowFn, shadowFnArgs });
+      wrapShadowFns({
+        scenario,
+        baseScenario,
+        fn: shadowFn,
+        fnArgs: shadowFnArgs
+      });
     }
     scenarios[scenarioName] = scenario;
     this.recalculate({ scenarioName });

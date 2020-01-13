@@ -185,7 +185,7 @@ emptyScenarios((test, setupFn, Type) => {
   });
 });
 
-populatedScenarios((test, setupFn) => {
+populatedScenarios((test, setupFn, Type) => {
   test("Add shadow scenario after adding multiple rows", t => {
     t.end();
   });
@@ -251,6 +251,26 @@ populatedScenarios((test, setupFn) => {
     t.end();
   });
 
+  test("can delete a shadow scenario without affecting other shadows", t => {
+    const shadowScenarioNames = ["shadow scenario 1", "shadow scenario 2"];
+    const shadowFn = identity;
+    const model = setupFn();
+    shadowScenarioNames.forEach(shadowScenarioName => {
+      model.addScenario({ scenarioName: shadowScenarioName, shadowFn });
+    });
+    t.same(model.lengths, { x: 10, y: 4, z: 3 });
+    model.deleteScenario({ scenarioName: shadowScenarioNames[1] });
+    t.same(
+      model.row({
+        rowName: "increment row",
+        scenarioName: shadowScenarioNames[0]
+      }),
+      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    );
+    t.same(model.lengths, { x: 10, y: 4, z: 2 });
+    t.end();
+  });
+
   test("can delete a base scenario after shadow deleted", t => {
     const baseScenarioName = "base scenario";
     const shadowScenarioName = "shadow scenario";
@@ -301,6 +321,42 @@ populatedScenarios((test, setupFn) => {
     model.addScenario({ scenarioName, shadowFn, shadowFnArgs });
     t.same(model.row({ rowName }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
     t.same(model.row({ rowName, scenarioName }), [
+      0,
+      2,
+      4,
+      6,
+      8,
+      10,
+      12,
+      14,
+      16,
+      18
+    ]);
+    t.end();
+  });
+
+  test("Populated shadow scenario serializes consistently", t => {
+    const scenarioName = "test scenario";
+    const shadowFn = multiplier;
+    const shadowFnArgs = 2;
+    const pre = setupFn();
+    pre.addScenario({ scenarioName, shadowFn, shadowFnArgs });
+    const s = pre.stringify();
+    const post = Type.parse(s);
+    t.same(post, pre);
+    t.end();
+  });
+  test("shadow transform works after serialisation", t => {
+    const scenarioName = "shadow scenario";
+    const rowName = "increment row";
+    const shadowFn = multiplier;
+    const shadowFnArgs = { multiple: 2 };
+    const pre = setupFn();
+    pre.addScenario({ scenarioName, shadowFn, shadowFnArgs });
+    const s = pre.stringify();
+    const post = Type.parse(s);
+    t.same(post.row({ rowName }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    t.same(post.row({ rowName, scenarioName }), [
       0,
       2,
       4,

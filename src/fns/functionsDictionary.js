@@ -1,7 +1,8 @@
 const lookupFns = require("./lookupFunctions");
 const interestFns = require("./interestFunctions");
+const shadowFns = require("./shadowFunctions");
 
-const allFns = { ...lookupFns, ...interestFns };
+const allFns = { ...lookupFns, ...interestFns, ...shadowFns };
 
 class FunctionsDictionary {
   constructor() {

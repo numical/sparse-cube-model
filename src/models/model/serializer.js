@@ -9,8 +9,17 @@ const replacer = (key, value) =>
     ? undefined
     : value;
 
-const reviver = (fnsRepo, key, value) =>
-  key === "fn" ? fnsRepo[value] : value;
+const reviver = (fnsRepo, key, value) => {
+  if (key === "fn") {
+    if (fnsRepo[value]) {
+      return fnsRepo[value];
+    } else {
+      throw new Error(`Missing function key '${value}'.`);
+    }
+  } else {
+    return value;
+  }
+};
 
 const stringify = (obj, { pretty = false } = {}) => {
   const space = pretty ? 2 : 0;

@@ -42,7 +42,7 @@ const populatedScenarios = (
         typeTests => {
           const { test } = typeTests;
           test.meta = testFixture.meta;
-          fn(test, setupFn.bind(null, Type));
+          fn(test, setupFn.bind(null, Type), Type);
           typeTests.end();
         }
       );

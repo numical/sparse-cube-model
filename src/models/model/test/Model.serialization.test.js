@@ -77,4 +77,17 @@ test("Populated model with row of constants correctly deserializes", t => {
   t.end();
 });
 
+test("Parsing fails eplicitly if fn not in fn dictionary", t => {
+  const model = testFixture();
+  const unknownFn = () => 10;
+  unknownFn.key = "unknown";
+  model.addRow({ rowName: "test row", fn: unknownFn });
+  const serialized = model.stringify();
+  t.throws(
+    () => Model.parse(serialized),
+    new Error("Missing function key 'unknown'")
+  );
+  t.end();
+});
+
 // console.log(testFixture().model.stringify({ pretty: true }));

@@ -172,11 +172,6 @@ class MappedModel extends Model {
   }
 
   deleteRows({ rowNames, scenarioName = defaultScenario }) {
-    const mapRow = row => ({
-      ...row,
-      name: this.#fns.toRowKey(row.name),
-      dependsOn: this.#fns.toRowKey(row.dependsOn)
-    });
     return this.#fns.unmapError(callMappings => {
       const { rows, shadowRows } = super.deleteRows({
         scenarioName: this.#fns.fromScenarioKey(scenarioName, callMappings),
