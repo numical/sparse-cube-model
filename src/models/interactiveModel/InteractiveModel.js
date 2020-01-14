@@ -1,5 +1,4 @@
 const MappedModel = require("../mappedModel/MappedModel");
-const modelMetadata = require("../model/modelMetadata");
 const serializer = require("../model/serializer");
 
 const maxHistoryItems = 100;

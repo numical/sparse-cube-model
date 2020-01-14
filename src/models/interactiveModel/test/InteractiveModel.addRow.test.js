@@ -2,7 +2,7 @@ const { test } = require("tap");
 const InteractiveModel = require("../InteractiveModel");
 const comparableUnserialisedForm = require("./comparableUnserialisedForm");
 const testFixture = require("../../test/testFixture");
-const { increment, interval, lookup } = require("../../../fns/lookupFunctions");
+const { interval, lookup } = require("../../../fns/lookupFunctions");
 
 const testMeta = {
   intervals: {
@@ -24,7 +24,6 @@ test("add row to blank model can be undone", t => {
 
 test("add row to blank model can be redone", t => {
   const model = new InteractiveModel(testMeta);
-  const serialisedBlank = model.stringify();
   model.addRow({ rowName: "test row", fn: interval });
   const pre = comparableUnserialisedForm({ model });
   model.undo();

@@ -2,7 +2,10 @@ const tap = require("tap");
 const Model = require("../model/Model");
 const MappedModel = require("../mappedModel/MappedModel");
 const InteractiveModel = require("../interactiveModel/InteractiveModel");
+const PersonalFinanceModel = require("../personalFinanceModel/PersonalFinanceModel");
 const testFixture = require("./testFixture");
+
+const allTypes = [Model, MappedModel, InteractiveModel, PersonalFinanceModel];
 
 const testMeta = {
   intervals: {
@@ -17,7 +20,7 @@ const setupFns = [
   Type => Type.parse(testFixture(Type).stringify())
 ];
 
-const emptyScenarios = (fn, Types = [Model, MappedModel, InteractiveModel]) => {
+const emptyScenarios = (fn, Types = allTypes) => {
   Types.forEach(Type => {
     tap.test(`${Type.name} tests:`, typeTests => {
       const { test } = typeTests;
@@ -31,10 +34,7 @@ const emptyScenarios = (fn, Types = [Model, MappedModel, InteractiveModel]) => {
   });
 };
 
-const populatedScenarios = (
-  fn,
-  Types = [Model, MappedModel, InteractiveModel]
-) => {
+const populatedScenarios = (fn, Types = allTypes) => {
   setupFns.forEach((setupFn, setupIndex) => {
     Types.forEach(Type => {
       tap.test(
