@@ -15,7 +15,7 @@ const bindFnToRow = (
       scenario,
       row,
       dependsOn,
-      ...fnArgs
+      fnArgs
     });
     boundFn.key = fn.key;
     boundFn.unbound = fnToBind;
