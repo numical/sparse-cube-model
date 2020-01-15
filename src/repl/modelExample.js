@@ -1,5 +1,4 @@
 const Model = require("../models/model/Model");
-const MappedModel = require("../models/mappedModel/MappedModel");
 const { interval, previous } = require("../fns/lookupFunctions");
 const {
   applyAnnualisedInterest,
@@ -64,6 +63,3 @@ model.addRow({
 });
 
 tablePrint(model);
-
-// console.log();
-// console.log(model.stringify());
