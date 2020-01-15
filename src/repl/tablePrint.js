@@ -6,13 +6,13 @@ const asTable = require("as-table");
 
 const tablePrint = (model, printFn = console.log) => {
   const meta = JSON.parse(model.stringify());
-  const rowNames = Object.keys(meta.scenarios.defaultScenario.rows);
-  const maxRowNameLength = rowNames.reduce(
-    (max, rowName) => (rowName.length > max ? rowName.length : max),
+  const rowKeys = Object.keys(meta.scenarios.defaultScenario.rows);
+  const maxRowNameLength = rowKeys.reduce(
+    (max, rowKey) => (rowKey.length > max ? rowKey.length : max),
     0
   );
-  const fixedLengthRowNames = rowNames.map(rowName =>
-    rowName.padStart(maxRowNameLength, " ")
+  const fixedLengthRowNames = rowKeys.map(rowKey =>
+    rowKey.padStart(maxRowNameLength, " ")
   );
 
   const s = asTable

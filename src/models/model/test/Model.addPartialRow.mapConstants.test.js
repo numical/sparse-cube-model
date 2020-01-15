@@ -3,7 +3,7 @@ const { increment } = require("../../../fns/lookupFunctions");
 
 emptyScenarios((test, setupFn) => {
   test("Add partial row of constants via Map with too few values", t => {
-    const rowName = "test row";
+    const rowKey = "test row";
     const start = 5;
     const constants = new Map([
       [8, 8],
@@ -13,7 +13,7 @@ emptyScenarios((test, setupFn) => {
     t.throws(
       () =>
         model.addRow({
-          rowName,
+          rowKey,
           constants,
           start
         }),
@@ -23,7 +23,7 @@ emptyScenarios((test, setupFn) => {
   });
 
   test("Add partial row of constants via Map with too small value", t => {
-    const rowName = "test row";
+    const rowKey = "test row";
     const start = 7;
     const constants = new Map([
       [3, 3],
@@ -34,7 +34,7 @@ emptyScenarios((test, setupFn) => {
     t.throws(
       () =>
         model.addRow({
-          rowName,
+          rowKey,
           constants,
           start
         }),
@@ -44,7 +44,7 @@ emptyScenarios((test, setupFn) => {
   });
 
   test("Add partial row of constants via Map with too large value", t => {
-    const rowName = "test row";
+    const rowKey = "test row";
     const start = 3;
     const end = 5;
     const constants = new Map([
@@ -56,7 +56,7 @@ emptyScenarios((test, setupFn) => {
     t.throws(
       () =>
         model.addRow({
-          rowName,
+          rowKey,
           constants,
           start,
           end
@@ -67,7 +67,7 @@ emptyScenarios((test, setupFn) => {
   });
 
   test("Add partial row of constants via Map with start, no fn", t => {
-    const rowName = "test row";
+    const rowKey = "test row";
     const start = 7;
     const constants = new Map([
       [7, 70],
@@ -76,17 +76,17 @@ emptyScenarios((test, setupFn) => {
     ]);
     const model = setupFn();
     model.addRow({
-      rowName,
+      rowKey,
       constants,
       start
     });
-    const row = model.row({ rowName });
+    const row = model.row({ rowKey });
     t.same(row, [0, 0, 0, 0, 0, 0, 0, 70, 80, 90]);
     t.end();
   });
 
   test("Add partial row of constants via Map with end, no fn", t => {
-    const rowName = "test row";
+    const rowKey = "test row";
     const end = 3;
     const constants = new Map([
       [0, 0],
@@ -96,17 +96,17 @@ emptyScenarios((test, setupFn) => {
     ]);
     const model = setupFn();
     model.addRow({
-      rowName,
+      rowKey,
       constants,
       end
     });
-    const row = model.row({ rowName });
+    const row = model.row({ rowKey });
     t.same(row, [0, 1, 2, 3, 0, 0, 0, 0, 0, 0]);
     t.end();
   });
 
   test("Add partial row of constants via Map with start and end, no fn", t => {
-    const rowName = "test row";
+    const rowKey = "test row";
     const start = 3;
     const end = 6;
     const constants = new Map([
@@ -117,18 +117,18 @@ emptyScenarios((test, setupFn) => {
     ]);
     const model = setupFn();
     model.addRow({
-      rowName,
+      rowKey,
       constants,
       start,
       end
     });
-    const row = model.row({ rowName });
+    const row = model.row({ rowKey });
     t.same(row, [0, 0, 0, 30, 40, 50, 60, 0, 0, 0]);
     t.end();
   });
 
   test("Add partial row of constants via Map with start and fn", t => {
-    const rowName = "test row";
+    const rowKey = "test row";
     const start = 4;
     const constants = new Map([
       [7, 70],
@@ -136,18 +136,18 @@ emptyScenarios((test, setupFn) => {
     ]);
     const model = setupFn();
     model.addRow({
-      rowName,
+      rowKey,
       constants,
       start,
       fn: increment
     });
-    const row = model.row({ rowName });
+    const row = model.row({ rowKey });
     t.same(row, [0, 0, 0, 0, 1, 2, 3, 70, 80, 81]);
     t.end();
   });
 
   test("Add partial row of constants via Map with end and fn", t => {
-    const rowName = "test row";
+    const rowKey = "test row";
     const end = 3;
     const constants = new Map([
       [0, 100],
@@ -155,18 +155,18 @@ emptyScenarios((test, setupFn) => {
     ]);
     const model = setupFn();
     model.addRow({
-      rowName,
+      rowKey,
       constants,
       end,
       fn: increment
     });
-    const row = model.row({ rowName });
+    const row = model.row({ rowKey });
     t.same(row, [100, 101, 200, 201, 0, 0, 0, 0, 0, 0]);
     t.end();
   });
 
   test("Add partial row of constants via Map with start and end and fn", t => {
-    const rowName = "test row";
+    const rowKey = "test row";
     const start = 3;
     const end = 6;
     const constants = new Map([
@@ -175,13 +175,13 @@ emptyScenarios((test, setupFn) => {
     ]);
     const model = setupFn();
     model.addRow({
-      rowName,
+      rowKey,
       constants,
       start,
       end,
       fn: increment
     });
-    const row = model.row({ rowName });
+    const row = model.row({ rowKey });
     t.same(row, [0, 0, 0, 1, 40, 41, 60, 0, 0, 0]);
     t.end();
   });

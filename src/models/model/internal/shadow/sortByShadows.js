@@ -1,5 +1,5 @@
 const isShadowOf = (scenario1, scenario2) =>
-  scenario1.shadows && scenario1.shadows[scenario2.name];
+  scenario1.shadows && scenario1.shadows[scenario2.key];
 
 const sortByShadows = (scenario1, scenario2) => {
   if (isShadowOf(scenario1, scenario2)) {

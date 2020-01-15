@@ -19,7 +19,7 @@ test("testFixture can return a MappedModel", t => {
 test("MappedModel: function args without 'reference' key do not cause error", t => {
   const model = testFixture(MappedModel);
   const args = {
-    rowName: "test row",
+    rowKey: "test row",
     fn: interval,
     fnArgs: {
       wibble: "wobble"
@@ -30,11 +30,11 @@ test("MappedModel: function args without 'reference' key do not cause error", t 
 });
 
 test("MappedModel: adding row with existing name errors", t => {
-  const rowName = "test row";
-  const args = { rowName, fn: interval };
+  const rowKey = "test row";
+  const args = { rowKey, fn: interval };
   const model = testFixture(MappedModel);
   model.addRow(args);
-  t.same(model.row({ rowName }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+  t.same(model.row({ rowKey }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
   t.throws(
     () => model.addRow(args),
     new Error("Row 'test row' already exists.")

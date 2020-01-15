@@ -11,9 +11,9 @@ const testMeta = {
 };
 
 const rows = [
-  { rowName: "row 0", fn: interval },
-  { rowName: "row 1", constants: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19] },
-  { rowName: "row 2", fn: lookup, dependsOn: "row 1" }
+  { rowKey: "row 0", fn: interval },
+  { rowKey: "row 1", constants: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19] },
+  { rowKey: "row 2", fn: lookup, dependsOn: "row 1" }
 ];
 
 test("add rows to blank model can be undone", t => {

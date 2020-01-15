@@ -18,7 +18,7 @@ test("blank model has zero undo and redo levels", t => {
 test("history increments after single operation", t => {
   const model = new InteractiveModel(testMeta);
   model.addRow({
-    rowName: "test row",
+    rowKey: "test row",
     fn: interval
   });
   t.same(model.undoOps(), ["add row 'test row'"]);
@@ -29,15 +29,15 @@ test("history increments after single operation", t => {
 test("history increments after multiple operation", t => {
   const model = new InteractiveModel(testMeta);
   model.addRow({
-    rowName: "test row",
+    rowKey: "test row",
     fn: interval
   });
   model.updateRow({
-    rowName: "test row",
+    rowKey: "test row",
     fn: increment,
     constants: [100]
   });
-  model.addScenario({ scenarioName: "second scenario" });
+  model.addScenario({ scenarioKey: "second scenario" });
   t.same(model.undoOps(), [
     "add scenario 'second scenario'",
     "update row 'test row'",
@@ -62,7 +62,7 @@ test("redo errors if no history", t => {
 test("undo updates single op history", t => {
   const model = new InteractiveModel(testMeta);
   model.addRow({
-    rowName: "test row",
+    rowKey: "test row",
     fn: interval
   });
   model.undo();
@@ -74,7 +74,7 @@ test("undo updates single op history", t => {
 test("second undo on single op history errors", t => {
   const model = new InteractiveModel(testMeta);
   model.addRow({
-    rowName: "test row",
+    rowKey: "test row",
     fn: interval
   });
   model.undo();
@@ -85,7 +85,7 @@ test("second undo on single op history errors", t => {
 test("redo after no undo on single op history errors", t => {
   const model = new InteractiveModel(testMeta);
   model.addRow({
-    rowName: "test row",
+    rowKey: "test row",
     fn: interval
   });
   t.throws(() => model.redo(), new Error("Nothing to redo."));
@@ -95,7 +95,7 @@ test("redo after no undo on single op history errors", t => {
 test("redo after undo on single op history equivalent to initial op", t => {
   const model = new InteractiveModel(testMeta);
   model.addRow({
-    rowName: "test row",
+    rowKey: "test row",
     fn: interval
   });
   model.undo();
@@ -108,7 +108,7 @@ test("redo after undo on single op history equivalent to initial op", t => {
 test("multiple undo/redo cycles equivalent to initial op", t => {
   const model = new InteractiveModel(testMeta);
   model.addRow({
-    rowName: "test row",
+    rowKey: "test row",
     fn: interval
   });
   for (let i = 0; i < 10; i++) {
@@ -123,18 +123,18 @@ test("multiple undo/redo cycles equivalent to initial op", t => {
 test("undo/redo over multiple ops updates history correctly", t => {
   const model = new InteractiveModel(testMeta);
   model.addRow({
-    rowName: "test row 1",
+    rowKey: "test row 1",
     fn: interval
   });
   model.updateRow({
-    rowName: "test row 1",
+    rowKey: "test row 1",
     fn: increment,
     constants: [100]
   });
-  model.addScenario({ scenarioName: "second scenario" });
+  model.addScenario({ scenarioKey: "second scenario" });
   model.addRow({
-    scenarioName: "second scenario",
-    rowName: "test row 2",
+    scenarioKey: "second scenario",
+    rowKey: "test row 2",
     fn: lookup,
     dependsOn: "test row 1"
   });
@@ -211,18 +211,18 @@ test("undo/redo over multiple ops updates history correctly", t => {
 test("adding new ops after undo clears redo items", t => {
   const model = new InteractiveModel(testMeta);
   model.addRow({
-    rowName: "test row 1",
+    rowKey: "test row 1",
     fn: interval
   });
   model.updateRow({
-    rowName: "test row 1",
+    rowKey: "test row 1",
     fn: increment,
     constants: [100]
   });
-  model.addScenario({ scenarioName: "second scenario" });
+  model.addScenario({ scenarioKey: "second scenario" });
   model.addRow({
-    scenarioName: "second scenario",
-    rowName: "test row 2",
+    scenarioKey: "second scenario",
+    rowKey: "test row 2",
     fn: lookup,
     dependsOn: "test row 1"
   });
@@ -240,7 +240,7 @@ test("adding new ops after undo clears redo items", t => {
     "add row 'test row 2' to scenario 'second scenario'",
     "add scenario 'second scenario'"
   ]);
-  model.addRow({ rowName: "test row 3", fn: interval });
+  model.addRow({ rowKey: "test row 3", fn: interval });
   t.same(model.undoOps(), [
     "add row 'test row 3'",
     "update row 'test row 1'",
@@ -253,18 +253,18 @@ test("adding new ops after undo clears redo items", t => {
 test("history displays custom history descriptions", t => {
   const model = new InteractiveModel(testMeta);
   model.addRow({
-    rowName: "test row",
+    rowKey: "test row",
     fn: interval,
     historyDescription: "first op"
   });
   model.updateRow({
-    rowName: "test row",
+    rowKey: "test row",
     fn: increment,
     constants: [100],
     historyDescription: "second op"
   });
   model.addScenario({
-    scenarioName: "second scenario",
+    scenarioKey: "second scenario",
     historyDescription: "third op"
   });
   t.same(model.undoOps(), ["third op", "second op", "first op"]);
@@ -276,7 +276,7 @@ test("history has a maximum number of items", t => {
   const model = new InteractiveModel(testMeta);
   for (let i = 0; i < InteractiveModel.maxHistoryItems; i++) {
     model.addRow({
-      rowName: `row ${i}`,
+      rowKey: `row ${i}`,
       fn: interval
     });
   }
@@ -285,7 +285,7 @@ test("history has a maximum number of items", t => {
   t.same(undoOps[0], "add row 'row 99'");
   t.same(undoOps[99], "add row 'row 0'");
   model.addRow({
-    rowName: "test row",
+    rowKey: "test row",
     fn: interval
   });
   undoOps = model.undoOps();

@@ -1,7 +1,7 @@
 const { emptyScenarios } = require("../../test/testScaffold");
 const { interval } = require("../../../fns/lookupFunctions");
 
-const rowName = "test row";
+const rowKey = "test row";
 const count = 12;
 const testDefaults = {
   intervals: {
@@ -16,7 +16,7 @@ emptyScenarios((test, setupFn) => {
     const start = new Date(2019, 11, 31);
     const model = setupFn(testDefaults);
     t.throws(
-      () => model.addRow({ rowName, fn: interval, start }),
+      () => model.addRow({ rowKey, fn: interval, start }),
       new Error("'Tue Dec 31 2019' earlier than model start.")
     );
     t.end();
@@ -26,7 +26,7 @@ emptyScenarios((test, setupFn) => {
     const end = new Date(2021, 0, 1);
     const model = setupFn(testDefaults);
     t.throws(
-      () => model.addRow({ rowName, fn: interval, end }),
+      () => model.addRow({ rowKey, fn: interval, end }),
       new Error("'Fri Jan 01 2021' later than model end.")
     );
     t.end();
@@ -36,11 +36,11 @@ emptyScenarios((test, setupFn) => {
     const start = new Date(2020, 5, 1);
     const model = setupFn(testDefaults);
     model.addRow({
-      rowName,
+      rowKey,
       fn: interval,
       start
     });
-    const row = model.row({ rowName });
+    const row = model.row({ rowKey });
     t.same(row, [0, 0, 0, 0, 0, 5, 6, 7, 8, 9, 10, 11]);
     t.end();
   });
@@ -49,11 +49,11 @@ emptyScenarios((test, setupFn) => {
     const end = new Date(2020, 5, 30);
     const model = setupFn(testDefaults);
     model.addRow({
-      rowName,
+      rowKey,
       fn: interval,
       end
     });
-    const row = model.row({ rowName });
+    const row = model.row({ rowKey });
     t.same(row, [0, 1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 0]);
     t.end();
   });
@@ -63,12 +63,12 @@ emptyScenarios((test, setupFn) => {
     const end = new Date(2020, 7, 31);
     const model = setupFn(testDefaults);
     model.addRow({
-      rowName,
+      rowKey,
       fn: interval,
       start,
       end
     });
-    const row = model.row({ rowName });
+    const row = model.row({ rowKey });
     t.same(row, [0, 0, 0, 0, 0, 5, 6, 7, 0, 0, 0, 0]);
     t.end();
   });
@@ -79,12 +79,12 @@ emptyScenarios((test, setupFn) => {
     const constants = [50, 60, 70];
     const model = setupFn(testDefaults);
     model.addRow({
-      rowName,
+      rowKey,
       constants,
       start,
       end
     });
-    const row = model.row({ rowName });
+    const row = model.row({ rowKey });
     t.same(row, [0, 0, 0, 0, 0, 50, 60, 70, 0, 0, 0, 0]);
     t.end();
   });
@@ -99,12 +99,12 @@ emptyScenarios((test, setupFn) => {
     ]);
     const model = setupFn(testDefaults);
     model.addRow({
-      rowName,
+      rowKey,
       constants,
       start,
       end
     });
-    const row = model.row({ rowName });
+    const row = model.row({ rowKey });
     t.same(row, [0, 0, 0, 0, 0, 50, 60, 70, 0, 0, 0, 0]);
     t.end();
   });
@@ -119,13 +119,13 @@ emptyScenarios((test, setupFn) => {
     ]);
     const model = setupFn(testDefaults);
     model.addRow({
-      rowName,
+      rowKey,
       constants,
       fn: interval,
       start,
       end
     });
-    const row = model.row({ rowName });
+    const row = model.row({ rowKey });
     t.same(row, [0, 0, 0, 0, 0, 110, 6, 70, 0, 0, 0, 0]);
     t.end();
   });
@@ -142,7 +142,7 @@ emptyScenarios((test, setupFn) => {
     t.throws(
       () =>
         model.addRow({
-          rowName,
+          rowKey,
           constants,
           start,
           end

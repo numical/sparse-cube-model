@@ -1,4 +1,4 @@
-const linkDependentRows = (scenario, rowName, dependsOn) => {
+const linkDependentRows = (scenario, rowKey, dependsOn) => {
   if (dependsOn) {
     const obj = typeof dependsOn === "string" ? { dependsOn } : dependsOn;
     // const array = Array.isArray(dependsOn) ? dependsOn : [dependsOn];
@@ -8,9 +8,9 @@ const linkDependentRows = (scenario, rowName, dependsOn) => {
         throw new Error(`Depends on unknown row '${providerName}'`);
       } else {
         if (provider.dependents) {
-          provider.dependents.push(rowName);
+          provider.dependents.push(rowKey);
         } else {
-          provider.dependents = [rowName];
+          provider.dependents = [rowKey];
         }
       }
     });

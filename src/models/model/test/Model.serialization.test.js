@@ -70,7 +70,7 @@ test("Populated model can be serialized and deserialized", t => {
 test("Populated model with row of constants correctly deserializes", t => {
   const model = testFixture();
   const constants = Array(testFixture.meta.intervals.count).fill(5);
-  model.addRow({ rowName: "constants row", constants });
+  model.addRow({ rowKey: "constants row", constants });
   const serialized = model.stringify();
   const deserialized = Model.parse(serialized);
   t.same(deserialized, model);
@@ -81,7 +81,7 @@ test("Parsing fails eplicitly if fn not in fn dictionary", t => {
   const model = testFixture();
   const unknownFn = () => 10;
   unknownFn.key = "unknown";
-  model.addRow({ rowName: "test row", fn: unknownFn });
+  model.addRow({ rowKey: "test row", fn: unknownFn });
   const serialized = model.stringify();
   t.throws(
     () => Model.parse(serialized),

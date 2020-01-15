@@ -1,6 +1,6 @@
 const mapRow = (toRowKey, row) => ({
   ...row,
-  name: toRowKey(row.name),
+  key: toRowKey(row.key),
   dependsOn: toRowKey(row.dependsOn)
 });
 

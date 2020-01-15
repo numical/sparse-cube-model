@@ -7,22 +7,22 @@ const {
 
 const rows = [
   {
-    rowName: "increment row",
+    rowKey: "increment row",
     fn: increment,
     constants: [0]
   },
   {
-    rowName: "first lookup row",
+    rowKey: "first lookup row",
     fn: lookup,
     dependsOn: "increment row"
   },
   {
-    rowName: "independent row",
+    rowKey: "independent row",
     fn: increment,
     constants: [10]
   },
   {
-    rowName: "second lookup row",
+    rowKey: "second lookup row",
     fn: lookupPrevious,
     constants: [1000],
     dependsOn: "increment row"
@@ -44,7 +44,7 @@ const testFixture = (constructorFn = Model) => {
 };
 
 testFixture.rows = rows;
-testFixture.rowNames = rows.map(row => row.rowName);
+testFixture.rowKeys = rows.map(row => row.rowKey);
 testFixture.meta = meta;
 
 module.exports = testFixture;

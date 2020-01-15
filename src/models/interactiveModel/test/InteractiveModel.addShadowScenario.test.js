@@ -7,10 +7,10 @@ const { identity } = require("../../../fns/shadowFunctions");
 test("add shadow scenario to empty model can be undone", t => {
   const model = new InteractiveModel();
   const historyDescription = "test operation";
-  const scenarioName = "test scenario";
+  const scenarioKey = "test scenario";
   const shadowFn = identity;
   const pre = comparableUnserialisedForm({ model });
-  model.addScenario({ scenarioName, shadowFn, historyDescription });
+  model.addScenario({ scenarioKey, shadowFn, historyDescription });
   t.same(model.lengths, { x: 0, y: 0, z: 0 });
   model.undo();
   t.same(model.lengths, { x: 0, y: 0, z: 0 });
@@ -22,9 +22,9 @@ test("add shadow scenario to empty model can be undone", t => {
 test("add shadow scenario to empty model can be redone", t => {
   const model = new InteractiveModel();
   const historyDescription = "test operation";
-  const scenarioName = "test scenario";
+  const scenarioKey = "test scenario";
   const shadowFn = identity;
-  model.addScenario({ scenarioName, shadowFn, historyDescription });
+  model.addScenario({ scenarioKey, shadowFn, historyDescription });
   const pre = comparableUnserialisedForm({ model });
   model.undo();
   model.redo();
@@ -36,10 +36,10 @@ test("add shadow scenario to empty model can be redone", t => {
 test("add shadow scenario to populated model can be undone", t => {
   const model = testFixture(InteractiveModel);
   const historyDescription = "test operation";
-  const scenarioName = "test scenario";
+  const scenarioKey = "test scenario";
   const shadowFn = identity;
   const pre = comparableUnserialisedForm({ model });
-  model.addScenario({ scenarioName, shadowFn, historyDescription });
+  model.addScenario({ scenarioKey, shadowFn, historyDescription });
   t.same(model.lengths, { x: 10, y: 4, z: 2 });
   model.undo();
   t.same(model.lengths, { x: 10, y: 4, z: 1 });
@@ -51,16 +51,16 @@ test("add shadow scenario to populated model can be undone", t => {
 test("add shadow scenario to populated model can be redone", t => {
   const model = testFixture(InteractiveModel);
   const historyDescription = "test operation";
-  const scenarioName = "test scenario";
+  const scenarioKey = "test scenario";
   const shadowFn = identity;
-  model.addScenario({ scenarioName, shadowFn, historyDescription });
+  model.addScenario({ scenarioKey, shadowFn, historyDescription });
   const pre = comparableUnserialisedForm({ model });
-  const preData = model.scenario({ scenarioName });
+  const preData = model.scenario({ scenarioKey });
   model.undo();
   model.redo();
   t.same(model.lengths, { x: 10, y: 4, z: 2 });
   const post = comparableUnserialisedForm({ model });
-  const postData = model.scenario({ scenarioName });
+  const postData = model.scenario({ scenarioKey });
   t.same(post, pre);
   t.same(postData, preData);
   t.end();

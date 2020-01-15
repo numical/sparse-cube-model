@@ -47,8 +47,8 @@ class MappedModel extends Model {
   }
 
   addRow({
-    rowName,
-    scenarioName = defaultScenario,
+    rowKey,
+    scenarioKey = defaultScenario,
     fn,
     fnArgs,
     constants,
@@ -58,8 +58,8 @@ class MappedModel extends Model {
   }) {
     this.#fns.unmapError(callMappings => {
       super.addRow({
-        scenarioName: this.#fns.fromScenarioKey(scenarioName, callMappings),
-        rowName: this.#fns.addRowKey(rowName, callMappings),
+        scenarioKey: this.#fns.fromScenarioKey(scenarioKey, callMappings),
+        rowKey: this.#fns.addRowKey(rowKey, callMappings),
         fn,
         fnArgs: this.#fns.fromRowKey(fnArgs, callMappings),
         constants,
@@ -74,11 +74,11 @@ class MappedModel extends Model {
     });
   }
 
-  addRows({ rows = [], scenarioName = defaultScenario }) {
+  addRows({ rows = [], scenarioKey = defaultScenario }) {
     this.#fns.unmapError(callMappings => {
       const mapped = rows.map(row => ({
         ...row,
-        rowName: this.#fns.addRowKey(row.rowName, callMappings),
+        rowKey: this.#fns.addRowKey(row.rowKey, callMappings),
         fnArgs: this.#fns.fromRowKey(row.fnArgs, callMappings),
         dependsOn: this.#fns.fromRowKey(
           row.dependsOn,
@@ -87,15 +87,15 @@ class MappedModel extends Model {
         )
       }));
       super.addRows({
-        scenarioName: this.#fns.fromScenarioKey(scenarioName, callMappings),
+        scenarioKey: this.#fns.fromScenarioKey(scenarioKey, callMappings),
         rows: mapped
       });
     });
   }
 
   updateRow({
-    rowName,
-    scenarioName = defaultScenario,
+    rowKey,
+    scenarioKey = defaultScenario,
     fn,
     fnArgs,
     constants,
@@ -103,8 +103,8 @@ class MappedModel extends Model {
   }) {
     return this.#fns.unmapError(callMappings => {
       const originalRow = super.updateRow({
-        scenarioName: this.#fns.fromScenarioKey(scenarioName, callMappings),
-        rowName: this.#fns.fromRowKey(rowName, callMappings),
+        scenarioKey: this.#fns.fromScenarioKey(scenarioKey, callMappings),
+        rowKey: this.#fns.fromRowKey(rowKey, callMappings),
         fn,
         fnArgs: this.#fns.fromRowKey(fnArgs, callMappings),
         constants,
@@ -116,16 +116,16 @@ class MappedModel extends Model {
       });
       return {
         ...originalRow,
-        scenarioName,
-        rowName,
+        scenarioKey,
+        rowKey,
         dependsOn: this.#fns.toRowKey(originalRow.dependsOn, callMappings)
       };
     });
   }
 
   patchRow({
-    rowName,
-    scenarioName = defaultScenario,
+    rowKey,
+    scenarioKey = defaultScenario,
     fn,
     fnArgs,
     constants,
@@ -133,8 +133,8 @@ class MappedModel extends Model {
   }) {
     return this.#fns.unmapError(callMappings => {
       const originalRow = super.patchRow({
-        scenarioName: this.#fns.fromScenarioKey(scenarioName, callMappings),
-        rowName: this.#fns.fromRowKey(rowName, callMappings),
+        scenarioKey: this.#fns.fromScenarioKey(scenarioKey, callMappings),
+        rowKey: this.#fns.fromRowKey(rowKey, callMappings),
         fn,
         fnArgs: this.#fns.fromRowKey(fnArgs, callMappings),
         constants,
@@ -146,18 +146,18 @@ class MappedModel extends Model {
       });
       return {
         ...originalRow,
-        scenarioName,
-        rowName,
+        scenarioKey,
+        rowKey,
         dependsOn: this.#fns.toRowKey(originalRow.dependsOn, callMappings)
       };
     });
   }
 
-  deleteRow({ rowName, scenarioName = defaultScenario }) {
+  deleteRow({ rowKey, scenarioKey = defaultScenario }) {
     return this.#fns.unmapError(callMappings => {
       const { row, shadowRows } = super.deleteRow({
-        scenarioName: this.#fns.fromScenarioKey(scenarioName, callMappings),
-        rowName: this.#fns.fromRowKey(rowName, callMappings)
+        scenarioKey: this.#fns.fromScenarioKey(scenarioKey, callMappings),
+        rowKey: this.#fns.fromRowKey(rowKey, callMappings)
       });
       const mapped = {
         row: this.#fns.mapRow(row),
@@ -165,56 +165,53 @@ class MappedModel extends Model {
       };
       // has row been deleted from every scenario?
       if (this.lengths.z === 1 + shadowRows.length) {
-        this.#fns.removeRowKey(rowName, callMappings);
+        this.#fns.removeRowKey(rowKey, callMappings);
       }
       return mapped;
     });
   }
 
-  deleteRows({ rowNames, scenarioName = defaultScenario }) {
+  deleteRows({ rowKeys, scenarioKey = defaultScenario }) {
     return this.#fns.unmapError(callMappings => {
       const { rows, shadowRows } = super.deleteRows({
-        scenarioName: this.#fns.fromScenarioKey(scenarioName, callMappings),
-        rowNames: this.#fns.fromRowKey(rowNames, callMappings)
+        scenarioKey: this.#fns.fromScenarioKey(scenarioKey, callMappings),
+        rowKeys: this.#fns.fromRowKey(rowKeys, callMappings)
       });
       const mapped = {
         rows: rows.map(this.#fns.mapRow),
         shadowRows: shadowRows.map(this.#fns.mapRow)
       };
       // have rows been deleted from every scenario?
-      if (
-        this.lengths.z * rowNames.length ===
-        rows.length + shadowRows.length
-      ) {
-        this.#fns.removeRowKey(rowNames, callMappings);
+      if (this.lengths.z * rowKeys.length === rows.length + shadowRows.length) {
+        this.#fns.removeRowKey(rowKeys, callMappings);
       }
       return mapped;
     });
   }
 
-  row({ rowName, scenarioName = defaultScenario }) {
+  row({ rowKey, scenarioKey = defaultScenario }) {
     return this.#fns.unmapError(callMappings => {
       return super.row({
-        scenarioName: this.#fns.fromScenarioKey(scenarioName, callMappings),
-        rowName: this.#fns.fromRowKey(rowName, callMappings)
+        scenarioKey: this.#fns.fromScenarioKey(scenarioKey, callMappings),
+        rowKey: this.#fns.fromRowKey(rowKey, callMappings)
       });
     });
   }
 
-  scenario({ scenarioName = defaultScenario } = {}) {
+  scenario({ scenarioKey = defaultScenario } = {}) {
     return this.#fns.unmapError(callMappings => {
       return super.scenario({
-        scenarioName: this.#fns.fromScenarioKey(scenarioName, callMappings)
+        scenarioKey: this.#fns.fromScenarioKey(scenarioKey, callMappings)
       });
     });
   }
 
   addScenario(args = {}) {
-    const { scenarioName, baseScenarioName = defaultScenario } = args;
+    const { scenarioKey, baseScenarioName = defaultScenario } = args;
     this.#fns.unmapError(callMappings => {
       super.addScenario({
         ...args,
-        scenarioName: this.#fns.addScenarioKey(scenarioName, callMappings),
+        scenarioKey: this.#fns.addScenarioKey(scenarioKey, callMappings),
         baseScenarioName: this.#fns.fromScenarioKey(
           baseScenarioName,
           callMappings
@@ -223,11 +220,11 @@ class MappedModel extends Model {
     });
   }
 
-  deleteScenario({ scenarioName } = {}) {
+  deleteScenario({ scenarioKey } = {}) {
     this.#fns.unmapError(callMappings => {
-      const mapped = this.#fns.fromScenarioKey(scenarioName, callMappings);
+      const mapped = this.#fns.fromScenarioKey(scenarioKey, callMappings);
       super.deleteScenario({
-        scenarioName: mapped
+        scenarioKey: mapped
       });
       this.#fns.removeScenarioKey(mapped, callMappings);
     });

@@ -27,11 +27,11 @@ const editRow = ({
   if (!fn) {
     ensureAllConstantsDefined(rowConstants, intervals);
   }
-  linkDependentRows(scenario, row.name, dependsOn);
+  linkDependentRows(scenario, row.key, dependsOn);
   bindFnToRow(model, intervals, scenario, row, fn, fnArgs, dependsOn);
   row.constants = rowConstants;
-  unlinkDependentRows(scenario, row.name, row.dependsOn);
-  linkDependentRows(scenario, row.name, dependsOn);
+  unlinkDependentRows(scenario, row.key, row.dependsOn);
+  linkDependentRows(scenario, row.key, dependsOn);
   const rowstoUpdate = [row];
   if (row.dependents) {
     rowstoUpdate.push(

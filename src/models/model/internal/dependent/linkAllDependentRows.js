@@ -2,8 +2,8 @@ const linkDependentRows = require("./linkDependentRows");
 
 const linkAllDependentRows = scenarios => {
   Object.values(scenarios).forEach(scenario => {
-    Object.entries(scenario.rows).forEach(([rowName, row]) => {
-      linkDependentRows(scenario, rowName, row.dependsOn);
+    Object.entries(scenario.rows).forEach(([rowKey, row]) => {
+      linkDependentRows(scenario, rowKey, row.dependsOn);
     });
   });
 };

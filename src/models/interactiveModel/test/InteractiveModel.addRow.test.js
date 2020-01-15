@@ -13,7 +13,7 @@ const testMeta = {
 test("add row to blank model can be undone", t => {
   const model = new InteractiveModel(testMeta);
   const pre = comparableUnserialisedForm({ model });
-  model.addRow({ rowName: "test row", fn: interval });
+  model.addRow({ rowKey: "test row", fn: interval });
   t.same(model.lengths, { x: 10, y: 1, z: 1 });
   model.undo();
   t.same(model.lengths, { x: 0, y: 0, z: 0 });
@@ -24,7 +24,7 @@ test("add row to blank model can be undone", t => {
 
 test("add row to blank model can be redone", t => {
   const model = new InteractiveModel(testMeta);
-  model.addRow({ rowName: "test row", fn: interval });
+  model.addRow({ rowKey: "test row", fn: interval });
   const pre = comparableUnserialisedForm({ model });
   model.undo();
   model.redo();
@@ -37,7 +37,7 @@ test("add row to blank model can be redone", t => {
 test("add row to populated model can be undone", t => {
   const model = testFixture(InteractiveModel);
   const pre = comparableUnserialisedForm({ model });
-  model.addRow({ rowName: "test row", fn: interval });
+  model.addRow({ rowKey: "test row", fn: interval });
   t.same(model.lengths, { x: 10, y: 5, z: 1 });
   model.undo();
   t.same(model.lengths, { x: 10, y: 4, z: 1 });
@@ -48,7 +48,7 @@ test("add row to populated model can be undone", t => {
 
 test("add row to populated model can be redone", t => {
   const model = testFixture(InteractiveModel);
-  model.addRow({ rowName: "test row", fn: interval });
+  model.addRow({ rowKey: "test row", fn: interval });
   const pre = comparableUnserialisedForm({ model });
   model.undo();
   model.redo();
@@ -62,7 +62,7 @@ test("add row with dependency can be undone", t => {
   const model = testFixture(InteractiveModel);
   const pre = comparableUnserialisedForm({ model });
   model.addRow({
-    rowName: "test row",
+    rowKey: "test row",
     fn: lookup,
     dependsOn: "independent row"
   });
@@ -77,7 +77,7 @@ test("add row with dependency can be undone", t => {
 test("add row with dependency can be redone", t => {
   const model = testFixture(InteractiveModel);
   model.addRow({
-    rowName: "test row",
+    rowKey: "test row",
     fn: lookup,
     dependsOn: "independent row"
   });
@@ -85,7 +85,7 @@ test("add row with dependency can be redone", t => {
   model.undo();
   model.redo();
   t.same(model.lengths, { x: 10, y: 5, z: 1 });
-  t.same(model.row({ rowName: "test row" }), [
+  t.same(model.row({ rowKey: "test row" }), [
     10,
     11,
     12,

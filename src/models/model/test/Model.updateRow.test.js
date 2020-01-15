@@ -10,7 +10,7 @@ populatedScenarios((test, setUp) => {
     t.throws(
       () =>
         model.updateRow({
-          rowName: "unknown row"
+          rowKey: "unknown row"
         }),
       new Error("Unknown row 'unknown row'")
     );
@@ -18,13 +18,13 @@ populatedScenarios((test, setUp) => {
   });
 
   test("Update row in unknown scenario throws error", t => {
-    const rowName = "increment row";
+    const rowKey = "increment row";
     const model = setUp();
     t.throws(
       () =>
         model.updateRow({
-          rowName,
-          scenarioName: "unknown scenario"
+          rowKey,
+          scenarioKey: "unknown scenario"
         }),
       new Error("Unknown scenario 'unknown scenario'")
     );
@@ -32,12 +32,12 @@ populatedScenarios((test, setUp) => {
   });
 
   test("Update row with neither function nor constants throws error", t => {
-    const rowName = "increment row";
+    const rowKey = "increment row";
     const model = setUp();
     t.throws(
       () =>
         model.updateRow({
-          rowName
+          rowKey
         }),
       new Error("Row has no function, but less constants than intervals.")
     );
@@ -45,12 +45,12 @@ populatedScenarios((test, setUp) => {
   });
 
   test("Update row with a function with no key throws an error", t => {
-    const rowName = "increment row";
+    const rowKey = "increment row";
     const model = setUp();
     t.throws(
       () =>
         model.updateRow({
-          rowName,
+          rowKey,
           fn: () => 2
         }),
       new Error("Function 'fn' must have a 'key' property.")
@@ -59,17 +59,17 @@ populatedScenarios((test, setUp) => {
   });
 
   test("Update row with no function and smaller constants array than intervals throws error", t => {
-    const rowName = "increment row";
+    const rowKey = "increment row";
     const model = setUp();
     t.throws(
-      () => model.updateRow({ rowName, constants: [0] }),
+      () => model.updateRow({ rowKey, constants: [0] }),
       new Error("Row has no function, but less constants than intervals.")
     );
     t.end();
   });
 
   test("Update row with no function and fewer constants than intervals throws error", t => {
-    const rowName = "increment row";
+    const rowKey = "increment row";
     const model = setUp();
     const constants = [
       0,
@@ -84,19 +84,19 @@ populatedScenarios((test, setUp) => {
       18
     ];
     t.throws(
-      () => model.updateRow({ rowName, constants }),
+      () => model.updateRow({ rowKey, constants }),
       new Error("Row has no function, but less constants than intervals.")
     );
     t.end();
   });
 
   test("Update row with fn args but no fn throws error", t => {
-    const rowName = "increment row";
+    const rowKey = "increment row";
     const model = setUp();
     t.throws(
       () =>
         model.updateRow({
-          rowName,
+          rowKey,
           constants: [0],
           fnArgs: { foo: "bar" }
         }),
@@ -106,17 +106,17 @@ populatedScenarios((test, setUp) => {
   });
 
   test("Update row updates all with constants", t => {
-    const rowName = "increment row";
+    const rowKey = "increment row";
     const constants = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18];
     const expected = constants;
     const model = setUp();
-    model.updateRow({ rowName, constants });
-    t.same(model.row({ rowName }), expected);
+    model.updateRow({ rowKey, constants });
+    t.same(model.row({ rowKey }), expected);
     t.end();
   });
 
   test("Update row overwrites all constants even if sparse constants array passed", t => {
-    const rowName = "increment row";
+    const rowKey = "increment row";
     const constants = [
       0,
       2,
@@ -131,13 +131,13 @@ populatedScenarios((test, setUp) => {
     ];
     const expected = [0, 2, 4, 5, 6, 7, 12, 14, 16, 18];
     const model = setUp();
-    model.updateRow({ rowName, constants, fn: increment });
-    t.same(model.row({ rowName }), expected);
+    model.updateRow({ rowKey, constants, fn: increment });
+    t.same(model.row({ rowKey }), expected);
     t.end();
   });
 
   test("Update row updates some with constants object", t => {
-    const rowName = "increment row";
+    const rowKey = "increment row";
     const constants = {
       0: 0,
       1: 2,
@@ -149,13 +149,13 @@ populatedScenarios((test, setUp) => {
     };
     const expected = [0, 2, 4, 5, 6, 7, 12, 14, 16, 18];
     const model = setUp();
-    model.updateRow({ rowName, constants, fn: increment });
-    t.same(model.row({ rowName }), expected);
+    model.updateRow({ rowKey, constants, fn: increment });
+    t.same(model.row({ rowKey }), expected);
     t.end();
   });
 
   test("Update row updates some with constants Map", t => {
-    const rowName = "increment row";
+    const rowKey = "increment row";
     const constants = new Map([
       [0, 0],
       [1, 2],
@@ -167,13 +167,13 @@ populatedScenarios((test, setUp) => {
     ]);
     const expected = [0, 2, 4, 5, 6, 7, 12, 14, 16, 18];
     const model = setUp();
-    model.updateRow({ rowName, constants, fn: increment });
-    t.same(model.row({ rowName }), expected);
+    model.updateRow({ rowKey, constants, fn: increment });
+    t.same(model.row({ rowKey }), expected);
     t.end();
   });
 
   test("Update row updates some with constants Map of Dates", t => {
-    const rowName = "increment row";
+    const rowKey = "increment row";
     const constants = new Map([
       [new Date(2020, 0, 31), 0],
       [new Date(2020, 1, 29), 2],
@@ -185,41 +185,41 @@ populatedScenarios((test, setUp) => {
     ]);
     const expected = [0, 2, 4, 5, 6, 7, 12, 14, 16, 18];
     const model = setUp();
-    model.updateRow({ rowName, constants, fn: increment });
-    t.same(model.row({ rowName }), expected);
+    model.updateRow({ rowKey, constants, fn: increment });
+    t.same(model.row({ rowKey }), expected);
     t.end();
   });
 
   test("Update row with a non-array, non-Map, non-dictionary constants fails", t => {
-    const rowName = "increment row";
+    const rowKey = "increment row";
     const constants = "should fail";
     const model = setUp();
 
     t.throws(
-      () => model.updateRow({ rowName, constants, fn: increment }),
+      () => model.updateRow({ rowKey, constants, fn: increment }),
       new Error("Constants must be an array or a dictionary or a map.")
     );
     t.end();
   });
 
   test("Update row updates all with function", t => {
-    const rowName = "increment row";
+    const rowKey = "increment row";
     const expected = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18];
     const model = setUp();
     const fn = (_, x) => 2 * x;
     fn.key = "test fn";
-    model.updateRow({ rowName, fn });
-    t.same(model.row({ rowName }), expected);
+    model.updateRow({ rowKey, fn });
+    t.same(model.row({ rowKey }), expected);
     t.end();
   });
 });
 
 emptyScenarios((test, setupFn) => {
   test("Update row - overwrite behaviour - fn", t => {
-    const rowName = "test row";
+    const rowKey = "test row";
     const model = setupFn();
     model.addRow({
-      rowName,
+      rowKey,
       fn: increment,
       constants: {
         0: 10,
@@ -227,9 +227,9 @@ emptyScenarios((test, setupFn) => {
         4: 30
       }
     });
-    t.same(model.row({ rowName }), [10, 11, 20, 21, 30, 31, 32, 33, 34, 35]);
+    t.same(model.row({ rowKey }), [10, 11, 20, 21, 30, 31, 32, 33, 34, 35]);
     model.updateRow({
-      rowName,
+      rowKey,
       fn: interval,
       constants: {
         0: 10,
@@ -237,15 +237,15 @@ emptyScenarios((test, setupFn) => {
         4: 30
       }
     });
-    t.same(model.row({ rowName }), [10, 1, 20, 3, 30, 5, 6, 7, 8, 9]);
+    t.same(model.row({ rowKey }), [10, 1, 20, 3, 30, 5, 6, 7, 8, 9]);
     t.end();
   });
 
   test("Update row - remove behaviour - fn", t => {
-    const rowName = "test row";
+    const rowKey = "test row";
     const model = setupFn();
     model.addRow({
-      rowName,
+      rowKey,
       fn: increment,
       constants: {
         0: 10,
@@ -253,23 +253,23 @@ emptyScenarios((test, setupFn) => {
         4: 30
       }
     });
-    t.same(model.row({ rowName }), [10, 11, 20, 21, 30, 31, 32, 33, 34, 35]);
+    t.same(model.row({ rowKey }), [10, 11, 20, 21, 30, 31, 32, 33, 34, 35]);
     t.match(model.stringify(), /increment/);
     const constants = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
     model.updateRow({
-      rowName,
+      rowKey,
       constants
     });
-    t.same(model.row({ rowName }), constants);
+    t.same(model.row({ rowKey }), constants);
     t.notMatch(model.stringify(), /increment/);
     t.end();
   });
 
   test("Update row - overwrite behaviour - fnArgs", t => {
-    const rowName = "test row";
+    const rowKey = "test row";
     const model = setupFn();
     model.addRow({
-      rowName,
+      rowKey,
       fn: increment,
       fnArgs: {
         step: 2
@@ -280,9 +280,9 @@ emptyScenarios((test, setupFn) => {
         4: 30
       }
     });
-    t.same(model.row({ rowName }), [10, 12, 20, 22, 30, 32, 34, 36, 38, 40]);
+    t.same(model.row({ rowKey }), [10, 12, 20, 22, 30, 32, 34, 36, 38, 40]);
     model.updateRow({
-      rowName,
+      rowKey,
       fn: increment,
       fnArgs: {
         step: 3
@@ -293,15 +293,15 @@ emptyScenarios((test, setupFn) => {
         4: 30
       }
     });
-    t.same(model.row({ rowName }), [10, 13, 20, 23, 30, 33, 36, 39, 42, 45]);
+    t.same(model.row({ rowKey }), [10, 13, 20, 23, 30, 33, 36, 39, 42, 45]);
     t.end();
   });
 
   test("Update row - remove behaviour - fnArgs", t => {
-    const rowName = "test row";
+    const rowKey = "test row";
     const model = setupFn();
     model.addRow({
-      rowName,
+      rowKey,
       fn: increment,
       fnArgs: {
         step: 2
@@ -312,9 +312,9 @@ emptyScenarios((test, setupFn) => {
         4: 30
       }
     });
-    t.same(model.row({ rowName }), [10, 12, 20, 22, 30, 32, 34, 36, 38, 40]);
+    t.same(model.row({ rowKey }), [10, 12, 20, 22, 30, 32, 34, 36, 38, 40]);
     model.updateRow({
-      rowName,
+      rowKey,
       fn: increment,
       constants: {
         0: 10,
@@ -322,45 +322,45 @@ emptyScenarios((test, setupFn) => {
         4: 30
       }
     });
-    t.same(model.row({ rowName }), [10, 11, 20, 21, 30, 31, 32, 33, 34, 35]);
+    t.same(model.row({ rowKey }), [10, 11, 20, 21, 30, 31, 32, 33, 34, 35]);
     t.end();
   });
 
   test("Update row - overwite behaviour - constants array", t => {
-    const rowName = "test row";
+    const rowKey = "test row";
     const model = setupFn();
     model.addRow({
-      rowName,
+      rowKey,
       fn: interval,
       constants: {
         2: 20,
         4: 30
       }
     });
-    t.same(model.row({ rowName }), [0, 1, 20, 3, 30, 5, 6, 7, 8, 9]);
+    t.same(model.row({ rowKey }), [0, 1, 20, 3, 30, 5, 6, 7, 8, 9]);
     model.updateRow({
-      rowName,
+      rowKey,
       fn: interval,
       constants: [undefined, 1000, 100, undefined, 10]
     });
-    t.same(model.row({ rowName }), [0, 1000, 100, 3, 10, 5, 6, 7, 8, 9]);
+    t.same(model.row({ rowKey }), [0, 1000, 100, 3, 10, 5, 6, 7, 8, 9]);
     t.end();
   });
 
   test("Update row - overwite behaviour - constants dictionary", t => {
-    const rowName = "test row";
+    const rowKey = "test row";
     const model = setupFn();
     model.addRow({
-      rowName,
+      rowKey,
       fn: interval,
       constants: {
         2: 20,
         4: 30
       }
     });
-    t.same(model.row({ rowName }), [0, 1, 20, 3, 30, 5, 6, 7, 8, 9]);
+    t.same(model.row({ rowKey }), [0, 1, 20, 3, 30, 5, 6, 7, 8, 9]);
     model.updateRow({
-      rowName,
+      rowKey,
       fn: interval,
       constants: {
         1: 10,
@@ -368,40 +368,40 @@ emptyScenarios((test, setupFn) => {
         8: 20
       }
     });
-    t.same(model.row({ rowName }), [0, 10, 2, 3, 4, 5, 10, 7, 20, 9]);
+    t.same(model.row({ rowKey }), [0, 10, 2, 3, 4, 5, 10, 7, 20, 9]);
     t.end();
   });
 
   test("Update row - overwite behaviour - constants Map", t => {
-    const rowName = "test row";
+    const rowKey = "test row";
     const model = setupFn();
     model.addRow({
-      rowName,
+      rowKey,
       fn: interval,
       constants: {
         2: 20,
         4: 30
       }
     });
-    t.same(model.row({ rowName }), [0, 1, 20, 3, 30, 5, 6, 7, 8, 9]);
+    t.same(model.row({ rowKey }), [0, 1, 20, 3, 30, 5, 6, 7, 8, 9]);
     const constants = new Map();
     constants.set(1, 10);
     constants.set(2, 30);
     constants.set(6, 10);
     model.updateRow({
-      rowName,
+      rowKey,
       fn: interval,
       constants
     });
-    t.same(model.row({ rowName }), [0, 10, 30, 3, 4, 5, 10, 7, 8, 9]);
+    t.same(model.row({ rowKey }), [0, 10, 30, 3, 4, 5, 10, 7, 8, 9]);
     t.end();
   });
 
   test("Update row - remove behaviour - constants", t => {
-    const rowName = "test row";
+    const rowKey = "test row";
     const model = setupFn();
     model.addRow({
-      rowName,
+      rowKey,
       fn: interval,
       constants: {
         0: 10,
@@ -409,12 +409,12 @@ emptyScenarios((test, setupFn) => {
         4: 30
       }
     });
-    t.same(model.row({ rowName }), [10, 1, 20, 3, 30, 5, 6, 7, 8, 9]);
+    t.same(model.row({ rowKey }), [10, 1, 20, 3, 30, 5, 6, 7, 8, 9]);
     model.updateRow({
-      rowName,
+      rowKey,
       fn: interval
     });
-    t.same(model.row({ rowName }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    t.same(model.row({ rowKey }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
     t.end();
   });
 });

@@ -14,50 +14,50 @@ const model = new Model({
 });
 
 model.addRow({
-  rowName: "interval",
+  rowKey: "interval",
   fn: interval
 });
 
 model.addRow({
-  rowName: "interest rate",
+  rowKey: "interest rate",
   fn: previous,
   constants: [3]
 });
 
 model.addRow({
-  rowName: "contributions",
+  rowKey: "contributions",
   fn: previous,
   constants: [300]
 });
 
 model.addRow({
-  rowName: "total",
+  rowKey: "total",
   fn: applyAnnualisedInterest,
   dependsOn: { interest: "interest rate", increment: "contributions" },
   constants: [10000]
 });
 
 model.addRow({
-  rowName: "compound total",
+  rowKey: "compound total",
   fn: applyAnnualisedCompoundInterest,
   dependsOn: { interest: "interest rate", increment: "contributions" },
   constants: [10000]
 });
 
 model.addRow({
-  rowName: "separator",
+  rowKey: "separator",
   fn: previous,
   constants: [0]
 });
 
 model.addRow({
-  rowName: "mortgage payments",
+  rowKey: "mortgage payments",
   fn: previous,
   constants: [-1000]
 });
 
 model.addRow({
-  rowName: "mortgage balance",
+  rowKey: "mortgage balance",
   fn: applyAnnualisedCompoundInterest,
   dependsOn: { interest: "interest rate", increment: "mortgage payments" },
   constants: [250000]

@@ -14,10 +14,10 @@ const testMeta = {
 test("delete row to blank model can be undone", t => {
   const model = new InteractiveModel(testMeta);
   const historyDescription = "test operation";
-  const rowName = "test row";
-  model.addRow({ rowName, fn: interval });
+  const rowKey = "test row";
+  model.addRow({ rowKey, fn: interval });
   const pre = comparableUnserialisedForm({ model });
-  model.deleteRow({ rowName, historyDescription });
+  model.deleteRow({ rowKey, historyDescription });
   t.same(model.lengths, { x: 0, y: 0, z: 0 });
   model.undo();
   t.same(model.lengths, { x: 10, y: 1, z: 1 });
@@ -28,9 +28,9 @@ test("delete row to blank model can be undone", t => {
 
 test("delete row to blank model can be redone", t => {
   const model = new InteractiveModel(testMeta);
-  const rowName = "test row";
-  model.addRow({ rowName, fn: interval });
-  model.deleteRow({ rowName });
+  const rowKey = "test row";
+  model.addRow({ rowKey, fn: interval });
+  model.deleteRow({ rowKey });
   const pre = comparableUnserialisedForm({ model });
   model.undo();
   model.redo();
@@ -42,9 +42,9 @@ test("delete row to blank model can be redone", t => {
 
 test("delete last row on populated model can be undone", t => {
   const model = testFixture(InteractiveModel);
-  const rowName = "second lookup row";
+  const rowKey = "second lookup row";
   const pre = comparableUnserialisedForm({ model });
-  model.deleteRow({ rowName, scenarioName: defaultScenario });
+  model.deleteRow({ rowKey, scenarioKey: defaultScenario });
   t.same(model.lengths, { x: 10, y: 3, z: 1 });
   model.undo();
   t.same(model.lengths, { x: 10, y: 4, z: 1 });
@@ -55,8 +55,8 @@ test("delete last row on populated model can be undone", t => {
 
 test("delete last row on populated model can be redone", t => {
   const model = testFixture(InteractiveModel);
-  const rowName = "second lookup row";
-  model.deleteRow({ rowName });
+  const rowKey = "second lookup row";
+  model.deleteRow({ rowKey });
   const pre = comparableUnserialisedForm({ model });
   model.undo();
   model.redo();
@@ -68,9 +68,9 @@ test("delete last row on populated model can be redone", t => {
 
 test("delete row (not last) on populated model can be undone", t => {
   const model = testFixture(InteractiveModel);
-  const rowName = "independent row";
+  const rowKey = "independent row";
   const pre = comparableUnserialisedForm({ model, ignoreIndex: true });
-  model.deleteRow({ rowName });
+  model.deleteRow({ rowKey });
   t.same(model.lengths, { x: 10, y: 3, z: 1 });
   model.undo();
   t.same(model.lengths, { x: 10, y: 4, z: 1 });
@@ -81,8 +81,8 @@ test("delete row (not last) on populated model can be undone", t => {
 
 test("multiple undo/redo of delete row works", t => {
   const model = testFixture(InteractiveModel);
-  const rowName = "independent row";
-  model.deleteRow({ rowName });
+  const rowKey = "independent row";
+  model.deleteRow({ rowKey });
   const pre = comparableUnserialisedForm({ model, ignoreIndex: true });
   for (let i = 0; i < 10; i++) {
     model.undo();

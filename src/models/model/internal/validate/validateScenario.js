@@ -1,21 +1,21 @@
 const validateScenario = ({
-  scenarioName,
+  scenarioKey,
   scenarios,
   shouldExist = true,
   toEdit = true
 }) => {
-  if (!scenarioName) {
-    throw new Error("A scenario name is required.");
+  if (!scenarioKey) {
+    throw new Error("A scenario key is required.");
   }
-  const scenario = scenarios[scenarioName];
+  const scenario = scenarios[scenarioKey];
   if (shouldExist && !scenario) {
-    throw new Error(`Unknown scenario '${scenarioName}'.`);
+    throw new Error(`Unknown scenario '${scenarioKey}'.`);
   }
   if (!shouldExist && scenario) {
-    throw new Error(`Scenario '${scenarioName}' already exists.`);
+    throw new Error(`Scenario '${scenarioKey}' already exists.`);
   }
   if (scenario && scenario.isShadow && toEdit) {
-    throw new Error(`Shadow scenario '${scenarioName}' cannot be edited.`);
+    throw new Error(`Shadow scenario '${scenarioKey}' cannot be edited.`);
   }
   return scenario;
 };

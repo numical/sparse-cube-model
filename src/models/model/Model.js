@@ -39,8 +39,8 @@ class Model extends Dense3DArray {
   }
 
   addRow({
-    rowName,
-    scenarioName = defaultScenario,
+    rowKey,
+    scenarioKey = defaultScenario,
     fn,
     fnArgs,
     start,
@@ -49,8 +49,8 @@ class Model extends Dense3DArray {
     dependsOn
   }) {
     const { intervals, scenarios } = this.#meta;
-    const scenario = validateScenario({ scenarioName, scenarios });
-    validateRow({ rowName, scenario, shouldExist: false });
+    const scenario = validateScenario({ scenarioKey, scenarios });
+    validateRow({ rowKey, scenario, shouldExist: false });
     validateFn({ fn });
     validateFnArgs({ fn, fnArgs });
     const { rowConstants } = prepareRowConstants({
@@ -62,9 +62,9 @@ class Model extends Dense3DArray {
     if (!fn) {
       ensureAllConstantsDefined(rowConstants, intervals);
     }
-    linkDependentRows(scenario, rowName, dependsOn);
+    linkDependentRows(scenario, rowKey, dependsOn);
     const row = {
-      name: rowName,
+      key: rowKey,
       index: this.lengths.y,
       constants: rowConstants
     };
@@ -77,12 +77,12 @@ class Model extends Dense3DArray {
       fnArgs,
       dependsOn
     );
-    scenario.rows[rowName] = row;
+    scenario.rows[rowKey] = row;
     const rowsToCalculate = Object.entries(scenario.shadows || {}).reduce(
       (rowsToCalculate, [shadowScenarioName, shadowArgs]) => {
         const shadowScenario = scenarios[shadowScenarioName];
         const shadowRow = {
-          name: row.name,
+          key: row.key,
           index: row.index,
           constants: []
         };
@@ -93,7 +93,7 @@ class Model extends Dense3DArray {
           shadowRow,
           shadowFunctionWrapper({ ...shadowArgs, baseScenario: scenario })
         );
-        shadowScenario.rows[row.name] = shadowRow;
+        shadowScenario.rows[row.key] = shadowRow;
         rowsToCalculate.push({ row: shadowRow, scenario: shadowScenario });
         return rowsToCalculate;
       },
@@ -104,15 +104,15 @@ class Model extends Dense3DArray {
     });
   }
 
-  addRows({ rows = [], scenarioName = defaultScenario }) {
+  addRows({ rows = [], scenarioKey = defaultScenario }) {
     const { intervals, scenarios } = this.#meta;
-    const scenario = validateScenario({ scenarioName, scenarios });
+    const scenario = validateScenario({ scenarioKey, scenarios });
     if (rows.length === 0) {
       throw new Error("At least one row must be added.");
     }
-    const rowNames = rows.map(({ rowName }) => rowName);
-    rowNames.forEach(rowName =>
-      validateRow({ rowName, scenario, shouldExist: false })
+    const rowKeys = rows.map(({ rowKey }) => rowKey);
+    rowKeys.forEach(rowKey =>
+      validateRow({ rowKey, scenario, shouldExist: false })
     );
     const allDependencies = rows.reduce((dependencies, { dependsOn }) => {
       if (dependsOn) {
@@ -124,7 +124,7 @@ class Model extends Dense3DArray {
       }
       return dependencies;
     }, []);
-    const availableRowNames = [...Object.keys(scenario.rows), ...rowNames];
+    const availableRowNames = [...Object.keys(scenario.rows), ...rowKeys];
     allDependencies.forEach(dependency => {
       if (!availableRowNames.includes(dependency)) {
         throw new Error(`Depends on unknown row '${dependency}'`);
@@ -134,21 +134,21 @@ class Model extends Dense3DArray {
     const addRow = Model.prototype.addRow.bind(this);
     rows
       .sort(sortByDependency)
-      .map(rowData => ({ ...rowData, scenarioName }))
+      .map(rowData => ({ ...rowData, scenarioKey }))
       .forEach(addRow);
   }
 
   updateRow({
-    rowName,
-    scenarioName = defaultScenario,
+    rowKey,
+    scenarioKey = defaultScenario,
     fn,
     fnArgs,
     constants,
     dependsOn
   }) {
     const { intervals, scenarios } = this.#meta;
-    const scenario = validateScenario({ scenarioName, scenarios });
-    const row = validateRow({ rowName, scenario });
+    const scenario = validateScenario({ scenarioKey, scenarios });
+    const row = validateRow({ rowKey, scenario });
     validateFn({ fn });
     validateFnArgs({ fn, fnArgs });
     return editRow({
@@ -165,16 +165,16 @@ class Model extends Dense3DArray {
   }
 
   patchRow({
-    rowName,
-    scenarioName = defaultScenario,
+    rowKey,
+    scenarioKey = defaultScenario,
     fn,
     fnArgs,
     constants,
     dependsOn
   }) {
     const { intervals, scenarios } = this.#meta;
-    const scenario = validateScenario({ scenarioName, scenarios });
-    const row = validateRow({ rowName, scenario });
+    const scenario = validateScenario({ scenarioKey, scenarios });
+    const row = validateRow({ rowKey, scenario });
     validateFn({ fn });
     validateFnArgs({ fn: fn || row.fn, fnArgs });
     return editRow({
@@ -190,13 +190,13 @@ class Model extends Dense3DArray {
     });
   }
 
-  deleteRow({ rowName, scenarioName = defaultScenario }) {
+  deleteRow({ rowKey, scenarioKey = defaultScenario }) {
     const { scenarios } = this.#meta;
-    const scenario = validateScenario({ scenarioName, scenarios });
-    const row = validateRow({ rowName, scenario });
+    const scenario = validateScenario({ scenarioKey, scenarios });
+    const row = validateRow({ rowKey, scenario });
     if (row.dependents) {
       throw new Error(
-        `Cannot delete row '${rowName}' as rows '${row.dependents.join(
+        `Cannot delete row '${rowKey}' as rows '${row.dependents.join(
           ", "
         )}' depend on it.`
       );
@@ -204,17 +204,17 @@ class Model extends Dense3DArray {
     return deleteRowAndShadows(this, scenarios, scenario, row);
   }
 
-  deleteRows({ rowNames, scenarioName = defaultScenario }) {
+  deleteRows({ rowKeys, scenarioKey = defaultScenario }) {
     const { scenarios } = this.#meta;
-    const scenario = validateScenario({ scenarioName, scenarios });
-    const rows = rowNames.map(rowName => validateRow({ rowName, scenario }));
+    const scenario = validateScenario({ scenarioKey, scenarios });
+    const rows = rowKeys.map(rowKey => validateRow({ rowKey, scenario }));
     // can delete all if they are dependent only on each other
     rows.forEach(row => {
       if (row.dependents) {
         row.dependents.forEach(dependent => {
-          if (!rowNames.includes(dependent)) {
+          if (!rowKeys.includes(dependent)) {
             throw new Error(
-              `Cannot delete row '${row.name}' as row '${dependent}' depends on it.`
+              `Cannot delete row '${row.key}' as row '${dependent}' depends on it.`
             );
           }
         });
@@ -239,21 +239,21 @@ class Model extends Dense3DArray {
       );
   }
 
-  row({ rowName, scenarioName = defaultScenario }) {
+  row({ rowKey, scenarioKey = defaultScenario }) {
     const { scenarios } = this.#meta;
     const scenario = validateScenario({
-      scenarioName,
+      scenarioKey,
       scenarios,
       toEdit: false
     });
-    const row = validateRow({ rowName, scenario });
+    const row = validateRow({ rowKey, scenario });
     return this.range({ y: row.index, z: scenario.index });
   }
 
-  scenario({ scenarioName = defaultScenario } = {}) {
+  scenario({ scenarioKey = defaultScenario } = {}) {
     const { scenarios } = this.#meta;
     const scenario = validateScenario({
-      scenarioName,
+      scenarioKey,
       scenarios,
       toEdit: false
     });
@@ -261,13 +261,13 @@ class Model extends Dense3DArray {
   }
 
   addScenario({
-    scenarioName,
+    scenarioKey,
     baseScenarioName = defaultScenario,
     shadowFn,
     shadowFnArgs
   } = {}) {
     const { scenarios } = this.#meta;
-    validateScenario({ scenarioName, scenarios, shouldExist: false });
+    validateScenario({ scenarioKey, scenarios, shouldExist: false });
     const baseScenario = scenarios[baseScenarioName];
     if (!baseScenario) {
       throw new Error(`Unknown scenario '${baseScenarioName}'`);
@@ -277,9 +277,9 @@ class Model extends Dense3DArray {
       validateFnArgs({ fn: shadowFn, fnArgs: shadowFnArgs });
     }
     const copiedRows = Object.entries(baseScenario.rows).reduce(
-      (copy, [rowName, row]) => {
+      (copy, [rowKey, row]) => {
         const fn = shadowFn || row.fn.unbound;
-        copy[rowName] = {
+        copy[rowKey] = {
           ...row,
           fn
         };
@@ -294,7 +294,7 @@ class Model extends Dense3DArray {
     if (shadowFn) {
       scenario.isShadow = true;
       const shadows = baseScenario.shadows || {};
-      shadows[scenarioName] = { fn: shadowFn, fnArgs: shadowFnArgs };
+      shadows[scenarioKey] = { fn: shadowFn, fnArgs: shadowFnArgs };
       baseScenario.shadows = shadows;
       wrapShadowFns({
         scenario,
@@ -303,34 +303,34 @@ class Model extends Dense3DArray {
         fnArgs: shadowFnArgs
       });
     }
-    scenarios[scenarioName] = scenario;
-    this.recalculate({ scenarioName });
+    scenarios[scenarioKey] = scenario;
+    this.recalculate({ scenarioKey });
   }
 
-  deleteScenario({ scenarioName } = {}) {
+  deleteScenario({ scenarioKey } = {}) {
     const { scenarios } = this.#meta;
     const scenario = validateScenario({
-      scenarioName,
+      scenarioKey,
       scenarios,
       toEdit: false
     });
     if (Object.keys(scenarios).length === 1) {
-      throw new Error(`Cannot delete only scenario '${scenarioName}'.`);
+      throw new Error(`Cannot delete only scenario '${scenarioKey}'.`);
     }
     if (scenario.shadows) {
       const shadowNames = Object.keys(scenario.shadows).join(", ");
       throw new Error(
-        `Cannot delete scenario '${scenarioName}' with shadows '${shadowNames}'.`
+        `Cannot delete scenario '${scenarioKey}' with shadows '${shadowNames}'.`
       );
     }
-    delete scenarios[scenarioName];
+    delete scenarios[scenarioKey];
     if (!this.isEmpty()) {
       this.delete({ z: scenario.index });
     }
     if (scenario.isShadow) {
       Object.values(scenarios).forEach(scenario => {
-        if (scenario.shadows && scenario.shadows[scenarioName]) {
-          delete scenario.shadows[scenarioName];
+        if (scenario.shadows && scenario.shadows[scenarioKey]) {
+          delete scenario.shadows[scenarioKey];
           if (Object.keys(scenario.shadows).length === 0) {
             delete scenario.shadows;
           }
@@ -340,9 +340,9 @@ class Model extends Dense3DArray {
     return scenario;
   }
 
-  recalculate({ scenarioName } = {}) {
+  recalculate({ scenarioKey } = {}) {
     const { intervals, scenarios } = this.#meta;
-    const toRecalc = scenarioName ? [scenarios[scenarioName]] : scenarios;
+    const toRecalc = scenarioKey ? [scenarios[scenarioKey]] : scenarios;
     Object.values(toRecalc)
       .sort(sortByShadows)
       .forEach(scenario => {

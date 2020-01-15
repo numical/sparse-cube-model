@@ -2,21 +2,21 @@ const { populatedScenarios } = require("../../test/testScaffold");
 
 populatedScenarios((test, setUp) => {
   test("Delete row with unknown scenario throws error", t => {
-    const rowName = "test row";
-    const scenarioName = "unknown test scenario";
+    const rowKey = "test row";
+    const scenarioKey = "unknown test scenario";
     const model = setUp();
     t.throws(
-      () => model.deleteRow({ rowName, scenarioName }),
+      () => model.deleteRow({ rowKey, scenarioKey }),
       new Error("Unknown scenario 'unknown test scenario'")
     );
     t.end();
   });
 
-  test("Delete row with unknown row name throws error", t => {
-    const rowName = "test row";
+  test("Delete row with unknown row key throws error", t => {
+    const rowKey = "test row";
     const model = setUp();
     t.throws(
-      () => model.deleteRow({ rowName }),
+      () => model.deleteRow({ rowKey }),
       new Error("Unknown row 'test row'")
     );
     t.end();
@@ -25,55 +25,46 @@ populatedScenarios((test, setUp) => {
   test("Delete independent row", t => {
     const model = setUp();
     t.same(model.lengths, { x: 10, y: 4, z: 1 });
-    const rowName = "independent row";
+    const rowKey = "independent row";
     model.deleteRow({
-      rowName,
-      scenarioName: "defaultScenario"
+      rowKey,
+      scenarioKey: "defaultScenario"
     });
     t.same(model.lengths, { x: 10, y: 3, z: 1 });
-    t.throws(
-      () => model.row({ rowName }),
-      new Error(`Unknown row '${rowName}'`)
-    );
+    t.throws(() => model.row({ rowKey }), new Error(`Unknown row '${rowKey}'`));
     t.end();
   });
 
   test("Delete independent row, default scenario", t => {
     const model = setUp();
     t.same(model.lengths, { x: 10, y: 4, z: 1 });
-    const rowName = "independent row";
+    const rowKey = "independent row";
     model.deleteRow({
-      rowName
+      rowKey
     });
     t.same(model.lengths, { x: 10, y: 3, z: 1 });
-    t.throws(
-      () => model.row({ rowName }),
-      new Error(`Unknown row '${rowName}'`)
-    );
+    t.throws(() => model.row({ rowKey }), new Error(`Unknown row '${rowKey}'`));
     t.end();
   });
 
   test("Delete dependent row", t => {
     const model = setUp();
     t.same(model.lengths, { x: 10, y: 4, z: 1 });
-    const rowName = "first lookup row";
+    const rowKey = "first lookup row";
     model.deleteRow({
-      rowName,
-      scenarioName: "defaultScenario"
+      rowKey,
+      scenarioKey: "defaultScenario"
     });
     t.same(model.lengths, { x: 10, y: 3, z: 1 });
-    t.throws(
-      () => model.row({ rowName }),
-      new Error(`Unknown row '${rowName}'`)
-    );
+    t.throws(() => model.row({ rowKey }), new Error(`Unknown row '${rowKey}'`));
     t.end();
   });
 
   test("Delete row with dependencies fails", t => {
     const model = setUp();
-    const rowName = "increment row";
+    const rowKey = "increment row";
     t.throws(
-      () => model.deleteRow({ rowName }),
+      () => model.deleteRow({ rowKey }),
       new Error(
         "Cannot delete row 'increment row' as rows 'first lookup row, second lookup row' depend on it."
       )
@@ -83,13 +74,13 @@ populatedScenarios((test, setUp) => {
 
   test("Delete multiple rows", t => {
     const model = setUp();
-    const rowNames = ["first lookup row", "independent row"];
-    model.deleteRows({ rowNames });
+    const rowKeys = ["first lookup row", "independent row"];
+    model.deleteRows({ rowKeys });
     t.same(model.lengths, { x: 10, y: 2, z: 1 });
-    rowNames.forEach(rowName => {
+    rowKeys.forEach(rowKey => {
       t.throws(
-        () => model.row({ rowName }),
-        new Error(`Unknown row '${rowName}'`)
+        () => model.row({ rowKey }),
+        new Error(`Unknown row '${rowKey}'`)
       );
     });
     t.end();
@@ -97,15 +88,15 @@ populatedScenarios((test, setUp) => {
 
   test("Delete multiple linked rows one at a time, latest first", t => {
     const model = setUp();
-    const rowNames = ["second lookup row", "first lookup row", "increment row"];
-    rowNames.forEach(rowName => {
-      model.deleteRow({ rowName });
+    const rowKeys = ["second lookup row", "first lookup row", "increment row"];
+    rowKeys.forEach(rowKey => {
+      model.deleteRow({ rowKey });
     });
     t.same(model.lengths, { x: 10, y: 1, z: 1 });
-    rowNames.forEach(rowName => {
+    rowKeys.forEach(rowKey => {
       t.throws(
-        () => model.row({ rowName }),
-        new Error(`Unknown row '${rowName}'`)
+        () => model.row({ rowKey }),
+        new Error(`Unknown row '${rowKey}'`)
       );
     });
     t.end();
@@ -113,15 +104,15 @@ populatedScenarios((test, setUp) => {
 
   test("Delete multiple linked rows one at a time, earliest first", t => {
     const model = setUp();
-    const rowNames = ["first lookup row", "second lookup row", "increment row"];
-    rowNames.forEach(rowName => {
-      model.deleteRow({ rowName });
+    const rowKeys = ["first lookup row", "second lookup row", "increment row"];
+    rowKeys.forEach(rowKey => {
+      model.deleteRow({ rowKey });
     });
     t.same(model.lengths, { x: 10, y: 1, z: 1 });
-    rowNames.forEach(rowName => {
+    rowKeys.forEach(rowKey => {
       t.throws(
-        () => model.row({ rowName }),
-        new Error(`Unknown row '${rowName}'`)
+        () => model.row({ rowKey }),
+        new Error(`Unknown row '${rowKey}'`)
       );
     });
     t.end();
@@ -129,13 +120,13 @@ populatedScenarios((test, setUp) => {
 
   test("Delete multiple linked rows in one go", t => {
     const model = setUp();
-    const rowNames = ["increment row", "first lookup row", "second lookup row"];
-    model.deleteRows({ rowNames });
+    const rowKeys = ["increment row", "first lookup row", "second lookup row"];
+    model.deleteRows({ rowKeys });
     t.same(model.lengths, { x: 10, y: 1, z: 1 });
-    rowNames.forEach(rowName => {
+    rowKeys.forEach(rowKey => {
       t.throws(
-        () => model.row({ rowName }),
-        new Error(`Unknown row '${rowName}'`)
+        () => model.row({ rowKey }),
+        new Error(`Unknown row '${rowKey}'`)
       );
     });
     t.end();
@@ -143,9 +134,9 @@ populatedScenarios((test, setUp) => {
 
   test("Delete multiple linked rows errors if other rows also linked", t => {
     const model = setUp();
-    const rowNames = ["increment row", "second lookup row"];
+    const rowKeys = ["increment row", "second lookup row"];
     t.throws(
-      () => model.deleteRows({ rowNames }),
+      () => model.deleteRows({ rowKeys }),
       new Error(
         "Cannot delete row 'increment row' as row 'first lookup row' depends on it."
       )

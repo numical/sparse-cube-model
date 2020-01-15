@@ -1,13 +1,13 @@
-const validateRow = ({ rowName, scenario, shouldExist = true }) => {
-  if (!rowName) {
-    throw new Error("A row name is required.");
+const validateRow = ({ rowKey, scenario, shouldExist = true }) => {
+  if (!rowKey) {
+    throw new Error("A row key is required.");
   }
-  const row = scenario.rows[rowName];
+  const row = scenario.rows[rowKey];
   if (shouldExist && !row) {
-    throw new Error(`Unknown row '${rowName}'.`);
+    throw new Error(`Unknown row '${rowKey}'.`);
   }
   if (!shouldExist && row) {
-    throw new Error(`Row '${rowName}' already exists.`);
+    throw new Error(`Row '${rowKey}' already exists.`);
   }
   return row;
 };

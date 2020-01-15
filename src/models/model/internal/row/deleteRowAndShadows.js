@@ -5,14 +5,14 @@ const deleteRowAndShadows = (
   model,
   scenarios,
   scenario,
-  { name, dependsOn, index }
+  { key, dependsOn, index }
 ) => {
   const { x: lenX, z: lenZ } = model.lengths;
-  unlinkDependentRows(scenario, name, dependsOn);
+  unlinkDependentRows(scenario, key, dependsOn);
   const shadowRows = Object.keys(scenario.shadows || {}).reduce(
     (shadowRows, shadowScenarioName) => {
       const shadowScenario = scenarios[shadowScenarioName];
-      const shadowRow = shadowScenario.rows[name];
+      const shadowRow = shadowScenario.rows[key];
       shadowRows.push(
         // shadows cannot have shadows
         deleteRowAndShadows(model, scenarios, shadowScenario, shadowRow).row
@@ -21,8 +21,8 @@ const deleteRowAndShadows = (
     },
     []
   );
-  const deletedRows = { row: scenario.rows[name], shadowRows };
-  delete scenario.rows[name];
+  const deletedRows = { row: scenario.rows[key], shadowRows };
+  delete scenario.rows[key];
   if (lenZ === 1 + shadowRows.length) {
     model.delete({ y: index });
     Object.values(scenario.rows).forEach(row => {

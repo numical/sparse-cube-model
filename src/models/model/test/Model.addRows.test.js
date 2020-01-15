@@ -10,15 +10,15 @@ const {
 const { applyInterest } = require("../../../fns/interestFunctions");
 
 const rows = [
-  { rowName: "row 0", fn: interval },
-  { rowName: "row 1", constants: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19] },
-  { rowName: "row 2", fn: lookup, dependsOn: "row 1" }
+  { rowKey: "row 0", fn: interval },
+  { rowKey: "row 1", constants: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19] },
+  { rowKey: "row 2", fn: lookup, dependsOn: "row 1" }
 ];
 
 emptyScenarios((test, setupFn) => {
   test("Add rows with unknown scenario throws error", t => {
-    const scenarioName = "unknown test scenario";
-    const args = { rows, scenarioName };
+    const scenarioKey = "unknown test scenario";
+    const args = { rows, scenarioKey };
     const model = setupFn();
     t.throws(
       () => model.addRows(args),
@@ -47,10 +47,10 @@ emptyScenarios((test, setupFn) => {
     t.end();
   });
 
-  test("Add rows with existing row name throws error", t => {
+  test("Add rows with existing row key throws error", t => {
     const args = { rows };
     const model = setupFn();
-    model.addRow({ rowName: "row 0", fn: interval });
+    model.addRow({ rowKey: "row 0", fn: interval });
     t.throws(
       () => model.addRows(args),
       new Error("Row 'row 0' already exists.")
@@ -62,7 +62,7 @@ emptyScenarios((test, setupFn) => {
     const args = {
       rows: [
         {
-          rowName: "test row",
+          rowKey: "test row",
           fn: lookup,
           dependsOn: "unknown row"
         }
@@ -77,33 +77,22 @@ emptyScenarios((test, setupFn) => {
   });
 
   test("Add rows can add single, independent row", t => {
-    const rowName = "test row";
-    const args = { rows: [{ rowName, fn: interval }] };
+    const rowKey = "test row";
+    const args = { rows: [{ rowKey, fn: interval }] };
     const model = setupFn();
     model.addRows(args);
-    t.same(model.row({ rowName }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    t.same(model.row({ rowKey }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
     t.end();
   });
 
   test("Add rows can add single, independent row, non-default scenario", t => {
-    const rowName = "test row";
-    const scenarioName = "test scenario";
-    const args = { scenarioName, rows: [{ rowName, fn: interval }] };
+    const rowKey = "test row";
+    const scenarioKey = "test scenario";
+    const args = { scenarioKey, rows: [{ rowKey, fn: interval }] };
     const model = setupFn();
-    model.addScenario({ scenarioName });
+    model.addScenario({ scenarioKey });
     model.addRows(args);
-    t.same(model.row({ scenarioName, rowName }), [
-      0,
-      1,
-      2,
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9
-    ]);
+    t.same(model.row({ scenarioKey, rowKey }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
     t.end();
   });
 
@@ -111,25 +100,14 @@ emptyScenarios((test, setupFn) => {
     const constants = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
     const args = {
       rows: [
-        { rowName: "test row 1", fn: interval },
-        { rowName: "test row 2", constants }
+        { rowKey: "test row 1", fn: interval },
+        { rowKey: "test row 2", constants }
       ]
     };
     const model = setupFn();
     model.addRows(args);
-    t.same(model.row({ rowName: "test row 1" }), [
-      0,
-      1,
-      2,
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9
-    ]);
-    t.same(model.row({ rowName: "test row 2" }), constants);
+    t.same(model.row({ rowKey: "test row 1" }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    t.same(model.row({ rowKey: "test row 2" }), constants);
     t.end();
   });
 
@@ -138,9 +116,9 @@ emptyScenarios((test, setupFn) => {
     const args = { rows };
     const model = setupFn();
     model.addRows(args);
-    t.same(model.row({ rowName: "row 0" }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
-    t.same(model.row({ rowName: "row 1" }), constants);
-    t.same(model.row({ rowName: "row 2" }), constants);
+    t.same(model.row({ rowKey: "row 0" }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    t.same(model.row({ rowKey: "row 1" }), constants);
+    t.same(model.row({ rowKey: "row 2" }), constants);
     t.end();
   });
 });
@@ -149,9 +127,9 @@ populatedScenarios((test, setupFn) => {
   test("Add rows can add rows with dependencies on existing rows", t => {
     const args = {
       rows: [
-        { rowName: "row 0", fn: lookup, dependsOn: "increment row" },
+        { rowKey: "row 0", fn: lookup, dependsOn: "increment row" },
         {
-          rowName: "row 1",
+          rowKey: "row 1",
           fn: lookupPrevious,
           constants: [1000, 1001],
           dependsOn: "independent row"
@@ -160,8 +138,8 @@ populatedScenarios((test, setupFn) => {
     };
     const model = setupFn();
     model.addRows(args);
-    t.same(model.row({ rowName: "row 0" }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
-    t.same(model.row({ rowName: "row 1" }), [
+    t.same(model.row({ rowKey: "row 0" }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    t.same(model.row({ rowKey: "row 1" }), [
       1000,
       1001,
       11,
@@ -179,9 +157,9 @@ populatedScenarios((test, setupFn) => {
   test("Add rows can add rows with mixed dependencies", t => {
     const args = {
       rows: [
-        { rowName: "row 0", fn: lookup, dependsOn: "increment row" },
+        { rowKey: "row 0", fn: lookup, dependsOn: "increment row" },
         {
-          rowName: "row 1",
+          rowKey: "row 1",
           fn: applyInterest,
           constants: [1000, 1000],
           dependsOn: {
@@ -193,8 +171,8 @@ populatedScenarios((test, setupFn) => {
     };
     const model = setupFn();
     model.addRows(args);
-    t.same(model.row({ rowName: "row 0" }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
-    t.same(model.row({ rowName: "row 1" }), [
+    t.same(model.row({ rowKey: "row 0" }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    t.same(model.row({ rowKey: "row 1" }), [
       1000,
       1000,
       1032.24,

@@ -12,7 +12,7 @@ emptyScenarios((test, setupFn) => {
     t.throws(
       () =>
         model.addRow({
-          rowName: "test row",
+          rowKey: "test row",
           fn: applyInterest,
           constants: [1000]
         }),
@@ -24,14 +24,14 @@ emptyScenarios((test, setupFn) => {
   test("Add row with complex function with incorrect dependency throws error", t => {
     const model = setupFn();
     model.addRow({
-      rowName: "interestRow",
+      rowKey: "interestRow",
       fn: previous,
       constants: [2]
     });
     t.throws(
       () =>
         model.addRow({
-          rowName: "test row",
+          rowKey: "test row",
           fn: applyInterest,
           constants: [1000],
           dependsOn: {
@@ -50,12 +50,12 @@ emptyScenarios((test, setupFn) => {
       }
     });
     model.addRow({
-      rowName: "interestRow",
+      rowKey: "interestRow",
       fn: previous,
       constants: [2]
     });
     model.addRow({
-      rowName: "testRow",
+      rowKey: "testRow",
       fn: applyInterest,
       constants: [1000],
       dependsOn: {
