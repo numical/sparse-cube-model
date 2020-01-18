@@ -7,6 +7,7 @@ const bindFnToRow = require("./internal/row/bindFnToRow");
 const editRow = require("./internal/row/editRow");
 const deleteRowAndShadows = require("./internal/row/deleteRowAndShadows");
 const ensureAllConstantsDefined = require("./internal/validate/ensureAllConstantsDefined");
+const getModelVersion = require("./internal/version/getModelVersion");
 const linkAllDependentRows = require("./internal/dependent/linkAllDependentRows");
 const linkDependentRows = require("./internal/dependent/linkDependentRows");
 const sortByDependency = require("./internal/dependent/sortByDependency");
@@ -17,6 +18,7 @@ const validateFn = require("./internal/validate/validateFn");
 const validateFnArgs = require("./internal/validate/validateFnArgs");
 const validateRow = require("./internal/validate/validateRow");
 const validateScenario = require("./internal/validate/validateScenario");
+const validateVersion = require("./internal/version/validateVersion");
 const serializer = require("./serializer");
 
 const { defaultScenario, defaultValue } = modelMetadata;
@@ -32,6 +34,7 @@ class Model extends Dense3DArray {
   constructor(meta = {}) {
     super({ defaultValue });
     this.#meta = modelMetadata(meta);
+    validateVersion(this.#meta.version);
     const { scenarios } = this.#meta;
     wrapAllShadowFns(scenarios);
     linkAllDependentRows(scenarios);
@@ -364,6 +367,7 @@ class Model extends Dense3DArray {
   }
 
   stringify(args) {
+    this.#meta.version = getModelVersion();
     return serializer.stringify(this.#meta, args);
   }
 }

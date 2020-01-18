@@ -5,7 +5,7 @@ const InteractiveModel = require("../interactiveModel/InteractiveModel");
 const PersonalFinanceModel = require("../personalFinanceModel/PersonalFinanceModel");
 const testFixture = require("./testFixture");
 
-const allTypes = [Model, MappedModel, InteractiveModel, PersonalFinanceModel];
+const allTypes = [Model, MappedModel, InteractiveModel];
 
 const testMeta = {
   intervals: {
