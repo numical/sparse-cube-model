@@ -1,4 +1,5 @@
 const { test } = require("tap");
+const { version } = require("../../../../package");
 const Model = require("../Model");
 const testFixture = require("../../test/testFixture");
 
@@ -77,7 +78,7 @@ test("Populated model with row of constants correctly deserializes", t => {
   t.end();
 });
 
-test("Parsing fails eplicitly if fn not in fn dictionary", t => {
+test("Parsing fails explicitly if fn not in fn dictionary", t => {
   const model = testFixture();
   const unknownFn = () => 10;
   unknownFn.key = "unknown";
@@ -90,4 +91,20 @@ test("Parsing fails eplicitly if fn not in fn dictionary", t => {
   t.end();
 });
 
-// console.log(testFixture().model.stringify({ pretty: true }));
+test("default model has package version", t => {
+  const model = testFixture();
+  const serialized = model.stringify();
+  const expected = `"version":"${version}"`;
+  t.match(serialized, expected);
+  t.end();
+});
+
+test("model updates old (compatible) versions", t => {
+  const pre = testFixture().stringify();
+  const updated = pre.replace(version, "0.0.1");
+  t.match(updated, `"version":"0.0.1"`);
+  const post = Model.parse(updated).stringify();
+  const expected = `"version":"${version}"`;
+  t.match(post, expected);
+  t.end();
+});
