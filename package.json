@@ -17,7 +17,7 @@
     "test": "tap src/**/*.test.js --100",
     "test:debug": "DEBUG=sparse-cube-model:* tap --only --timeout=600 --no-coverage src/**/*.test.js",
     "test:only": "tap --only --timeout=600 --no-coverage src/**/*.test.js",
-    "test:focus": "tap --timeout=600 --no-coverage src/**/Model.serialization.test.js",
+    "test:focus": "tap --timeout=600 --no-coverage src/**/PersonalFinanceModel.test.js",
     "test:model": "tap --timeout=600 --no-coverage src/**/*Model.**.test.js",
     "test:d3da": "tap --timeout=600 --no-coverage src/**/Dense3DArray.**.test.js"
   },

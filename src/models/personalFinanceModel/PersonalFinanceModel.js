@@ -1,4 +1,5 @@
 const InteractiveModel = require("../interactiveModel/InteractiveModel");
+const init = require("./internal/init");
 const serializer = require("../model/serializer");
 
 class PersonalFinanceModel extends InteractiveModel {
@@ -13,6 +14,9 @@ class PersonalFinanceModel extends InteractiveModel {
 
   constructor(meta, keyMap, products = {}) {
     super(meta, keyMap);
+    if (!meta) {
+      init(this);
+    }
     this.#products = products;
   }
 
