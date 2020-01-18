@@ -12,16 +12,17 @@ const { defaultScenario } = modelMetadata;
 const dependsOnErrorPrefix = "Depends on unknown row";
 
 class MappedModel extends Model {
-  static parse([serializedModel, serializedMap], fnsRepo) {
-    const meta = serializer.parse(serializedModel, fnsRepo);
-    const map = serializer.parse(serializedMap, fnsRepo);
-    return new MappedModel(meta, map);
+  static parse([model, map], fnsRepo) {
+    const meta = serializer.parse(model, fnsRepo);
+    const keyMap = serializer.parse(map, fnsRepo);
+    return new MappedModel(meta, keyMap);
   }
 
   #fns;
 
-  constructor(meta, fromMap = { row: {}, scenario: {} }) {
+  constructor(meta, keyMap = { row: {}, scenario: {} }) {
     super(meta);
+    const fromMap = keyMap;
     const toMap = {
       row: invertObj(fromMap.row),
       scenario: invertObj(fromMap.scenario)

@@ -1,6 +1,6 @@
 const fnsDictionary = require("../../fns/functionsDictionary");
 
-const replacer = (key, value) =>
+const defaultReplacer = (key, value) =>
   key === "fn"
     ? value
       ? value.key
@@ -9,7 +9,7 @@ const replacer = (key, value) =>
     ? undefined
     : value;
 
-const reviver = (fnsRepo, key, value) => {
+const defaultReviver = (fnsRepo, key, value) => {
   if (key === "fn") {
     if (fnsRepo[value]) {
       return fnsRepo[value];
@@ -21,13 +21,16 @@ const reviver = (fnsRepo, key, value) => {
   }
 };
 
-const stringify = (obj, { pretty = false } = {}) => {
+const stringify = (
+  obj,
+  { pretty = false, replacer = defaultReplacer } = {}
+) => {
   const space = pretty ? 2 : 0;
   return JSON.stringify(obj, replacer, space);
 };
 
 const parse = (serialized, fnsRepo = fnsDictionary) => {
-  return JSON.parse(serialized, reviver.bind(null, fnsRepo));
+  return JSON.parse(serialized, defaultReviver.bind(null, fnsRepo));
 };
 
 module.exports = { stringify, parse };

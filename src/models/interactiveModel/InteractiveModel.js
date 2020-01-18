@@ -15,16 +15,16 @@ const addToHistory = (history, item) => {
 };
 
 class InteractiveModel extends MappedModel {
-  static parse([serializedModel, serializedMap], fnsRepo) {
-    const meta = serializer.parse(serializedModel, fnsRepo);
-    const map = serializer.parse(serializedMap, fnsRepo);
-    return new InteractiveModel(meta, map);
+  static parse([model, map], fnsRepo) {
+    const meta = serializer.parse(model, fnsRepo);
+    const keyMap = serializer.parse(map, fnsRepo);
+    return new InteractiveModel(meta, keyMap);
   }
 
   #history;
 
-  constructor(meta, map) {
-    super(meta, map);
+  constructor(meta, keyMap) {
+    super(meta, keyMap);
     this.#history = [];
     this.#history.current = -1;
   }
