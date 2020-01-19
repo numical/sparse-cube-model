@@ -180,10 +180,9 @@ populatedScenarios((test, setUp) => {
       [new Date(2020, 2, 1), 4],
       [new Date(2020, 6, 31), 12],
       [new Date(2020, 7, 31), 14],
-      [new Date(2020, 8, 30), 16],
-      [new Date(2020, 9, 31), 18]
+      [new Date(2020, 8, 30), 16]
     ]);
-    const expected = [0, 2, 4, 5, 6, 7, 12, 14, 16, 18];
+    const expected = [0, 2, 4, 5, 6, 7, 12, 14, 16, 17];
     const model = setUp();
     model.updateRow({ rowKey, constants, fn: increment });
     t.same(model.row({ rowKey }), expected);

@@ -6,7 +6,7 @@ const { interval, lookup } = require("../../../fns/lookupFunctions");
 
 const testMeta = {
   intervals: {
-    count: 10
+    count: 9
   }
 };
 

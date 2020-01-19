@@ -1,7 +1,7 @@
 const msg = "Row has no function, but less constants than intervals.";
 
 const ensureAllConstantsDefined = (constants, intervals) => {
-  const numRequired = intervals.count;
+  const numRequired = intervals.count + 1;
   const values = Array.isArray(constants)
     ? constants
     : constants instanceof Map

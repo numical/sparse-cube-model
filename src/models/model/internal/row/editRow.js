@@ -41,7 +41,7 @@ const editRow = ({
     );
   }
   rowstoUpdate.forEach(row => {
-    calculateRow(row, scenario, startInterval, intervals.count - 1, model.set);
+    calculateRow(row, scenario, startInterval, intervals.count, model.set);
   });
   return original;
 };

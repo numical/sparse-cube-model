@@ -7,7 +7,7 @@ const { defaultScenario } = require("../../model/modelMetadata");
 
 const testMeta = {
   intervals: {
-    count: 10
+    count: 9
   }
 };
 

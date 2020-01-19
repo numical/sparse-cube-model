@@ -2,7 +2,7 @@ const { test } = require("tap");
 const ensureAllConstantsDefined = require("../ensureAllConstantsDefined");
 
 const intervals = {
-  count: 3
+  count: 2
 };
 
 test("ensureAllConstantsDefined passes for dense array", t => {

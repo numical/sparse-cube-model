@@ -31,7 +31,7 @@ const rows = [
 
 const meta = {
   intervals: {
-    count: 10
+    count: 9
   }
 };
 

@@ -92,13 +92,13 @@ emptyScenarios((test, setupFn) => {
 
   test("Add row of constants", t => {
     const rowKey = "test row";
-    const constants = sequence(test.meta.intervals.count);
+    const constants = sequence(test.meta.intervals.count + 1);
     const model = setupFn();
     model.addRow({
       rowKey,
       constants
     });
-    for (let i = 0; i < test.meta.intervals.count; i++) {
+    for (let i = 0; i < test.meta.intervals.count + 1; i++) {
       t.equal(model[i][0][0], constants[i]);
     }
     t.end();
@@ -106,7 +106,7 @@ emptyScenarios((test, setupFn) => {
 
   test("retrieve added row of constants", t => {
     const rowKey = "test row";
-    const constants = sequence(test.meta.intervals.count);
+    const constants = sequence(test.meta.intervals.count + 1);
     const model = setupFn();
     model.addRow({
       rowKey,
@@ -217,7 +217,7 @@ emptyScenarios((test, setupFn) => {
 
   test("retrieve row fails if unknown row key", t => {
     const rowKey = "test row";
-    const constants = sequence(test.meta.intervals.count);
+    const constants = sequence(test.meta.intervals.count + 1);
     const model = setupFn();
     model.addRow({
       rowKey,
@@ -232,7 +232,7 @@ emptyScenarios((test, setupFn) => {
 
   test("retrieve row fails if unknown scenario key", t => {
     const rowKey = "test row";
-    const constants = sequence(test.meta.intervals.count);
+    const constants = sequence(test.meta.intervals.count + 1);
     const model = setupFn();
     model.addRow({
       rowKey,

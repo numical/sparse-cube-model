@@ -46,7 +46,7 @@ emptyScenarios((test, setupFn) => {
   test("Add row with complex function works", t => {
     const model = setupFn({
       intervals: {
-        count: 20
+        count: 19
       }
     });
     model.addRow({

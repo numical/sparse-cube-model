@@ -3,12 +3,12 @@ const PersonalFinanceModel = require("../PersonalFinanceModel");
 const keys = require("../internal/keys");
 const { defaults } = require("../../model/modelMetadata");
 
-const threeHundredZeros = Array(defaults.intervals.count).fill(0);
+const threeHundredAndOneZeros = Array(defaults.intervals.count + 1).fill(0);
 
 test("Creates an inflationRow row", t => {
   const model = new PersonalFinanceModel();
   const inflationValues = model.row({ rowKey: keys.inflationRow });
-  t.same(inflationValues, threeHundredZeros);
+  t.same(inflationValues, threeHundredAndOneZeros);
   t.end();
 });
 
@@ -17,7 +17,7 @@ test("Creates an inflation adjusted shadow scenario", t => {
   const shadow = model.scenario({
     scenarioKey: "defaultScenario_inflationAdjusted"
   });
-  t.same(shadow, [threeHundredZeros]);
+  t.same(shadow, [threeHundredAndOneZeros]);
   t.end();
 });
 

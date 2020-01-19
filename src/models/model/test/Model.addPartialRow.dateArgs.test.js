@@ -2,7 +2,7 @@ const { emptyScenarios } = require("../../test/testScaffold");
 const { interval } = require("../../../fns/lookupFunctions");
 
 const rowKey = "test row";
-const count = 12;
+const count = 11;
 const testDefaults = {
   intervals: {
     count,

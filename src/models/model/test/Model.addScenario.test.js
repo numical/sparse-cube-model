@@ -256,7 +256,7 @@ emptyScenarios((test, setupFn) => {
   });
 
   test("scenario with unknown key errors", t => {
-    const model = setupFn({ intervals: { count: 3 } });
+    const model = setupFn({ intervals: { count: 2 } });
     t.throws(
       () => model.scenario({ scenarioKey: "unknown" }),
       new Error("Unknown scenario 'unknown'")
@@ -265,20 +265,20 @@ emptyScenarios((test, setupFn) => {
   });
 
   test("scenario with default scenario returns OK", t => {
-    const model = setupFn({ intervals: { count: 3 } });
+    const model = setupFn({ intervals: { count: 2 } });
     model.addRow({ rowKey: "default scenario row", fn: interval });
     t.same(model.scenario(), [[0, 1, 2]]);
     t.end();
   });
 
   test("scenario with default empty scenario returns empty array", t => {
-    const model = setupFn({ intervals: { count: 3 } });
+    const model = setupFn({ intervals: { count: 2 } });
     t.same(model.scenario(), []);
     t.end();
   });
 
   test("scenario returns scenario values", t => {
-    const model = setupFn({ intervals: { count: 3 } });
+    const model = setupFn({ intervals: { count: 2 } });
     model.addRow({ rowKey: "default scenario row", fn: interval });
     const scenarioKey = "scenario 1";
     const rowKeys = ["row 0", "row 1", "row 2"];
@@ -307,7 +307,7 @@ emptyScenarios((test, setupFn) => {
 
   test("Add scenario based on empty default", t => {
     const scenarioKey = "test scenario";
-    const model = setupFn({ intervals: { count: 3 } });
+    const model = setupFn({ intervals: { count: 2 } });
     model.addScenario({ scenarioKey });
     t.same(model.scenario({ scenarioKey }), []);
     t.end();
@@ -315,7 +315,7 @@ emptyScenarios((test, setupFn) => {
 
   test("Mutating a scenario based on an empty default is fine", t => {
     const scenarioKey = "test scenario";
-    const model = setupFn({ intervals: { count: 3 } });
+    const model = setupFn({ intervals: { count: 2 } });
     model.addScenario({ scenarioKey });
     model.addRow({
       scenarioKey,
@@ -343,7 +343,7 @@ emptyScenarios((test, setupFn) => {
 
   test("Mutating then updating a scenario based on an empty default is fine", t => {
     const scenarioKey = "test scenario";
-    const model = setupFn({ intervals: { count: 3 } });
+    const model = setupFn({ intervals: { count: 2 } });
     model.addScenario({ scenarioKey });
     model.addRow({
       scenarioKey,
@@ -376,7 +376,7 @@ emptyScenarios((test, setupFn) => {
   });
 
   test("scenario returns scenario values with multiple scenarios", t => {
-    const model = setupFn({ intervals: { count: 3 } });
+    const model = setupFn({ intervals: { count: 2 } });
     model.addRow({ rowKey: "default scenario row", fn: interval });
     const rowKeys = ["row 0", "row 1", "row 2"];
     const fn = ({ scenario, row }, index) =>
@@ -415,7 +415,7 @@ emptyScenarios((test, setupFn) => {
   });
 
   test("scenario returns scenario values with multiple scenarios, empty default scenario", t => {
-    const model = setupFn({ intervals: { count: 3 } });
+    const model = setupFn({ intervals: { count: 2 } });
     const rowKeys = ["row 0", "row 1", "row 2"];
     const fn = ({ scenario, row }, index) =>
       `${index},${row.index},${scenario.index}`;

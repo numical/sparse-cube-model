@@ -119,7 +119,7 @@ const prepareRowConstants = ({
   end,
   intervals
 }) => {
-  const maxInterval = intervals.count - 1;
+  const maxInterval = intervals.count;
   const calcIntervalFromDate = getIntervalFromDate(intervals);
   if (start instanceof Date) {
     start = calcIntervalFromDate(start);

@@ -9,7 +9,7 @@ const allTypes = [Model, MappedModel, InteractiveModel, PersonalFinanceModel];
 
 const testMeta = {
   intervals: {
-    count: 10
+    count: 9
   }
 };
 

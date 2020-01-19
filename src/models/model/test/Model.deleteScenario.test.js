@@ -37,13 +37,13 @@ populatedScenarios((test, setUp) => {
     const scenarioKey = "second scenario";
     model.addScenario({ scenarioKey });
     t.same(model.lengths, {
-      x: testFixture.meta.intervals.count,
+      x: testFixture.meta.intervals.count + 1,
       y: testFixture.rows.length,
       z: 2
     });
     model.deleteScenario({ scenarioKey });
     t.same(model.lengths, {
-      x: testFixture.meta.intervals.count,
+      x: testFixture.meta.intervals.count + 1,
       y: testFixture.rows.length,
       z: 1
     });
@@ -60,7 +60,7 @@ populatedScenarios((test, setUp) => {
     const scenarioKey = "defaultScenario";
     model.deleteScenario({ scenarioKey });
     t.same(model.lengths, {
-      x: testFixture.meta.intervals.count,
+      x: testFixture.meta.intervals.count + 1,
       y: testFixture.rows.length,
       z: 1
     });

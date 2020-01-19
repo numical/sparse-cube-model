@@ -8,7 +8,7 @@ const tablePrint = require("./tablePrint");
 
 const model = new Model({
   intervals: {
-    count: 301
+    count: 300
   }
 });
 

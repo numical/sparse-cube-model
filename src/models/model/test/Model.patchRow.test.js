@@ -50,7 +50,10 @@ emptyScenarios((test, setupFn) => {
   test("Patch row errors if no fn but fnArgs", t => {
     const rowKey = "test row";
     const model = setupFn();
-    model.addRow({ rowKey, constants: sequence(test.meta.intervals.count) });
+    model.addRow({
+      rowKey,
+      constants: sequence(test.meta.intervals.count + 1)
+    });
     t.throws(
       () => model.patchRow({ rowKey, fnArgs: { foo: "bar" } }),
       new Error("Function args passed but no function.")

@@ -78,7 +78,7 @@ test("Populated model can be serialized and deserialized", t => {
 
 test("Populated model with row of constants correctly deserializes", t => {
   const model = testFixture(MappedModel);
-  const constants = Array(testFixture.meta.intervals.count).fill(5);
+  const constants = Array(testFixture.meta.intervals.count + 1).fill(5);
   model.addRow({ rowKey: "constants row", constants });
   const serialized = model.stringify();
   const deserialized = MappedModel.parse(serialized);

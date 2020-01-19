@@ -10,7 +10,7 @@ test("Default metadata", t => {
 test("Merge customer metadata", t => {
   const testDefaults = {
     intervals: {
-      count: 10
+      count: 9
     }
   };
   const meta = modelMetadata(testDefaults);

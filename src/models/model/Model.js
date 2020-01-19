@@ -103,7 +103,7 @@ class Model extends Dense3DArray {
       [{ row, scenario }]
     );
     rowsToCalculate.forEach(({ row, scenario }) => {
-      calculateRow(row, scenario, 0, intervals.count - 1, this.set);
+      calculateRow(row, scenario, 0, intervals.count, this.set);
     });
   }
 
@@ -361,7 +361,7 @@ class Model extends Dense3DArray {
               row.fnArgs,
               row.dependsOn
             );
-            calculateRow(row, scenario, 0, intervals.count - 1, this.set);
+            calculateRow(row, scenario, 0, intervals.count, this.set);
           });
       });
   }
