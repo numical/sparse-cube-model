@@ -5,7 +5,7 @@ const { identity } = require("../../../fns/shadowFunctions");
 
 const addExternals = model => {
   model.addRow({
-    rowKey: keys.inflationRow,
+    rowKey: keys.inflation.row,
     constants: [0],
     fn: previous
   });
@@ -13,7 +13,7 @@ const addExternals = model => {
 
 const addInflationAdjusted = model => {
   model.addScenario({
-    scenarioKey: `${defaultScenario}${keys.inflationAdjustedSuffix}`,
+    scenarioKey: `${defaultScenario}${keys.inflation.adjustedSuffix}`,
     shadowFn: identity
   });
 };

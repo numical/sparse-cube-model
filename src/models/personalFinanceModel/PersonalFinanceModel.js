@@ -1,5 +1,6 @@
 const InteractiveModel = require("../interactiveModel/InteractiveModel");
 const init = require("./internal/init");
+const savings = require("./internal/savings");
 const serializer = require("../model/serializer");
 
 class PersonalFinanceModel extends InteractiveModel {
@@ -12,7 +13,7 @@ class PersonalFinanceModel extends InteractiveModel {
 
   #products;
 
-  constructor(meta, keyMap, products = {}) {
+  constructor(meta, keyMap, products = []) {
     super(meta, keyMap);
     if (!meta) {
       init(this);
@@ -20,8 +21,11 @@ class PersonalFinanceModel extends InteractiveModel {
     this.#products = products;
   }
 
-  addSavings() {
-    // TODO
+  addSavings(args = {}) {
+    savings.checkMandatoryFields(args);
+    const { name } = args;
+    const productIndex = this.#products.push(name) - 1;
+    savings.add({ model: this, productIndex, ...args });
   }
 
   stringify(args) {

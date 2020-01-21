@@ -5,6 +5,12 @@
 const asTable = require("as-table");
 const MappedModel = require("../models/mappedModel/MappedModel");
 
+const tableConfig = {
+  right: true,
+  print: n =>
+    typeof n === "number" ? Number.parseFloat(n).toFixed(2) : String(n)
+};
+
 const getMeta = model => {
   const serialized = model.stringify();
   const metaSerialized =
@@ -14,7 +20,9 @@ const getMeta = model => {
 
 const tablePrint = (model, printFn = console.log) => {
   const meta = getMeta(model);
-  const rowKeys = Object.keys(meta.scenarios.defaultScenario.rows);
+  const { intervals, scenarios } = meta;
+  const rowKeys = Object.keys(scenarios.defaultScenario.rows);
+  rowKeys.unshift("interval");
   const maxRowNameLength = rowKeys.reduce(
     (max, rowKey) => (rowKey.length > max ? rowKey.length : max),
     0
@@ -22,18 +30,14 @@ const tablePrint = (model, printFn = console.log) => {
   const fixedLengthRowNames = rowKeys.map(rowKey =>
     rowKey.padStart(maxRowNameLength, " ")
   );
+  const rows = model.scenario();
+  rows.unshift(Array.from({ length: intervals.count }, (_, i) => i));
 
   const s =
     rowKeys.length === 0
       ? "Empty Model."
       : asTable
-          .configure({
-            right: true,
-            print: n =>
-              typeof n === "number"
-                ? Number.parseFloat(n).toFixed(2)
-                : String(n)
-          })(model.scenario())
+          .configure(tableConfig)(rows)
           .split("\n")
           .map((row, index) => `${fixedLengthRowNames[index]}: ${row}`)
           .join("\n");
