@@ -8,4 +8,9 @@ model.addSavings({
   startAmount: 1000,
   interestRate: 2
 });
+
+console.log("Default:");
 tablePrint(model);
+console.log();
+console.log("Inflation Adjusted:");
+tablePrint(model, "defaultScenario_pfm.inflationAdjusted");

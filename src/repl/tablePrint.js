@@ -3,7 +3,7 @@
  */
 
 const asTable = require("as-table");
-const MappedModel = require("../models/mappedModel/MappedModel");
+const extractMetaData = require("./extractMetaData");
 
 const printNumber = n => Number.parseFloat(n).toFixed(2);
 
@@ -23,17 +23,8 @@ const tableConfig = {
       : String(n)
 };
 
-const getMeta = model => {
-  const serialized = model.stringify();
-  const metaSerialized =
-    model instanceof MappedModel ? serialized[0] : serialized;
-  return JSON.parse(metaSerialized);
-};
-
-const tablePrint = (model, printFn = console.log) => {
-  const meta = getMeta(model);
-  const { intervals, scenarios } = meta;
-  const rowKeys = Object.keys(scenarios.defaultScenario.rows);
+const tablePrint = (model, scenarioKey, printFn = console.log) => {
+  const { intervals, rowKeys, scenarios } = extractMetaData(model, scenarioKey);
   rowKeys.unshift("interval");
   const maxRowNameLength = rowKeys.reduce(
     (max, rowKey) => (rowKey.length > max ? rowKey.length : max),
@@ -43,7 +34,6 @@ const tablePrint = (model, printFn = console.log) => {
     rowKey.padStart(maxRowNameLength, " ")
   );
   const rows = model.scenario({ includeDates: true });
-
   const s =
     rowKeys.length === 0
       ? "Empty Model."
