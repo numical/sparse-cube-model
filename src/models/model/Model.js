@@ -7,6 +7,7 @@ const bindFnToRow = require("./internal/row/bindFnToRow");
 const editRow = require("./internal/row/editRow");
 const deleteRowAndShadows = require("./internal/row/deleteRowAndShadows");
 const ensureAllConstantsDefined = require("./internal/validate/ensureAllConstantsDefined");
+const getDateFromInterval = require("./internal/date/getDateFromInterval");
 const getModelVersion = require("./internal/version/getModelVersion");
 const linkAllDependentRows = require("./internal/dependent/linkAllDependentRows");
 const linkDependentRows = require("./internal/dependent/linkDependentRows");
@@ -30,6 +31,7 @@ class Model extends Dense3DArray {
   }
 
   #meta;
+  #dates; // lazily instantiated
 
   constructor(meta = {}) {
     super({ defaultValue });
@@ -253,14 +255,24 @@ class Model extends Dense3DArray {
     return this.range({ y: row.index, z: scenario.index });
   }
 
-  scenario({ scenarioKey = defaultScenario } = {}) {
-    const { scenarios } = this.#meta;
+  scenario({ scenarioKey = defaultScenario, includeDates = false } = {}) {
+    const { scenarios, intervals } = this.#meta;
     const scenario = validateScenario({
       scenarioKey,
       scenarios,
       toEdit: false
     });
-    return this.isEmpty() ? [] : this.range({ z: scenario.index });
+    const rows = this.isEmpty() ? [] : this.range({ z: scenario.index });
+    if (includeDates) {
+      if (!this.#dates) {
+        const fn = getDateFromInterval(intervals);
+        this.#dates = Array.from({ length: intervals.count + 1 }, (_, i) =>
+          fn(i)
+        );
+      }
+      rows.unshift(this.#dates);
+    }
+    return rows;
   }
 
   addScenario({

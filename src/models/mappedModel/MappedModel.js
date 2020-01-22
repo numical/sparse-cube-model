@@ -199,10 +199,11 @@ class MappedModel extends Model {
     });
   }
 
-  scenario({ scenarioKey = defaultScenario } = {}) {
+  scenario(args = { scenarioKey: defaultScenario }) {
     return this.#fns.unmapError(callMappings => {
       return super.scenario({
-        scenarioKey: this.#fns.fromScenarioKey(scenarioKey, callMappings)
+        ...args,
+        scenarioKey: this.#fns.fromScenarioKey(args.scenarioKey, callMappings)
       });
     });
   }

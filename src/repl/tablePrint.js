@@ -5,10 +5,22 @@
 const asTable = require("as-table");
 const MappedModel = require("../models/mappedModel/MappedModel");
 
+const printNumber = n => Number.parseFloat(n).toFixed(2);
+
+const printDate = d => {
+  const month = d.getMonth() + 1;
+  const year = String(d.getFullYear()).substring(2);
+  return `${month > 9 ? month : "0" + month}/${year}`;
+};
+
 const tableConfig = {
   right: true,
   print: n =>
-    typeof n === "number" ? Number.parseFloat(n).toFixed(2) : String(n)
+    typeof n === "number"
+      ? printNumber(n)
+      : n instanceof Date
+      ? printDate(n)
+      : String(n)
 };
 
 const getMeta = model => {
@@ -30,8 +42,7 @@ const tablePrint = (model, printFn = console.log) => {
   const fixedLengthRowNames = rowKeys.map(rowKey =>
     rowKey.padStart(maxRowNameLength, " ")
   );
-  const rows = model.scenario();
-  rows.unshift(Array.from({ length: intervals.count }, (_, i) => i));
+  const rows = model.scenario({ includeDates: true });
 
   const s =
     rowKeys.length === 0

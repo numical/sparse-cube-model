@@ -305,6 +305,21 @@ emptyScenarios((test, setupFn) => {
     t.end();
   });
 
+  test("scenario with 'includeDates' param returns scenario dates and values", t => {
+    const model = setupFn({ intervals: { count: 2 } });
+    model.addRow({ rowKey: "default scenario row", fn: interval });
+    const scenarioKey = "scenario 1";
+    model.addScenario({ scenarioKey });
+
+    const scenario1 = model.scenario({ scenarioKey, includeDates: true });
+    t.same(scenario1, [
+      [new Date(2020, 0, 1), new Date(2020, 1, 1), new Date(2020, 2, 1)],
+      [0, 1, 2]
+    ]);
+
+    t.end();
+  });
+
   test("Add scenario based on empty default", t => {
     const scenarioKey = "test scenario";
     const model = setupFn({ intervals: { count: 2 } });
