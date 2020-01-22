@@ -1,4 +1,4 @@
-const { divide, multiply } = require("../maths/coreOperations");
+const { multiply } = require("../maths/coreOperations");
 
 const keyPrefix = "shadow.";
 

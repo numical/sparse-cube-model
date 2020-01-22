@@ -3,10 +3,10 @@ const { defaultScenario } = require("../../model/modelMetadata");
 const { previous } = require("../../../fns/lookupFunctions");
 const { identity } = require("../../../fns/shadowFunctions");
 
-const addExternals = model => {
+const addExternals = (model, { inflation = 0 }) => {
   model.addRow({
     rowKey: keys.inflation.row,
-    constants: [0],
+    constants: [inflation],
     fn: previous
   });
 };
@@ -18,8 +18,8 @@ const addInflationAdjusted = model => {
   });
 };
 
-const init = model => {
-  addExternals(model);
+const init = (model, meta = {}) => {
+  addExternals(model, meta);
   addInflationAdjusted(model);
 };
 

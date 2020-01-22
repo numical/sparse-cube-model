@@ -1,7 +1,7 @@
 const PersonalFinanceModel = require("../models/personalFinanceModel/PersonalFinanceModel");
 const tablePrint = require("./tablePrint");
 
-const model = new PersonalFinanceModel();
+const model = new PersonalFinanceModel({ inflation: 2 });
 model.addSavings({
   name: "Savings Account",
   startDate: new Date(2020, 5, 1),

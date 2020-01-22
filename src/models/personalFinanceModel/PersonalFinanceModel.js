@@ -15,8 +15,9 @@ class PersonalFinanceModel extends InteractiveModel {
 
   constructor(meta, keyMap, products = []) {
     super(meta, keyMap);
-    if (!meta) {
-      init(this);
+    // might be passed metadata but will only get keyMap from deserialisation
+    if (!keyMap) {
+      init(this, meta);
     }
     this.#products = products;
   }
