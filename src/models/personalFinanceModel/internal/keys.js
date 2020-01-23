@@ -1,5 +1,6 @@
 module.exports = {
   inflation: {
+    adjustShadowFn: "pfm.adjustShadowFn",
     row: "pfm.inflation.row",
     adjustedSuffix: "_pfm.inflationAdjusted"
   },

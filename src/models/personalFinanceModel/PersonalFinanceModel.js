@@ -1,5 +1,5 @@
 const InteractiveModel = require("../interactiveModel/InteractiveModel");
-const inflation = require("./internal/inflation");
+const setInflation = require("./internal/inflation/setInflation");
 const savings = require("./internal/savings");
 const serializer = require("../model/serializer");
 
@@ -19,7 +19,7 @@ class PersonalFinanceModel extends InteractiveModel {
   }
 
   setInflation(rate) {
-    inflation.set(this, rate);
+    setInflation(this, rate);
   }
 
   addSavings(args = {}) {

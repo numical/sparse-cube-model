@@ -2,10 +2,10 @@ const { multiply } = require("../maths/coreOperations");
 
 const keyPrefix = "shadow.";
 
-const identity = ({ value }) => value;
+const identity = (_, __, value) => value;
 identity.key = `${keyPrefix}identity`;
 
-const multiplier = ({ value, fnArgs = { multiple: 1 } }) =>
+const multiplier = ({ fnArgs = { multiple: 1 } }, _, value) =>
   multiply(value, fnArgs.multiple);
 multiplier.key = `${keyPrefix}multiplier`;
 
