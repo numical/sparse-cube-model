@@ -1,5 +1,5 @@
 const InteractiveModel = require("../interactiveModel/InteractiveModel");
-const init = require("./internal/init");
+const inflation = require("./internal/inflation");
 const savings = require("./internal/savings");
 const serializer = require("../model/serializer");
 
@@ -15,11 +15,11 @@ class PersonalFinanceModel extends InteractiveModel {
 
   constructor(meta, keyMap, products = []) {
     super(meta, keyMap);
-    // might be passed metadata but will only get keyMap from deserialisation
-    if (!keyMap) {
-      init(this, meta);
-    }
     this.#products = products;
+  }
+
+  setInflation(rate) {
+    inflation.set(this, rate);
   }
 
   addSavings(args = {}) {

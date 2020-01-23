@@ -24,6 +24,10 @@ const tableConfig = {
 };
 
 const tablePrint = (model, scenarioKey, printFn = console.log) => {
+  if (model.isEmpty()) {
+    printFn("Empty Model.");
+    return;
+  }
   const { intervals, rowKeys, scenarios } = extractMetaData(model, scenarioKey);
   rowKeys.unshift("interval");
   const maxRowNameLength = rowKeys.reduce(
@@ -34,15 +38,11 @@ const tablePrint = (model, scenarioKey, printFn = console.log) => {
     rowKey.padStart(maxRowNameLength, " ")
   );
   const rows = model.scenario({ includeDates: true });
-  const s =
-    rowKeys.length === 0
-      ? "Empty Model."
-      : asTable
-          .configure(tableConfig)(rows)
-          .split("\n")
-          .map((row, index) => `${fixedLengthRowNames[index]}: ${row}`)
-          .join("\n");
-
+  const s = asTable
+    .configure(tableConfig)(rows)
+    .split("\n")
+    .map((row, index) => `${fixedLengthRowNames[index]}: ${row}`)
+    .join("\n");
   printFn(s);
 };
 
