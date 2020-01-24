@@ -117,6 +117,36 @@ emptyScenarios((test, setupFn) => {
     t.end();
   });
 
+  test("Add partial constants via number", t => {
+    const rowKey = "test row";
+    const constants = 7;
+    const expected = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+    const model = setupFn();
+    model.addRow({
+      rowKey,
+      constants,
+      fn: increment
+    });
+    const row = model.row({ rowKey });
+    t.same(row, expected);
+    t.end();
+  });
+
+  test("Add partial constants via number zero", t => {
+    const rowKey = "test row";
+    const constants = 0;
+    const expected = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+    const model = setupFn();
+    model.addRow({
+      rowKey,
+      constants,
+      fn: increment
+    });
+    const row = model.row({ rowKey });
+    t.same(row, expected);
+    t.end();
+  });
+
   test("Add partial constants via object", t => {
     const rowKey = "test row";
     const constants = {

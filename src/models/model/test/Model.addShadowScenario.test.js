@@ -359,4 +359,27 @@ populatedScenarios((test, setupFn, Type) => {
     ]);
     t.end();
   });
+
+  test("scenario() works for shadow scenario", t => {
+    const scenarioKey = "shadow scenario";
+    const rowKey = "increment row";
+    const shadowFn = identity;
+    const model = setupFn();
+    model.addScenario({ scenarioKey, shadowFn });
+    t.same(model.scenario({ scenarioKey }), model.scenario());
+    t.end();
+  });
+
+  test("scenario() with dates works for shadow scenario", t => {
+    const scenarioKey = "shadow scenario";
+    const rowKey = "increment row";
+    const shadowFn = identity;
+    const model = setupFn();
+    model.addScenario({ scenarioKey, shadowFn });
+    t.same(
+      model.scenario({ scenarioKey, includeDates: true }),
+      model.scenario({ includeDates: true })
+    );
+    t.end();
+  });
 });

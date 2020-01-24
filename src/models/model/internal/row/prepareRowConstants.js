@@ -8,8 +8,12 @@ const validateConstantsType = constants => {
     return true;
   } else if (typeof constants === "object") {
     return true;
+  } else if (typeof constants === "number") {
+    return true;
   } else {
-    throw new Error("Constants must be an array or a dictionary or a map.");
+    throw new Error(
+      "Constants must be a number or an array or a dictionary or a map."
+    );
   }
 };
 
@@ -138,10 +142,10 @@ const prepareRowConstants = ({
     initial = defaultValuesArray({ start, end, maxInterval });
     startInterval = start;
   }
-  if (constants) {
+  if (constants !== undefined) {
     validateConstantsType(constants);
     const args = {
-      constants,
+      constants: typeof constants === "number" ? [constants] : constants,
       initial,
       startInterval,
       start,
