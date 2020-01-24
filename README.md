@@ -1,2 +1,2 @@
 # Next Steps
-* PersonalFinanceModel: shadow fn for inflation adjusted
+* PersonalFinanceModel: add fnArg for inflation adjustment to row...

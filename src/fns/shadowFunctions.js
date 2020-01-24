@@ -5,8 +5,8 @@ const keyPrefix = "shadow.";
 const identity = (_, __, value) => value;
 identity.key = `${keyPrefix}identity`;
 
-const multiplier = ({ fnArgs = { multiple: 1 } }, _, value) =>
-  multiply(value, fnArgs.multiple);
+const multiplier = ({ fnArgs }, _, value) =>
+  fnArgs.multiple ? multiply(value, fnArgs.multiple) : value;
 multiplier.key = `${keyPrefix}multiplier`;
 
 module.exports = {
