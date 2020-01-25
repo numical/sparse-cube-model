@@ -84,7 +84,7 @@ test("update row - change depends on - can be undone", t => {
   model.updateRow({
     rowKey,
     fn: lookupPrevious,
-    dependsOn: "independent row",
+    dependsOn: { lookup: "independent row" },
     constants: [1000]
   });
   t.same(model.row({ rowKey }), [1000, 10, 11, 12, 13, 14, 15, 16, 17, 18]);
@@ -101,7 +101,7 @@ test("update row - change depends on - can be redone", t => {
   model.updateRow({
     rowKey,
     fn: lookupPrevious,
-    dependsOn: "independent row",
+    dependsOn: { lookup: "independent row" },
     constants: [1000]
   });
   const pre = comparableUnserialisedForm({ model });
@@ -130,7 +130,7 @@ test("update row - change everything - can be undone", t => {
   model.updateRow({
     rowKey,
     fn: lookup,
-    dependsOn: "independent row",
+    dependsOn: { lookup: "independent row" },
     constants: {
       7: 33
     }
@@ -158,7 +158,7 @@ test("update row - change everything - can be redone", t => {
   model.updateRow({
     rowKey,
     fn: lookup,
-    dependsOn: "independent row",
+    dependsOn: { lookup: "independent row" },
     constants: {
       7: 33
     }

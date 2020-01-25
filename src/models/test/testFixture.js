@@ -14,7 +14,7 @@ const rows = [
   {
     rowKey: "first lookup row",
     fn: lookup,
-    dependsOn: "increment row"
+    dependsOn: { lookup: "increment row" }
   },
   {
     rowKey: "independent row",
@@ -25,7 +25,7 @@ const rows = [
     rowKey: "second lookup row",
     fn: lookupPrevious,
     constants: [1000],
-    dependsOn: "increment row"
+    dependsOn: { lookup: "increment row" }
   }
 ];
 

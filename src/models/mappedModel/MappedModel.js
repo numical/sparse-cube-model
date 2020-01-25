@@ -41,6 +41,7 @@ class MappedModel extends Model {
       fromRowKey: mapKey.bind(this, fromMap, "row", ""),
       fromScenarioKey: mapKey.bind(this, fromMap, "scenario", defaultScenario),
       toRowKey: mapKey.bind(this, toMap, "row", ""),
+      toScenarioKey: mapKey.bind(this, toMap, "scenario", defaultScenario),
       unmapError: unmapError.bind(this, fromMap),
       serializeMap: serializer.stringify.bind(this, fromMap)
     };
@@ -209,26 +210,50 @@ class MappedModel extends Model {
   }
 
   addScenario(args = {}) {
-    const { scenarioKey, baseScenarioName = defaultScenario } = args;
+    const { scenarioKey, baseScenarioKey = defaultScenario, shadow } = args;
     this.#fns.unmapError(callMappings => {
+      const mappedShadow = shadow
+        ? {
+            fn: shadow.fn,
+            fnArgs: this.#fns.fromRowKey(shadow.fnArgs, callMappings),
+            dependsOn: this.#fns.fromRowKey(
+              shadow.dependsOn,
+              callMappings,
+              dependsOnErrorPrefix
+            )
+          }
+        : undefined;
       super.addScenario({
-        ...args,
         scenarioKey: this.#fns.addScenarioKey(scenarioKey, callMappings),
-        baseScenarioName: this.#fns.fromScenarioKey(
-          baseScenarioName,
+        baseScenarioKey: this.#fns.fromScenarioKey(
+          baseScenarioKey,
           callMappings
-        )
+        ),
+        shadow: mappedShadow
       });
     });
   }
 
   deleteScenario({ scenarioKey } = {}) {
-    this.#fns.unmapError(callMappings => {
+    return this.#fns.unmapError(callMappings => {
       const mapped = this.#fns.fromScenarioKey(scenarioKey, callMappings);
-      super.deleteScenario({
+      const { baseScenarioKey, shadow, ...rest } = super.deleteScenario({
         scenarioKey: mapped
       });
       this.#fns.removeScenarioKey(mapped, callMappings);
+      const mappedShadow = shadow
+        ? {
+            ...shadow,
+            dependsOn: shadow.dependsOn
+              ? this.#fns.toRowKey(shadow.dependsOn)
+              : undefined
+          }
+        : undefined;
+      return {
+        ...rest,
+        baseScenarioKey: this.#fns.toScenarioKey(baseScenarioKey),
+        shadow: mappedShadow
+      };
     });
   }
 

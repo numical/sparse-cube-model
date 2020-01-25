@@ -12,7 +12,7 @@ const { applyInterest } = require("../../../fns/interestFunctions");
 const rows = [
   { rowKey: "row 0", fn: interval },
   { rowKey: "row 1", constants: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19] },
-  { rowKey: "row 2", fn: lookup, dependsOn: "row 1" }
+  { rowKey: "row 2", fn: lookup, dependsOn: { lookup: "row 1" } }
 ];
 
 emptyScenarios((test, setupFn) => {
@@ -64,7 +64,7 @@ emptyScenarios((test, setupFn) => {
         {
           rowKey: "test row",
           fn: lookup,
-          dependsOn: "unknown row"
+          dependsOn: { lookup: "unknown row" }
         }
       ]
     };
@@ -127,12 +127,12 @@ populatedScenarios((test, setupFn) => {
   test("Add rows can add rows with dependencies on existing rows", t => {
     const args = {
       rows: [
-        { rowKey: "row 0", fn: lookup, dependsOn: "increment row" },
+        { rowKey: "row 0", fn: lookup, dependsOn: { lookup: "increment row" } },
         {
           rowKey: "row 1",
           fn: lookupPrevious,
           constants: [1000, 1001],
-          dependsOn: "independent row"
+          dependsOn: { lookup: "independent row" }
         }
       ]
     };
@@ -157,7 +157,7 @@ populatedScenarios((test, setupFn) => {
   test("Add rows can add rows with mixed dependencies", t => {
     const args = {
       rows: [
-        { rowKey: "row 0", fn: lookup, dependsOn: "increment row" },
+        { rowKey: "row 0", fn: lookup, dependsOn: { lookup: "increment row" } },
         {
           rowKey: "row 1",
           fn: applyInterest,

@@ -2,12 +2,15 @@ const { test } = require("tap");
 const InteractiveModel = require("../InteractiveModel");
 const comparableUnserialisedForm = require("./comparableUnserialisedForm");
 const testFixture = require("../../test/testFixture");
+const { multiplier } = require("../../../fns/shadowFunctions");
+const { lookup } = require("../../../fns/lookupFunctions");
 
 test("delete scenario based on default scenario to empty model can be undone", t => {
   const model = new InteractiveModel();
   const scenarioKey = "test scenario";
+  const shadow = { fn: multiplier, fnArgs: { multiple: 2 } };
   const historyDescription = "test operation";
-  model.addScenario({ scenarioKey, historyDescription });
+  model.addScenario({ scenarioKey, shadow, historyDescription });
   const pre = comparableUnserialisedForm({ model });
   model.deleteScenario({ scenarioKey });
   model.undo();
@@ -20,7 +23,8 @@ test("delete scenario based on default scenario to empty model can be undone", t
 test("delete scenario based on default scenario to empty model can be redone", t => {
   const model = new InteractiveModel();
   const scenarioKey = "test scenario";
-  model.addScenario({ scenarioKey });
+  const shadow = { fn: multiplier, fnArgs: { multiple: 2 } };
+  model.addScenario({ scenarioKey, shadow });
   model.deleteScenario({ scenarioKey });
   const pre = comparableUnserialisedForm({ model });
   model.undo();
@@ -35,12 +39,14 @@ test("delete scenario based on non-default scenario to empty model can be undone
   const model = new InteractiveModel();
   const baseScenarioKey = "base scenario";
   const testScenarioKey = "test scenario";
+  const shadow = { fn: multiplier, fnArgs: { multiple: 2 } };
   model.addScenario({
     scenarioKey: baseScenarioKey,
     historyDescription: "add base scenario"
   });
   model.addScenario({
     scenarioKey: testScenarioKey,
+    shadow,
     historyDescription: "add test scenario",
     baseScenarioKey
   });
@@ -57,12 +63,14 @@ test("delete scenario based on non-default scenario to empty model can be redone
   const model = new InteractiveModel();
   const baseScenarioKey = "base scenario";
   const testScenarioKey = "test scenario";
+  const shadow = { fn: multiplier, fnArgs: { multiple: 2 } };
   model.addScenario({
     scenarioKey: baseScenarioKey,
     historyDescription: "add base scenario"
   });
   model.addScenario({
     scenarioKey: testScenarioKey,
+    shadow,
     historyDescription: "add test scenario",
     baseScenarioKey
   });
@@ -79,7 +87,8 @@ test("delete scenario based on non-default scenario to empty model can be redone
 test("delete scenario based on default scenario to populated model can be undone", t => {
   const model = testFixture(InteractiveModel);
   const scenarioKey = "test scenario";
-  model.addScenario({ scenarioKey });
+  const shadow = { fn: multiplier, fnArgs: { multiple: 2 } };
+  model.addScenario({ scenarioKey, shadow });
   const pre = comparableUnserialisedForm({ model });
   const preData = model.scenario({ scenarioKey });
   model.deleteScenario({ scenarioKey });
@@ -95,7 +104,8 @@ test("delete scenario based on default scenario to populated model can be undone
 test("delete scenario based on default scenario to populated model can be redone", t => {
   const model = testFixture(InteractiveModel);
   const scenarioKey = "test scenario";
-  model.addScenario({ scenarioKey });
+  const shadow = { fn: multiplier, fnArgs: { multiple: 2 } };
+  model.addScenario({ scenarioKey, shadow });
   model.deleteScenario({ scenarioKey });
   const pre = comparableUnserialisedForm({ model });
   model.undo();
@@ -110,6 +120,7 @@ test("delete scenario based on non-default scenario to populated model can be un
   const model = testFixture(InteractiveModel);
   const baseScenarioKey = "base scenario";
   const testScenarioKey = "test scenario";
+  const shadow = { fn: multiplier, fnArgs: { multiple: 2 } };
   model.addScenario({
     scenarioKey: baseScenarioKey,
     historyDescription: "add base scenario"
@@ -118,7 +129,8 @@ test("delete scenario based on non-default scenario to populated model can be un
   model.addScenario({
     scenarioKey: testScenarioKey,
     historyDescription: "add test scenario",
-    baseScenarioKey
+    baseScenarioKey,
+    shadow
   });
   t.same(model.lengths, { x: 10, y: 4, z: 3 });
   const pre = comparableUnserialisedForm({ model });
@@ -135,6 +147,7 @@ test("delete scenario based on non-default scenario to populatd model can be red
   const model = testFixture(InteractiveModel);
   const baseScenarioKey = "base scenario";
   const testScenarioKey = "test scenario";
+  const shadow = { fn: multiplier, fnArgs: { multiple: 2 } };
   model.addScenario({
     scenarioKey: baseScenarioKey,
     historyDescription: "add base scenario"
@@ -142,13 +155,41 @@ test("delete scenario based on non-default scenario to populatd model can be red
   model.addScenario({
     scenarioKey: testScenarioKey,
     historyDescription: "add test scenario",
-    baseScenarioKey
+    baseScenarioKey,
+    shadow
   });
   model.deleteScenario({ scenarioKey: testScenarioKey });
   const pre = comparableUnserialisedForm({ model });
   model.undo();
   model.redo();
   t.same(model.lengths, { x: 10, y: 4, z: 2 });
+  const post = comparableUnserialisedForm({ model });
+  t.same(post, pre);
+  t.end();
+});
+
+test("delete scenario with lookup shadow fn based on non-default scenario to populated model can be undone", t => {
+  const model = testFixture(InteractiveModel);
+  const baseScenarioKey = "base scenario";
+  const testScenarioKey = "test scenario";
+  const shadow = { fn: lookup, dependsOn: { lookup: "increment row" } };
+  model.addScenario({
+    scenarioKey: baseScenarioKey,
+    historyDescription: "add base scenario"
+  });
+  t.same(model.lengths, { x: 10, y: 4, z: 2 });
+  model.addScenario({
+    scenarioKey: testScenarioKey,
+    historyDescription: "add test scenario",
+    baseScenarioKey,
+    shadow
+  });
+  t.same(model.lengths, { x: 10, y: 4, z: 3 });
+  const pre = comparableUnserialisedForm({ model });
+  model.deleteScenario({ scenarioKey: testScenarioKey });
+  t.same(model.lengths, { x: 10, y: 4, z: 2 });
+  model.undo();
+  t.same(model.lengths, { x: 10, y: 4, z: 3 });
   const post = comparableUnserialisedForm({ model });
   t.same(post, pre);
   t.end();

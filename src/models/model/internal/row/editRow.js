@@ -3,8 +3,8 @@ const calculateRow = require("./calculateRow");
 const bindFnToRow = require("./bindFnToRow");
 const prepareRowConstants = require("./prepareRowConstants");
 const ensureAllConstantsDefined = require("../validate/ensureAllConstantsDefined");
-const linkDependentRows = require("../dependent/linkDependentRows");
-const unlinkDependentRows = require("../dependent/unlinkDependentRows");
+const linkDependentRows = require("../dependent/addToRowDependents");
+const unlinkDependentRows = require("../dependent/removeFromRowDependents");
 
 const editRow = ({
   model,
@@ -27,15 +27,14 @@ const editRow = ({
   if (!fn) {
     ensureAllConstantsDefined(rowConstants, intervals);
   }
-  linkDependentRows(scenario, row.key, dependsOn);
   bindFnToRow(model, intervals, scenario, row, fn, fnArgs, dependsOn);
   row.constants = rowConstants;
   unlinkDependentRows(scenario, row.key, row.dependsOn);
   linkDependentRows(scenario, row.key, dependsOn);
   const rowstoUpdate = [row];
-  if (row.dependents) {
+  if (row.dependents && row.dependents.rows) {
     rowstoUpdate.push(
-      ...row.dependents.map(
+      ...row.dependents.rows.map(
         dependencyRowName => scenario.rows[dependencyRowName]
       )
     );

@@ -136,7 +136,7 @@ test("undo/redo over multiple ops updates history correctly", t => {
     scenarioKey: "second scenario",
     rowKey: "test row 2",
     fn: lookup,
-    dependsOn: "test row 1"
+    dependsOn: { lookup: "test row 1" }
   });
   t.same(model.undoOps(), [
     "add row 'test row 2' to scenario 'second scenario'",
@@ -224,7 +224,7 @@ test("adding new ops after undo clears redo items", t => {
     scenarioKey: "second scenario",
     rowKey: "test row 2",
     fn: lookup,
-    dependsOn: "test row 1"
+    dependsOn: { lookup: "test row 1" }
   });
   t.same(model.undoOps(), [
     "add row 'test row 2' to scenario 'second scenario'",

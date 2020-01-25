@@ -2,16 +2,30 @@ const {
   emptyScenarios,
   populatedScenarios
 } = require("../../test/testScaffold");
-const { increment } = require("../../../fns/lookupFunctions");
+const functionsDictionary = require("../../../fns/functionsDictionary");
+const { increment, lookup } = require("../../../fns/lookupFunctions");
 const { identity, multiplier } = require("../../../fns/shadowFunctions");
+const { add } = require("../../../maths/coreOperations");
 const { defaultScenario } = require("../modelMetadata");
+const { multiply } = require("../../../maths/coreOperations");
+
+const testLookupShadowFn = (rowContext, interval, value) => {
+  const lookupRowContext = {
+    ...rowContext,
+    scenario: rowContext.baseScenario
+  };
+  const multiplicand = lookup(lookupRowContext, interval);
+  return multiply(multiplicand, value);
+};
+testLookupShadowFn.key = "Model.addShadowScenario.test lookup shadow fn";
+functionsDictionary.add(testLookupShadowFn);
 
 emptyScenarios((test, setupFn, Type) => {
   test("Add shadow scenario must have a shadow function", t => {
     const scenarioKey = "test scenario";
     const model = setupFn();
     t.throws(
-      () => model.addScenario({ scenarioKey, shadowFn: "do it" }),
+      () => model.addScenario({ scenarioKey, shadow: { fn: "do it" } }),
       new Error("Function 'do it' must be a function.")
     );
     t.end();
@@ -19,29 +33,29 @@ emptyScenarios((test, setupFn, Type) => {
 
   test("Shadow function must have a key", t => {
     const scenarioKey = "test scenario";
-    const shadowFn = () => 5;
+    const shadow = { fn: () => 5 };
     const model = setupFn();
     t.throws(
-      () => model.addScenario({ scenarioKey, shadowFn }),
-      new Error("Function 'shadowFn' must have a 'key' property.")
+      () => model.addScenario({ scenarioKey, shadow }),
+      new Error("Function 'fn' must have a 'key' property.")
     );
     t.end();
   });
 
   test("Add empty shadow scenario does not error", t => {
     const scenarioKey = "test scenario";
-    const shadowFn = identity;
+    const shadow = { fn: identity };
     const model = setupFn();
-    model.addScenario({ scenarioKey, shadowFn });
+    model.addScenario({ scenarioKey, shadow });
     t.same(model.lengths, { x: 0, y: 0, z: 0 });
     t.end();
   });
 
   test("Add empty shadow scenario serializes consistently", t => {
     const scenarioKey = "test scenario";
-    const shadowFn = identity;
+    const shadow = { fn: identity };
     const pre = setupFn();
-    pre.addScenario({ scenarioKey, shadowFn });
+    pre.addScenario({ scenarioKey, shadow });
     const s = pre.stringify();
     const post = Type.parse(s);
     t.same(post, pre);
@@ -51,12 +65,12 @@ emptyScenarios((test, setupFn, Type) => {
   test("Add shadow scenario after adding a single row", t => {
     const rowKey = "test row";
     const scenarioKey = "test scenario";
-    const shadowFn = identity;
+    const shadow = { fn: identity };
     const model = setupFn();
     model.addRow({ rowKey, fn: increment, constants: [10] });
     t.same(model.lengths, { x: 10, y: 1, z: 1 });
     t.same(model.row({ rowKey }), [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]);
-    model.addScenario({ scenarioKey, shadowFn });
+    model.addScenario({ scenarioKey, shadow });
     t.same(model.lengths, { x: 10, y: 1, z: 2 });
     t.same(model.row({ rowKey, scenarioKey }), [
       10,
@@ -76,9 +90,9 @@ emptyScenarios((test, setupFn, Type) => {
   test("Add single row after adding shadow scenario", t => {
     const rowKey = "test row";
     const scenarioKey = "test scenario";
-    const shadowFn = identity;
+    const shadow = { fn: identity };
     const model = setupFn();
-    model.addScenario({ scenarioKey, shadowFn });
+    model.addScenario({ scenarioKey, shadow });
     model.addRow({ rowKey, fn: increment, constants: [10] });
     t.same(model.lengths, { x: 10, y: 1, z: 2 });
     t.same(model.row({ rowKey }), [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]);
@@ -100,10 +114,10 @@ emptyScenarios((test, setupFn, Type) => {
   test("deleting base row deletes shadow row", t => {
     const rowKey = "test row";
     const scenarioKey = "test scenario";
-    const shadowFn = identity;
+    const shadow = { fn: identity };
     const expected = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
     const model = setupFn();
-    model.addScenario({ scenarioKey, shadowFn });
+    model.addScenario({ scenarioKey, shadow });
     model.addRow({ rowKey, fn: increment, constants: [0] });
     t.same(model.lengths, { x: 10, y: 1, z: 2 });
     t.same(model.row({ rowKey }), expected);
@@ -122,10 +136,10 @@ emptyScenarios((test, setupFn, Type) => {
     const rowKey = "test row";
     const shadowScenarioName = "shadow scenario";
     const standaloneScenarioName = "standalone scenario";
-    const shadowFn = identity;
+    const shadow = { fn: identity };
     const expected = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
     const model = setupFn();
-    model.addScenario({ scenarioKey: shadowScenarioName, shadowFn });
+    model.addScenario({ scenarioKey: shadowScenarioName, shadow });
     model.addRow({ rowKey, fn: increment, constants: [0] });
     model.addScenario({ scenarioKey: standaloneScenarioName });
     t.same(model.lengths, { x: 10, y: 1, z: 3 });
@@ -149,9 +163,9 @@ emptyScenarios((test, setupFn, Type) => {
   test("cannot edit a shadow scenario", t => {
     const rowKey = "test row";
     const scenarioKey = "shadow scenario";
-    const shadowFn = identity;
+    const shadow = { fn: identity };
     const model = setupFn();
-    model.addScenario({ scenarioKey, shadowFn });
+    model.addScenario({ scenarioKey, shadow });
     t.throws(
       () =>
         model.addRow({ scenarioKey, rowKey, fn: increment, constants: [0] }),
@@ -201,9 +215,9 @@ populatedScenarios((test, setupFn, Type) => {
       [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     ];
     const scenarioKey = "test scenario";
-    const shadowFn = identity;
+    const shadow = { fn: identity };
     const model = setupFn();
-    model.addScenario({ scenarioKey, shadowFn });
+    model.addScenario({ scenarioKey, shadow });
     t.same(model.lengths, { x: 10, y: 4, z: 2 });
     rowKeys.forEach((rowKey, index) => {
       t.same(model.row({ rowKey }), expected[index]);
@@ -227,9 +241,9 @@ populatedScenarios((test, setupFn, Type) => {
   test("cannot delete a base scenario if it has a shadow", t => {
     const shadowScenarioName = "shadow scenario";
     const standaloneScenarioName = "standalone scenario";
-    const shadowFn = identity;
+    const shadow = { fn: identity };
     const model = setupFn();
-    model.addScenario({ scenarioKey: shadowScenarioName, shadowFn });
+    model.addScenario({ scenarioKey: shadowScenarioName, shadow });
     t.throws(
       () => model.deleteScenario({ scenarioKey: defaultScenario }),
       new Error(
@@ -242,9 +256,9 @@ populatedScenarios((test, setupFn, Type) => {
   test("can delete a shadow scenario", t => {
     const shadowScenarioName = "shadow scenario";
     const standaloneScenarioName = "standalone scenario";
-    const shadowFn = identity;
+    const shadow = { fn: identity };
     const model = setupFn();
-    model.addScenario({ scenarioKey: shadowScenarioName, shadowFn });
+    model.addScenario({ scenarioKey: shadowScenarioName, shadow });
     t.same(model.lengths, { x: 10, y: 4, z: 2 });
     model.deleteScenario({ scenarioKey: shadowScenarioName });
     t.same(model.lengths, { x: 10, y: 4, z: 1 });
@@ -253,10 +267,10 @@ populatedScenarios((test, setupFn, Type) => {
 
   test("can delete a shadow scenario without affecting other shadows", t => {
     const shadowScenarioNames = ["shadow scenario 1", "shadow scenario 2"];
-    const shadowFn = identity;
+    const shadow = { fn: identity };
     const model = setupFn();
     shadowScenarioNames.forEach(shadowScenarioName => {
-      model.addScenario({ scenarioKey: shadowScenarioName, shadowFn });
+      model.addScenario({ scenarioKey: shadowScenarioName, shadow });
     });
     t.same(model.lengths, { x: 10, y: 4, z: 3 });
     model.deleteScenario({ scenarioKey: shadowScenarioNames[1] });
@@ -272,20 +286,20 @@ populatedScenarios((test, setupFn, Type) => {
   });
 
   test("can delete a base scenario after shadow deleted", t => {
-    const baseScenarioName = "base scenario";
+    const baseScenarioKey = "base scenario";
     const shadowScenarioName = "shadow scenario";
-    const shadowFn = identity;
+    const shadow = { fn: identity };
     const model = setupFn();
-    model.addScenario({ scenarioKey: baseScenarioName });
+    model.addScenario({ scenarioKey: baseScenarioKey });
     model.addScenario({
       scenarioKey: shadowScenarioName,
-      baseScenarioName,
-      shadowFn
+      baseScenarioKey,
+      shadow
     });
     t.same(model.lengths, { x: 10, y: 4, z: 3 });
     model.deleteScenario({ scenarioKey: shadowScenarioName });
     t.same(model.lengths, { x: 10, y: 4, z: 2 });
-    model.deleteScenario({ scenarioKey: baseScenarioName });
+    model.deleteScenario({ scenarioKey: baseScenarioKey });
     t.same(model.lengths, { x: 10, y: 4, z: 1 });
     t.end();
   });
@@ -293,21 +307,20 @@ populatedScenarios((test, setupFn, Type) => {
   test("shadow transform works without args", t => {
     const scenarioKey = "shadow scenario";
     const rowKey = "increment row";
-    const shadowFn = multiplier;
+    const shadow = { fn: multiplier };
     const model = setupFn();
-    model.addScenario({ scenarioKey, shadowFn });
+    model.addScenario({ scenarioKey, shadow });
     t.same(model.row({ rowKey }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
     t.same(model.row({ rowKey, scenarioKey }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
     t.end();
   });
 
-  test("shadow transform works", t => {
+  test("shadow transform with constant args works", t => {
     const scenarioKey = "shadow scenario";
     const rowKey = "increment row";
-    const shadowFn = multiplier;
-    const shadowFnArgs = { multiple: 2 };
+    const shadow = { fn: multiplier, fnArgs: { multiple: 2 } };
     const model = setupFn();
-    model.addScenario({ scenarioKey, shadowFn, shadowFnArgs });
+    model.addScenario({ scenarioKey, shadow });
     t.same(model.row({ rowKey }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
     t.same(model.row({ rowKey, scenarioKey }), [
       0,
@@ -324,24 +337,50 @@ populatedScenarios((test, setupFn, Type) => {
     t.end();
   });
 
+  test("shadow transform with lookup args works", t => {
+    const scenarioKey = "shadow scenario";
+    const rowKey = "increment row";
+    const model = setupFn();
+    model.addScenario({
+      scenarioKey,
+      shadow: {
+        fn: testLookupShadowFn,
+        dependsOn: { lookup: "increment row" }
+      }
+    });
+    t.same(model.row({ rowKey }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    t.same(model.row({ rowKey, scenarioKey }), [
+      0,
+      1,
+      4,
+      9,
+      16,
+      25,
+      36,
+      49,
+      64,
+      81
+    ]);
+    t.end();
+  });
+
   test("Populated shadow scenario serializes consistently", t => {
     const scenarioKey = "test scenario";
-    const shadowFn = multiplier;
-    const shadowFnArgs = 2;
+    const shadow = { fn: multiplier, fnArgs: { multiple: 2 } };
     const pre = setupFn();
-    pre.addScenario({ scenarioKey, shadowFn, shadowFnArgs });
+    pre.addScenario({ scenarioKey, shadow });
     const s = pre.stringify();
     const post = Type.parse(s);
     t.same(post, pre);
     t.end();
   });
+
   test("shadow transform works after serialisation", t => {
     const scenarioKey = "shadow scenario";
     const rowKey = "increment row";
-    const shadowFn = multiplier;
-    const shadowFnArgs = { multiple: 2 };
+    const shadow = { fn: multiplier, fnArgs: { multiple: 2 } };
     const pre = setupFn();
-    pre.addScenario({ scenarioKey, shadowFn, shadowFnArgs });
+    pre.addScenario({ scenarioKey, shadow });
     const s = pre.stringify();
     const post = Type.parse(s);
     t.same(post.row({ rowKey }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
@@ -363,9 +402,9 @@ populatedScenarios((test, setupFn, Type) => {
   test("scenario() works for shadow scenario", t => {
     const scenarioKey = "shadow scenario";
     const rowKey = "increment row";
-    const shadowFn = identity;
+    const shadow = { fn: identity };
     const model = setupFn();
-    model.addScenario({ scenarioKey, shadowFn });
+    model.addScenario({ scenarioKey, shadow });
     t.same(model.scenario({ scenarioKey }), model.scenario());
     t.end();
   });
@@ -373,13 +412,39 @@ populatedScenarios((test, setupFn, Type) => {
   test("scenario() with dates works for shadow scenario", t => {
     const scenarioKey = "shadow scenario";
     const rowKey = "increment row";
-    const shadowFn = identity;
+    const shadow = { fn: identity };
     const model = setupFn();
-    model.addScenario({ scenarioKey, shadowFn });
+    model.addScenario({ scenarioKey, shadow });
     t.same(
       model.scenario({ scenarioKey, includeDates: true }),
       model.scenario({ includeDates: true })
     );
+    t.end();
+  });
+
+  test("cannot delete a row used by a shadow fn", t => {
+    const scenarioKey = "shadow scenario";
+    const rowKey = "independent row";
+    const shadow = { fn: lookup, dependsOn: { lookup: rowKey } };
+    const model = setupFn();
+    model.addScenario({ scenarioKey, shadow });
+    t.throws(
+      () => model.deleteRow({ rowKey }),
+      new Error(
+        "Cannot delete row 'independent row' as 'defaultScenario' depends on it."
+      )
+    );
+    t.end();
+  });
+
+  test("can delete a row used by a shadow fn once the scenario is deleted", t => {
+    const scenarioKey = "shadow scenario";
+    const rowKey = "independent row";
+    const shadow = { fn: lookup, dependsOn: { lookup: rowKey } };
+    const model = setupFn();
+    model.addScenario({ scenarioKey, shadow });
+    model.deleteScenario({ scenarioKey });
+    t.doesNotThrow(() => model.deleteRow({ rowKey }));
     t.end();
   });
 });

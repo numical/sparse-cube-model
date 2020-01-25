@@ -1,2 +1,5 @@
 # Next Steps
-* PersonalFinanceModel: add fnArg for inflation adjustment to row...
+* Shadow Scenario:
+  * update shadow when row updated?
+  * update shadow fn dependency after serialisation (addToAllRowDependents)
+  * scnerio and row with same name

@@ -75,7 +75,7 @@ test("patch row - change depends on - can be undone", t => {
   const pre = comparableUnserialisedForm({ model });
   model.patchRow({
     rowKey,
-    dependsOn: "independent row"
+    dependsOn: { lookup: "independent row" }
   });
   t.same(model.row({ rowKey }), [1000, 10, 11, 12, 13, 14, 15, 16, 17, 18]);
   model.undo();
@@ -90,7 +90,7 @@ test("patch row - change depends on - can be redone", t => {
   const model = testFixture(InteractiveModel);
   model.patchRow({
     rowKey,
-    dependsOn: "independent row"
+    dependsOn: { lookup: "independent row" }
   });
   const pre = comparableUnserialisedForm({ model });
   model.undo();
@@ -118,7 +118,7 @@ test("patch row - change everything (merge constants) - can be undone", t => {
   model.patchRow({
     rowKey,
     fn: lookup,
-    dependsOn: "independent row",
+    dependsOn: { lookup: "independent row" },
     constants: {
       7: 33
     }
@@ -146,7 +146,7 @@ test("patch row - change everything (merge constants) - can be redone", t => {
   model.patchRow({
     rowKey,
     fn: lookup,
-    dependsOn: "independent row",
+    dependsOn: { lookup: "independent row" },
     constants: {
       7: 33
     }

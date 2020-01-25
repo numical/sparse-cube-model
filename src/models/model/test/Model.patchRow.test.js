@@ -40,7 +40,7 @@ populatedScenarios((test, setUp) => {
     const rowKey = "second lookup row";
     const model = setUp();
     t.same(model.row({ rowKey }), [1000, 0, 1, 2, 3, 4, 5, 6, 7, 8]);
-    model.patchRow({ rowKey, dependsOn: "independent row" });
+    model.patchRow({ rowKey, dependsOn: { lookup: "independent row" } });
     t.same(model.row({ rowKey }), [1000, 10, 11, 12, 13, 14, 15, 16, 17, 18]);
     t.end();
   });
@@ -288,14 +288,14 @@ emptyScenarios((test, setupFn) => {
     model.addRow({
       rowKey,
       fn: lookup,
-      dependsOn: "first lookup",
+      dependsOn: { lookup: "first lookup" },
       constants: { 1: 7 }
     });
     t.same(model.row({ rowKey }), [10, 7, 12, 13, 14, 15, 16, 17, 18, 19]);
     model.patchRow({
       rowKey,
       fn: lookupPrevious,
-      dependsOn: "second lookup",
+      dependsOn: { lookup: "second lookup" },
       constants: [123]
     });
     t.same(model.row({ rowKey }), [

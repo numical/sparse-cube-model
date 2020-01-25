@@ -1,11 +1,15 @@
-const shadowFunctionWrapper = ({ fn, fnArgs, baseScenario }) => {
+const shadowFunctionWrapper = ({ baseScenario, dependsOn, fn, fnArgs }) => {
   const wrapper = (rowContext, interval) => {
     const { model, row } = rowContext;
-    const value = model[interval][row.index][baseScenario.index];
     return fn(
-      { ...rowContext, fnArgs: { ...rowContext.fnArgs, ...fnArgs } },
+      {
+        ...rowContext,
+        baseScenario,
+        fnArgs: { ...rowContext.fnArgs, ...fnArgs },
+        dependsOn: { ...rowContext.dependsOn, ...dependsOn }
+      },
       interval,
-      value
+      model[interval][row.index][baseScenario.index]
     );
   };
   wrapper.key = fn.key;

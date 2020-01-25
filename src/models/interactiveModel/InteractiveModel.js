@@ -195,7 +195,7 @@ class InteractiveModel extends MappedModel {
   deleteScenario(args = {}) {
     const { historyDescription, ...rest } = args;
     const { scenarioKey } = rest;
-    const original = super.deleteScenario(rest);
+    const { baseScenarioKey, shadow } = super.deleteScenario(rest);
     addToHistory(this.#history, {
       description: historyDescription || `delete scenario '${scenarioKey}'`,
       redo: {
@@ -206,7 +206,8 @@ class InteractiveModel extends MappedModel {
         fn: "addScenario",
         args: {
           scenarioKey,
-          baseScenarioName: original
+          baseScenarioKey,
+          shadow
         }
       }
     });

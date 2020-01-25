@@ -14,7 +14,7 @@ const validateScenario = ({
   if (!shouldExist && scenario) {
     throw new Error(`Scenario '${scenarioKey}' already exists.`);
   }
-  if (scenario && scenario.isShadow && toEdit) {
+  if (scenario && scenario.shadow && toEdit) {
     throw new Error(`Shadow scenario '${scenarioKey}' cannot be edited.`);
   }
   return scenario;

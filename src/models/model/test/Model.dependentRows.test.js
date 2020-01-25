@@ -22,9 +22,9 @@ populatedScenarios((test, setUp) => {
     const model = setUp();
     const row = {
       rowKey: "test row",
-      fn: increment,
+      fn: lookup,
       constants: [0],
-      dependsOn: "unknown row"
+      dependsOn: { lookup: "unknown row" }
     };
     t.throws(() => model.addRow(row));
     t.end();
@@ -60,7 +60,7 @@ populatedScenarios((test, setUp) => {
     model.updateRow({
       rowKey,
       fn: lookup,
-      dependsOn: "independent row"
+      dependsOn: { lookup: "independent row" }
     });
     t.same(model.row({ rowKey }), expected);
     t.end();
@@ -108,7 +108,7 @@ populatedScenarios((test, setUp) => {
     model.updateRow({
       rowKey,
       fn: lookup,
-      dependsOn: "independent row"
+      dependsOn: { lookup: "independent row" }
     });
     t.same(model.row({ rowKey }), expected);
     t.end();

@@ -18,8 +18,8 @@ class PersonalFinanceModel extends InteractiveModel {
     this.#products = products;
   }
 
-  setInflation(rate) {
-    setInflation(this, rate);
+  setInflation(rates) {
+    setInflation(this, rates);
   }
 
   addSavings(args = {}) {

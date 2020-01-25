@@ -13,7 +13,7 @@ const testMeta = {
 const rows = [
   { rowKey: "row 0", fn: interval },
   { rowKey: "row 1", constants: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19] },
-  { rowKey: "row 2", fn: lookup, dependsOn: "row 1" }
+  { rowKey: "row 2", fn: lookup, dependsOn: { lookup: "row 1" } }
 ];
 
 test("add rows to blank model can be undone", t => {

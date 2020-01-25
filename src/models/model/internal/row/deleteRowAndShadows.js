@@ -1,4 +1,4 @@
-const unlinkDependentRows = require("../dependent/unlinkDependentRows");
+const unlinkDependentRows = require("../dependent/removeFromRowDependents");
 const { defaultValue } = require("../../modelMetadata");
 
 const deleteRowAndShadows = (

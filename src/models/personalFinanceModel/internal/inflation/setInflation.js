@@ -5,15 +5,15 @@ const { previous } = require("../../../../fns/lookupFunctions");
 
 const rowKey = keys.inflation.row;
 
-const setInflation = (model, rate = 0) => {
+const setInflation = (model, rates = 0) => {
   const args = {
     rowKey,
-    constants: [rate],
+    constants: rates,
     fn: previous
   };
   try {
     model.row({ rowKey });
-    model.patchRow(args);
+    model.updateRow(args);
   } catch {
     model.addRow(args);
     model.addScenario({

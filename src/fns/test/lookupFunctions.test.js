@@ -23,12 +23,22 @@ test("intervals per year - other", t => {
   t.end();
 });
 
+test("lookup reports no 'lookup' dependsOn'", t => {
+  const args = {
+    scenario: {
+      rows: {}
+    }
+  };
+  t.throws(() => lookup(args), new Error("Missing 'lookup' dependsOn arg."));
+  t.end();
+});
+
 test("lookup reports unknown row", t => {
   const args = {
     scenario: {
       rows: {}
     },
-    dependsOn: "unknown row"
+    dependsOn: { lookup: "unknown row" }
   };
   t.throws(() => lookup(args), new Error("Unknown row 'unknown row'"));
   t.end();
@@ -39,7 +49,7 @@ test("lookupPrevious reports unknown row", t => {
     scenario: {
       rows: {}
     },
-    dependsOn: "another unknown row"
+    dependsOn: { lookup: "another unknown row" }
   };
   t.throws(
     () => lookupPrevious(args),

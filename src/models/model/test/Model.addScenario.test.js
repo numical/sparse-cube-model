@@ -42,11 +42,11 @@ populatedScenarios((test, setupFn) => {
 
   test("Add scenario copying unknown scenario throws error", t => {
     const scenarioKey = "test scenario";
-    const baseScenarioName = "unknown scenario";
+    const baseScenarioKey = "unknown scenario";
     const model = setupFn();
     t.throws(
-      () => model.addScenario({ scenarioKey, baseScenarioName }),
-      new Error(`Unknown scenario '${baseScenarioName}'`)
+      () => model.addScenario({ scenarioKey, baseScenarioKey }),
+      new Error(`Unknown scenario '${baseScenarioKey}'`)
     );
     t.end();
   });
@@ -342,7 +342,7 @@ emptyScenarios((test, setupFn) => {
       scenarioKey,
       rowKey: "row 1",
       fn: lookup,
-      dependsOn: "row 0"
+      dependsOn: { lookup: "row 0" }
     });
     t.same(model.scenario({ scenarioKey }), [
       [5, 6, 6],
@@ -371,7 +371,7 @@ emptyScenarios((test, setupFn) => {
       rowKey: "row 1",
       fn: lookup,
       fnArgs: { reference: "row 0" },
-      dependsOn: "row 0"
+      dependsOn: { lookup: "row 0" }
     });
     model.updateRow({
       scenarioKey,
@@ -407,7 +407,7 @@ emptyScenarios((test, setupFn) => {
     });
     model.addScenario({
       scenarioKey: "scenario 2",
-      baseScenarioName: "scenario 1"
+      baseScenarioKey: "scenario 1"
     });
 
     const scenario1 = model.scenario({ scenarioKey: "scenario 1" });
@@ -445,7 +445,7 @@ emptyScenarios((test, setupFn) => {
     });
     model.addScenario({
       scenarioKey: "scenario 2",
-      baseScenarioName: "scenario 1"
+      baseScenarioKey: "scenario 1"
     });
 
     const scenario1 = model.scenario({ scenarioKey: "scenario 1" });

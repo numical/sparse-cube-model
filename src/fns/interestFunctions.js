@@ -11,7 +11,7 @@ const {
 const getInterest = (rowContext, interval) => {
   if (rowContext.dependsOn && rowContext.dependsOn.interest) {
     return lookup(
-      { ...rowContext, dependsOn: rowContext.dependsOn.interest },
+      { ...rowContext, dependsOn: { lookup: rowContext.dependsOn.interest } },
       interval
     );
   } else {
@@ -24,7 +24,7 @@ const getIncrement = (rowContext, interval) =>
     ? lookup(
         {
           ...rowContext,
-          dependsOn: rowContext.dependsOn.increment
+          dependsOn: { lookup: rowContext.dependsOn.increment }
         },
         interval
       )
@@ -35,7 +35,7 @@ const getDecrement = (rowContext, interval) =>
     ? lookup(
         {
           ...rowContext,
-          dependsOn: rowContext.dependsOn.decrement
+          dependsOn: { lookup: rowContext.dependsOn.decrement }
         },
         interval
       )

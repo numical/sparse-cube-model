@@ -64,7 +64,7 @@ test("add row with dependency can be undone", t => {
   model.addRow({
     rowKey: "test row",
     fn: lookup,
-    dependsOn: "independent row"
+    dependsOn: { lookup: "independent row" }
   });
   t.same(model.lengths, { x: 10, y: 5, z: 1 });
   model.undo();
@@ -79,7 +79,7 @@ test("add row with dependency can be redone", t => {
   model.addRow({
     rowKey: "test row",
     fn: lookup,
-    dependsOn: "independent row"
+    dependsOn: { lookup: "independent row" }
   });
   const pre = comparableUnserialisedForm({ model });
   model.undo();

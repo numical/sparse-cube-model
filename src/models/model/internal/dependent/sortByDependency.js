@@ -1,11 +1,7 @@
 const isDependentOn = (row1, row2) => {
   const dependsOn = row1.dependsOn;
   const key = row2.rowKey || row2.key;
-  return !dependsOn
-    ? false
-    : typeof dependsOn === "object"
-    ? Object.values(dependsOn).includes(key)
-    : dependsOn === key;
+  return dependsOn ? Object.values(dependsOn).includes(key) : false;
 };
 
 const sortByDependency = (row1, row2) => {
