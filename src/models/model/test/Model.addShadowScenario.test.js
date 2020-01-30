@@ -8,6 +8,7 @@ const { identity, multiplier } = require("../../../fns/shadowFunctions");
 const { add } = require("../../../maths/coreOperations");
 const { defaultScenario } = require("../modelMetadata");
 const { multiply } = require("../../../maths/coreOperations");
+const { expectedLengths } = require("../../test/testFixture");
 
 const testLookupShadowFn = (rowContext, interval, value) => {
   const lookupRowContext = {
@@ -218,13 +219,13 @@ populatedScenarios((test, setupFn, Type) => {
     const shadow = { fn: identity };
     const model = setupFn();
     model.addScenario({ scenarioKey, shadow });
-    t.same(model.lengths, { x: 10, y: 4, z: 2 });
+    t.same(model.lengths, expectedLengths(0, 0, 1));
     rowKeys.forEach((rowKey, index) => {
       t.same(model.row({ rowKey }), expected[index]);
       t.same(model.row({ rowKey, scenarioKey }), expected[index]);
     });
     model.deleteRows({ rowKeys });
-    t.same(model.lengths, { x: 10, y: 2, z: 2 });
+    t.same(model.lengths, expectedLengths(0, 0, 1));
     rowKeys.forEach(rowKey => {
       t.throws(
         () => model.row({ rowKey }),
@@ -247,7 +248,7 @@ populatedScenarios((test, setupFn, Type) => {
     t.throws(
       () => model.deleteScenario({ scenarioKey: defaultScenario }),
       new Error(
-        "Cannot delete scenario 'defaultScenario' with shadows 'shadow scenario'."
+        "Cannot delete scenario 'defaultScenario' with shadows 'fixture shadow scenario, shadow scenario'."
       )
     );
     t.end();
@@ -259,9 +260,9 @@ populatedScenarios((test, setupFn, Type) => {
     const shadow = { fn: identity };
     const model = setupFn();
     model.addScenario({ scenarioKey: shadowScenarioName, shadow });
-    t.same(model.lengths, { x: 10, y: 4, z: 2 });
+    t.same(model.lengths, expectedLengths(0, 0, 1));
     model.deleteScenario({ scenarioKey: shadowScenarioName });
-    t.same(model.lengths, { x: 10, y: 4, z: 1 });
+    t.same(model.lengths, expectedLengths());
     t.end();
   });
 
@@ -272,7 +273,7 @@ populatedScenarios((test, setupFn, Type) => {
     shadowScenarioNames.forEach(shadowScenarioName => {
       model.addScenario({ scenarioKey: shadowScenarioName, shadow });
     });
-    t.same(model.lengths, { x: 10, y: 4, z: 3 });
+    t.same(model.lengths, expectedLengths(0, 0, 2));
     model.deleteScenario({ scenarioKey: shadowScenarioNames[1] });
     t.same(
       model.row({
@@ -281,7 +282,7 @@ populatedScenarios((test, setupFn, Type) => {
       }),
       [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     );
-    t.same(model.lengths, { x: 10, y: 4, z: 2 });
+    t.same(model.lengths, expectedLengths(0, 0, 1));
     t.end();
   });
 
@@ -296,11 +297,11 @@ populatedScenarios((test, setupFn, Type) => {
       baseScenarioKey,
       shadow
     });
-    t.same(model.lengths, { x: 10, y: 4, z: 3 });
+    t.same(model.lengths, expectedLengths(0, 0, 2));
     model.deleteScenario({ scenarioKey: shadowScenarioName });
-    t.same(model.lengths, { x: 10, y: 4, z: 2 });
+    t.same(model.lengths, expectedLengths(0, 0, 1));
     model.deleteScenario({ scenarioKey: baseScenarioKey });
-    t.same(model.lengths, { x: 10, y: 4, z: 1 });
+    t.same(model.lengths, expectedLengths());
     t.end();
   });
 

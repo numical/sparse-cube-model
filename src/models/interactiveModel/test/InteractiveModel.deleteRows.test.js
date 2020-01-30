@@ -4,6 +4,7 @@ const comparableUnserialisedForm = require("./comparableUnserialisedForm");
 const testFixture = require("../../test/testFixture");
 const { interval } = require("../../../fns/lookupFunctions");
 const { defaultScenario } = require("../../model/modelMetadata");
+const { expectedLengths } = require("../../test/testFixture");
 
 const testMeta = {
   intervals: {
@@ -47,9 +48,9 @@ test("delete last rows on populated model can be undone", t => {
   const rowKeys = ["independent row", "second lookup row"];
   const pre = comparableUnserialisedForm({ model });
   model.deleteRows({ rowKeys });
-  t.same(model.lengths, { x: 10, y: 2, z: 1 });
+  t.same(model.lengths, expectedLengths());
   model.undo();
-  t.same(model.lengths, { x: 10, y: 4, z: 1 });
+  t.same(model.lengths, expectedLengths());
   const post = comparableUnserialisedForm({ model });
   t.same(post, pre);
   t.end();

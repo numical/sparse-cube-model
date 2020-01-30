@@ -2,6 +2,7 @@ const { test } = require("tap");
 const InteractiveModel = require("../InteractiveModel");
 const comparableUnserialisedForm = require("./comparableUnserialisedForm");
 const testFixture = require("../../test/testFixture");
+const { expectedLengths } = require("../../test/testFixture");
 
 test("delete scenario based on default scenario to empty model can be undone", t => {
   const model = new InteractiveModel();
@@ -84,7 +85,7 @@ test("delete scenario based on default scenario to populated model can be undone
   const preData = model.scenario({ scenarioKey });
   model.deleteScenario({ scenarioKey });
   model.undo();
-  t.same(model.lengths, { x: 10, y: 4, z: 2 });
+  t.same(model.lengths, expectedLengths(0, 0, 1));
   const postData = model.scenario({ scenarioKey });
   const post = comparableUnserialisedForm({ model });
   t.same(post, pre);
@@ -100,7 +101,7 @@ test("delete scenario based on default scenario to populated model can be redone
   const pre = comparableUnserialisedForm({ model });
   model.undo();
   model.redo();
-  t.same(model.lengths, { x: 10, y: 4, z: 1 });
+  t.same(model.lengths, expectedLengths());
   const post = comparableUnserialisedForm({ model });
   t.same(post, pre);
   t.end();
@@ -114,18 +115,18 @@ test("delete scenario based on non-default scenario to populated model can be un
     scenarioKey: baseScenarioKey,
     historyDescription: "add base scenario"
   });
-  t.same(model.lengths, { x: 10, y: 4, z: 2 });
+  t.same(model.lengths, expectedLengths(0, 0, 1));
   model.addScenario({
     scenarioKey: testScenarioKey,
     historyDescription: "add test scenario",
     baseScenarioKey
   });
-  t.same(model.lengths, { x: 10, y: 4, z: 3 });
+  t.same(model.lengths, expectedLengths(0, 0, 2));
   const pre = comparableUnserialisedForm({ model });
   model.deleteScenario({ scenarioKey: testScenarioKey });
-  t.same(model.lengths, { x: 10, y: 4, z: 2 });
+  t.same(model.lengths, expectedLengths(0, 0, 1));
   model.undo();
-  t.same(model.lengths, { x: 10, y: 4, z: 3 });
+  t.same(model.lengths, expectedLengths(0, 0, 2));
   const post = comparableUnserialisedForm({ model });
   t.same(post, pre);
   t.end();
@@ -148,7 +149,7 @@ test("delete scenario based on non-default scenario to populatd model can be red
   const pre = comparableUnserialisedForm({ model });
   model.undo();
   model.redo();
-  t.same(model.lengths, { x: 10, y: 4, z: 2 });
+  t.same(model.lengths, expectedLengths(0, 0, 1));
   const post = comparableUnserialisedForm({ model });
   t.same(post, pre);
   t.end();

@@ -4,6 +4,7 @@ const {
   lookup,
   lookupPrevious
 } = require("../../fns/lookupFunctions");
+const { identity } = require("../../fns/shadowFunctions");
 
 const rows = [
   {
@@ -40,11 +41,25 @@ const testFixture = (constructorFn = Model) => {
   rows.forEach(row => {
     model.addRow(row);
   });
+  model.addScenario({
+    scenarioKey: "fixture scenario"
+  });
+  model.addScenario({
+    scenarioKey: "fixture shadow scenario",
+    shadow: { fn: identity }
+  });
   return model;
 };
+
+const expectedLengths = (x = 0, y = 0, z = 0) => ({
+  x: 10 + x,
+  y: 4 + y,
+  z: 3 + z
+});
 
 testFixture.rows = rows;
 testFixture.rowKeys = rows.map(row => row.rowKey);
 testFixture.meta = meta;
+testFixture.expectedLengths = expectedLengths;
 
 module.exports = testFixture;

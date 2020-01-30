@@ -1,4 +1,5 @@
 const { populatedScenarios } = require("../../test/testScaffold");
+const { expectedLengths } = require("../../test/testFixture");
 
 populatedScenarios((test, setUp) => {
   test("Delete row with unknown scenario throws error", t => {
@@ -24,38 +25,38 @@ populatedScenarios((test, setUp) => {
 
   test("Delete independent row", t => {
     const model = setUp();
-    t.same(model.lengths, { x: 10, y: 4, z: 1 });
+    t.same(model.lengths, expectedLengths());
     const rowKey = "independent row";
     model.deleteRow({
       rowKey,
       scenarioKey: "defaultScenario"
     });
-    t.same(model.lengths, { x: 10, y: 3, z: 1 });
+    t.same(model.lengths, expectedLengths());
     t.throws(() => model.row({ rowKey }), new Error(`Unknown row '${rowKey}'`));
     t.end();
   });
 
   test("Delete independent row, default scenario", t => {
     const model = setUp();
-    t.same(model.lengths, { x: 10, y: 4, z: 1 });
+    t.same(model.lengths, expectedLengths());
     const rowKey = "independent row";
     model.deleteRow({
       rowKey
     });
-    t.same(model.lengths, { x: 10, y: 3, z: 1 });
+    t.same(model.lengths, expectedLengths());
     t.throws(() => model.row({ rowKey }), new Error(`Unknown row '${rowKey}'`));
     t.end();
   });
 
   test("Delete dependent row", t => {
     const model = setUp();
-    t.same(model.lengths, { x: 10, y: 4, z: 1 });
+    t.same(model.lengths, expectedLengths());
     const rowKey = "first lookup row";
     model.deleteRow({
       rowKey,
       scenarioKey: "defaultScenario"
     });
-    t.same(model.lengths, { x: 10, y: 3, z: 1 });
+    t.same(model.lengths, expectedLengths());
     t.throws(() => model.row({ rowKey }), new Error(`Unknown row '${rowKey}'`));
     t.end();
   });
@@ -76,7 +77,7 @@ populatedScenarios((test, setUp) => {
     const model = setUp();
     const rowKeys = ["first lookup row", "independent row"];
     model.deleteRows({ rowKeys });
-    t.same(model.lengths, { x: 10, y: 2, z: 1 });
+    t.same(model.lengths, expectedLengths());
     rowKeys.forEach(rowKey => {
       t.throws(
         () => model.row({ rowKey }),
@@ -92,7 +93,7 @@ populatedScenarios((test, setUp) => {
     rowKeys.forEach(rowKey => {
       model.deleteRow({ rowKey });
     });
-    t.same(model.lengths, { x: 10, y: 1, z: 1 });
+    t.same(model.lengths, expectedLengths());
     rowKeys.forEach(rowKey => {
       t.throws(
         () => model.row({ rowKey }),
@@ -108,7 +109,7 @@ populatedScenarios((test, setUp) => {
     rowKeys.forEach(rowKey => {
       model.deleteRow({ rowKey });
     });
-    t.same(model.lengths, { x: 10, y: 1, z: 1 });
+    t.same(model.lengths, expectedLengths());
     rowKeys.forEach(rowKey => {
       t.throws(
         () => model.row({ rowKey }),
@@ -122,7 +123,7 @@ populatedScenarios((test, setUp) => {
     const model = setUp();
     const rowKeys = ["increment row", "first lookup row", "second lookup row"];
     model.deleteRows({ rowKeys });
-    t.same(model.lengths, { x: 10, y: 1, z: 1 });
+    t.same(model.lengths, expectedLengths());
     rowKeys.forEach(rowKey => {
       t.throws(
         () => model.row({ rowKey }),

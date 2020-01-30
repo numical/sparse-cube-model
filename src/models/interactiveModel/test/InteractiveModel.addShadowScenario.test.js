@@ -3,6 +3,7 @@ const InteractiveModel = require("../InteractiveModel");
 const comparableUnserialisedForm = require("./comparableUnserialisedForm");
 const testFixture = require("../../test/testFixture");
 const { identity } = require("../../../fns/shadowFunctions");
+const { expectedLengths } = require("../../test/testFixture");
 
 test("add shadow scenario to empty model can be undone", t => {
   const model = new InteractiveModel();
@@ -40,9 +41,9 @@ test("add shadow scenario to populated model can be undone", t => {
   const shadow = { fn: identity };
   const pre = comparableUnserialisedForm({ model });
   model.addScenario({ scenarioKey, shadow, historyDescription });
-  t.same(model.lengths, { x: 10, y: 4, z: 2 });
+  t.same(model.lengths, expectedLengths(0, 0, 1));
   model.undo();
-  t.same(model.lengths, { x: 10, y: 4, z: 1 });
+  t.same(model.lengths, expectedLengths());
   const post = comparableUnserialisedForm({ model });
   t.same(post, pre);
   t.end();
@@ -58,7 +59,7 @@ test("add shadow scenario to populated model can be redone", t => {
   const preData = model.scenario({ scenarioKey });
   model.undo();
   model.redo();
-  t.same(model.lengths, { x: 10, y: 4, z: 2 });
+  t.same(model.lengths, expectedLengths(0, 0, 1));
   const post = comparableUnserialisedForm({ model });
   const postData = model.scenario({ scenarioKey });
   t.same(post, pre);
