@@ -9,9 +9,8 @@ const {
   previous
 } = require("../../../fns/lookupFunctions");
 const iterate2D = require("../../../data-structures/iterate2D");
-const { expectedLengths } = require("../../test/testFixture");
 
-populatedScenarios((test, setupFn) => {
+populatedScenarios((test, setupFn, fixture) => {
   test("Add scenario with no args throws error", t => {
     const model = setupFn();
     t.throws(
@@ -55,9 +54,9 @@ populatedScenarios((test, setupFn) => {
   test("Add scenario based on populated default", t => {
     const scenarioKey = "test scenario";
     const model = setupFn();
-    t.same(model.lengths, expectedLengths());
+    t.same(model.lengths, fixture.expectedLengths());
     model.addScenario({ scenarioKey });
-    t.same(model.lengths, expectedLengths(0, 0, 1));
+    t.same(model.lengths, fixture.expectedLengths(0, 0, 1));
     iterate2D(10, 4, (x, y) => {
       t.equal(model[x][y][0], model[x][y][1]);
     });
@@ -128,7 +127,7 @@ populatedScenarios((test, setupFn) => {
     t.equal(model[9][2][0], 19);
 
     // test scenario
-    const scenarioIndex = expectedLengths().z;
+    const scenarioIndex = fixture.expectedLengths().z;
     t.equal(model[0][0][scenarioIndex], 0);
     t.equal(model[9][0][scenarioIndex], 9);
     t.equal(model[0][1][scenarioIndex], 0);
@@ -142,11 +141,11 @@ populatedScenarios((test, setupFn) => {
   test("Add scenario based on another scenario", t => {
     const scenarioKeys = ["test scenario 1", "test scenario 2"];
     const model = setupFn();
-    t.same(model.lengths, expectedLengths());
+    t.same(model.lengths, fixture.expectedLengths());
     scenarioKeys.forEach(scenarioKey => {
       model.addScenario({ scenarioKey });
     });
-    t.same(model.lengths, expectedLengths(0, 0, 2));
+    t.same(model.lengths, fixture.expectedLengths(0, 0, 2));
     iterate2D(10, 4, (x, y) => {
       t.equal(model[x][y][0], model[x][y][1]);
       t.equal(model[x][y][1], model[x][y][2]);
@@ -165,7 +164,7 @@ populatedScenarios((test, setupFn) => {
       constants: [100],
       fn: increment
     });
-    const scenarioIndex = expectedLengths().z;
+    const scenarioIndex = fixture.expectedLengths().z;
     t.same(model.range({ y: 0, z: scenarioIndex }), [
       100,
       101,

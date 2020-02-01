@@ -1,9 +1,8 @@
-const testFixture = require("../../test/testFixture");
 const { increment, lookup } = require("../../../fns/lookupFunctions");
 const { applyInterest } = require("../../../fns/interestFunctions");
 const { populatedScenarios } = require("../../test/testScaffold");
 
-populatedScenarios((test, setUp) => {
+populatedScenarios((test, setUp, fixture) => {
   test("Dependent rows have same values as their lookup", t => {
     const expected = [
       [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
@@ -12,7 +11,7 @@ populatedScenarios((test, setUp) => {
       [1000, 0, 1, 2, 3, 4, 5, 6, 7, 8]
     ];
     const model = setUp();
-    testFixture.rowKeys.forEach((rowKey, index) => {
+    fixture.rowKeys.forEach((rowKey, index) => {
       t.same(model.row({ rowKey }), expected[index]);
     });
     t.end();
@@ -43,7 +42,7 @@ populatedScenarios((test, setUp) => {
       constants: [10],
       fn: increment
     });
-    testFixture.rowKeys.forEach((rowKey, index) => {
+    fixture.rowKeys.forEach((rowKey, index) => {
       t.same(
         model.row({ rowKey }),
         expected[index],

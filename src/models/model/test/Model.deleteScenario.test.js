@@ -1,12 +1,9 @@
-const testFixture = require("../../test/testFixture");
-const { expectedLengths } = require("../../test/testFixture");
-
 const {
   emptyScenarios,
   populatedScenarios
 } = require("../../test/testScaffold");
 
-populatedScenarios((test, setUpFn) => {
+populatedScenarios((test, setUpFn, fixture) => {
   test("Delete scenario with no arg throws error", t => {
     const model = setUpFn();
     t.throws(
@@ -29,9 +26,9 @@ populatedScenarios((test, setUpFn) => {
     const model = setUpFn();
     const scenarioKey = "second scenario";
     model.addScenario({ scenarioKey });
-    t.same(model.lengths, expectedLengths(0, 0, 1));
+    t.same(model.lengths, fixture.expectedLengths(0, 0, 1));
     model.deleteScenario({ scenarioKey });
-    t.same(model.lengths, expectedLengths());
+    t.same(model.lengths, fixture.expectedLengths());
     t.throws(
       () => model.addRow({ rowKey: "test row", scenarioKey }),
       new Error(`Unknown scenario '${scenarioKey}'`)

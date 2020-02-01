@@ -1,7 +1,9 @@
 const { test } = require("tap");
 const { version } = require("../../../../package");
 const Model = require("../Model");
-const testFixture = require("../../test/testFixture");
+const testFixture = require("../../test/testFixtures");
+
+const { setUp } = testFixture.withRows;
 
 test("Blank model stringify does not error", t => {
   const model = new Model();
@@ -16,19 +18,19 @@ test("Blank model stringify returns a string", t => {
 });
 
 test("Populated model stringify does not error", t => {
-  const model = testFixture();
+  const model = setUp();
   t.doesNotThrow(() => model.stringify());
   t.end();
 });
 
 test("Populated model stringify returns a string", t => {
-  const model = testFixture();
+  const model = setUp();
   t.type(model.stringify(), "string");
   t.end();
 });
 
 test("Can pass blank object args to no effect", t => {
-  const model = testFixture();
+  const model = setUp();
   const args = {};
   t.doesNotThrow(() => model.stringify(args));
   t.type(model.stringify(args), "string");
@@ -36,7 +38,7 @@ test("Can pass blank object args to no effect", t => {
 });
 
 test("Can pass unrecognised object args to no effect", t => {
-  const model = testFixture();
+  const model = setUp();
   const args = { wibble: true };
   t.doesNotThrow(() => model.stringify(args));
   t.type(model.stringify(args), "string");
@@ -44,7 +46,7 @@ test("Can pass unrecognised object args to no effect", t => {
 });
 
 test("Can pretty print", t => {
-  const model = testFixture();
+  const model = setUp();
   const compact = model.stringify();
   t.notOk(compact.includes("\n"));
   const pretty = model.stringify({ pretty: true });
@@ -61,7 +63,7 @@ test("Empty model can be serialized and deserialized", t => {
 });
 
 test("Populated model can be serialized and deserialized", t => {
-  const model = testFixture();
+  const model = setUp();
   const serialized = model.stringify();
   const deserialized = Model.parse(serialized);
   t.same(deserialized, model);
@@ -69,8 +71,8 @@ test("Populated model can be serialized and deserialized", t => {
 });
 
 test("Populated model with row of constants correctly deserializes", t => {
-  const model = testFixture();
-  const constants = Array(testFixture.meta.intervals.count + 1).fill(5);
+  const model = setUp();
+  const constants = Array(10).fill(5);
   model.addRow({ rowKey: "constants row", constants });
   const serialized = model.stringify();
   const deserialized = Model.parse(serialized);
@@ -79,7 +81,7 @@ test("Populated model with row of constants correctly deserializes", t => {
 });
 
 test("Parsing fails explicitly if fn not in fn dictionary", t => {
-  const model = testFixture();
+  const model = setUp();
   const unknownFn = () => 10;
   unknownFn.key = "unknown";
   model.addRow({ rowKey: "test row", fn: unknownFn });
@@ -92,7 +94,7 @@ test("Parsing fails explicitly if fn not in fn dictionary", t => {
 });
 
 test("default model has package version", t => {
-  const model = testFixture();
+  const model = setUp();
   const serialized = model.stringify();
   const expected = `"version":"${version}"`;
   t.match(serialized, expected);
@@ -100,7 +102,7 @@ test("default model has package version", t => {
 });
 
 test("model updates old (compatible) versions", t => {
-  const pre = testFixture().stringify();
+  const pre = setUp().stringify();
   const updated = pre.replace(version, "0.0.1");
   t.match(updated, `"version":"0.0.1"`);
   const post = Model.parse(updated).stringify();

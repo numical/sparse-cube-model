@@ -8,7 +8,6 @@ const { identity, multiplier } = require("../../../fns/shadowFunctions");
 const { add } = require("../../../maths/coreOperations");
 const { defaultScenario } = require("../modelMetadata");
 const { multiply } = require("../../../maths/coreOperations");
-const { expectedLengths } = require("../../test/testFixture");
 
 const testLookupShadowFn = (rowContext, interval, value) => {
   const lookupRowContext = {
@@ -21,7 +20,7 @@ const testLookupShadowFn = (rowContext, interval, value) => {
 testLookupShadowFn.key = "Model.addShadowScenario.test lookup shadow fn";
 functionsDictionary.add(testLookupShadowFn);
 
-emptyScenarios((test, setupFn, Type) => {
+emptyScenarios((test, setupFn, { Type }) => {
   test("Add shadow scenario must have a shadow function", t => {
     const scenarioKey = "test scenario";
     const model = setupFn();
@@ -200,7 +199,7 @@ emptyScenarios((test, setupFn, Type) => {
   });
 });
 
-populatedScenarios((test, setupFn, Type) => {
+populatedScenarios((test, setupFn, fixture) => {
   test("Add shadow scenario after adding multiple rows", t => {
     t.end();
   });
@@ -219,13 +218,14 @@ populatedScenarios((test, setupFn, Type) => {
     const shadow = { fn: identity };
     const model = setupFn();
     model.addScenario({ scenarioKey, shadow });
-    t.same(model.lengths, expectedLengths(0, 0, 1));
+    t.same(model.lengths, fixture.expectedLengths(0, 0, 1));
     rowKeys.forEach((rowKey, index) => {
       t.same(model.row({ rowKey }), expected[index]);
       t.same(model.row({ rowKey, scenarioKey }), expected[index]);
     });
     model.deleteRows({ rowKeys });
-    t.same(model.lengths, expectedLengths(0, 0, 1));
+    const expectedRows = fixture.hasMultipleScenarios ? 0 : -2;
+    t.same(model.lengths, fixture.expectedLengths(0, expectedRows, 1));
     rowKeys.forEach(rowKey => {
       t.throws(
         () => model.row({ rowKey }),
@@ -245,11 +245,12 @@ populatedScenarios((test, setupFn, Type) => {
     const shadow = { fn: identity };
     const model = setupFn();
     model.addScenario({ scenarioKey: shadowScenarioName, shadow });
+    const errMsg = fixture.hasShadowScenario
+      ? "Cannot delete scenario 'defaultScenario' with shadows 'fixture shadow scenario, shadow scenario'."
+      : "Cannot delete scenario 'defaultScenario' with shadows 'shadow scenario'.";
     t.throws(
       () => model.deleteScenario({ scenarioKey: defaultScenario }),
-      new Error(
-        "Cannot delete scenario 'defaultScenario' with shadows 'fixture shadow scenario, shadow scenario'."
-      )
+      new Error(errMsg)
     );
     t.end();
   });
@@ -260,9 +261,9 @@ populatedScenarios((test, setupFn, Type) => {
     const shadow = { fn: identity };
     const model = setupFn();
     model.addScenario({ scenarioKey: shadowScenarioName, shadow });
-    t.same(model.lengths, expectedLengths(0, 0, 1));
+    t.same(model.lengths, fixture.expectedLengths(0, 0, 1));
     model.deleteScenario({ scenarioKey: shadowScenarioName });
-    t.same(model.lengths, expectedLengths());
+    t.same(model.lengths, fixture.expectedLengths());
     t.end();
   });
 
@@ -273,7 +274,7 @@ populatedScenarios((test, setupFn, Type) => {
     shadowScenarioNames.forEach(shadowScenarioName => {
       model.addScenario({ scenarioKey: shadowScenarioName, shadow });
     });
-    t.same(model.lengths, expectedLengths(0, 0, 2));
+    t.same(model.lengths, fixture.expectedLengths(0, 0, 2));
     model.deleteScenario({ scenarioKey: shadowScenarioNames[1] });
     t.same(
       model.row({
@@ -282,7 +283,7 @@ populatedScenarios((test, setupFn, Type) => {
       }),
       [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     );
-    t.same(model.lengths, expectedLengths(0, 0, 1));
+    t.same(model.lengths, fixture.expectedLengths(0, 0, 1));
     t.end();
   });
 
@@ -297,11 +298,11 @@ populatedScenarios((test, setupFn, Type) => {
       baseScenarioKey,
       shadow
     });
-    t.same(model.lengths, expectedLengths(0, 0, 2));
+    t.same(model.lengths, fixture.expectedLengths(0, 0, 2));
     model.deleteScenario({ scenarioKey: shadowScenarioName });
-    t.same(model.lengths, expectedLengths(0, 0, 1));
+    t.same(model.lengths, fixture.expectedLengths(0, 0, 1));
     model.deleteScenario({ scenarioKey: baseScenarioKey });
-    t.same(model.lengths, expectedLengths());
+    t.same(model.lengths, fixture.expectedLengths());
     t.end();
   });
 
@@ -371,7 +372,7 @@ populatedScenarios((test, setupFn, Type) => {
     const pre = setupFn();
     pre.addScenario({ scenarioKey, shadow });
     const s = pre.stringify();
-    const post = Type.parse(s);
+    const post = fixture.Type.parse(s);
     t.same(post, pre);
     t.end();
   });
@@ -383,7 +384,7 @@ populatedScenarios((test, setupFn, Type) => {
     const pre = setupFn();
     pre.addScenario({ scenarioKey, shadow });
     const s = pre.stringify();
-    const post = Type.parse(s);
+    const post = fixture.Type.parse(s);
     t.same(post.row({ rowKey }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
     t.same(post.row({ rowKey, scenarioKey }), [
       0,

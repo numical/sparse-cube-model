@@ -3,7 +3,7 @@ const Model = require("../model/Model");
 const MappedModel = require("../mappedModel/MappedModel");
 const InteractiveModel = require("../interactiveModel/InteractiveModel");
 const PersonalFinanceModel = require("../personalFinanceModel/PersonalFinanceModel");
-const testFixture = require("./testFixture");
+const testFixtures = require("./testFixtures");
 
 const allTypes = [Model, MappedModel, InteractiveModel, PersonalFinanceModel];
 
@@ -13,13 +13,6 @@ const testMeta = {
   }
 };
 
-const setupDescriptions = [":", "after serialisation:"];
-
-const setupFns = [
-  Type => testFixture(Type),
-  Type => Type.parse(testFixture(Type).stringify())
-];
-
 const emptyScenarios = (fn, Types = allTypes) => {
   Types.forEach(Type => {
     tap.test(`${Type.name} tests:`, typeTests => {
@@ -28,24 +21,40 @@ const emptyScenarios = (fn, Types = allTypes) => {
         test.meta = meta; // yuk, impure
         return new Type(meta);
       };
-      fn(test, setupFn, Type);
+      fn(test, setupFn, { Type });
       typeTests.end();
     });
   });
 };
 
+const typeFixtures = Object.entries(testFixtures).reduce(
+  (typeFixtures, [name, testFixture]) => {
+    const { setUp, ...rest } = testFixture;
+    typeFixtures.push({
+      name: `${name} : tests`,
+      setUp: Type => setUp(Type),
+      ...rest
+    });
+    typeFixtures.push({
+      name: `${name} after serialisation : tests`,
+      setUp: Type => Type.parse(setUp(Type).stringify()),
+      ...rest
+    });
+    return typeFixtures;
+  },
+  []
+);
+
 const populatedScenarios = (fn, Types = allTypes) => {
-  setupFns.forEach((setupFn, setupIndex) => {
+  typeFixtures.forEach(({ name, setUp, ...rest }) => {
     Types.forEach(Type => {
-      tap.test(
-        `${Type.name} tests ${setupDescriptions[setupIndex]}`,
-        typeTests => {
-          const { test } = typeTests;
-          test.meta = testFixture.meta;
-          fn(test, setupFn.bind(null, Type), Type);
-          typeTests.end();
-        }
-      );
+      const description = `${Type.name} : ${name}`;
+      tap.test(description, typeTests => {
+        const { test } = typeTests;
+        const fixture = { Type, ...rest };
+        fn(test, setUp.bind(null, Type), fixture);
+        typeTests.end();
+      });
     });
   });
 };
