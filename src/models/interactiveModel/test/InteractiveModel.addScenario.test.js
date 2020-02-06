@@ -44,9 +44,9 @@ populatedScenarios(
       const scenarioKey = "test scenario";
       const pre = comparableUnserialisedForm({ model });
       model.addScenario({ scenarioKey });
-      t.same(model.lengths, { x: 10, y: 4, z: 2 });
+      t.same(model.lengths, fixture.expectedLengths(0, 0, 1));
       model.undo();
-      t.same(model.lengths, { x: 10, y: 4, z: 1 });
+      t.same(model.lengths, fixture.expectedLengths());
       const post = comparableUnserialisedForm({ model });
       t.same(post, pre);
       t.end();
@@ -60,7 +60,7 @@ populatedScenarios(
       const preData = model.scenario({ scenarioKey });
       model.undo();
       model.redo();
-      t.same(model.lengths, { x: 10, y: 4, z: 2 });
+      t.same(model.lengths, fixture.expectedLengths(0, 0, 1));
       const post = comparableUnserialisedForm({ model });
       const postData = model.scenario({ scenarioKey });
       t.same(post, pre);

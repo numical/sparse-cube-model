@@ -49,9 +49,10 @@ populatedScenarios(
       const rowKey = "second lookup row";
       const pre = comparableUnserialisedForm({ model });
       model.deleteRow({ rowKey, scenarioKey: defaultScenario });
-      t.same(model.lengths, { x: 10, y: 3, z: 1 });
+      const rowCountDelta = fixture.hasMultipleScenarios ? 0 : -1;
+      t.same(model.lengths, fixture.expectedLengths(0, rowCountDelta, 0));
       model.undo();
-      t.same(model.lengths, { x: 10, y: 4, z: 1 });
+      t.same(model.lengths, fixture.expectedLengths());
       const post = comparableUnserialisedForm({ model });
       t.same(post, pre);
       t.end();
@@ -64,7 +65,8 @@ populatedScenarios(
       const pre = comparableUnserialisedForm({ model });
       model.undo();
       model.redo();
-      t.same(model.lengths, { x: 10, y: 3, z: 1 });
+      const rowCountDelta = fixture.hasMultipleScenarios ? 0 : -1;
+      t.same(model.lengths, fixture.expectedLengths(0, rowCountDelta, 0));
       const post = comparableUnserialisedForm({ model });
       t.same(post, pre);
       t.end();
@@ -75,9 +77,10 @@ populatedScenarios(
       const rowKey = "independent row";
       const pre = comparableUnserialisedForm({ model, ignoreIndex: true });
       model.deleteRow({ rowKey });
-      t.same(model.lengths, { x: 10, y: 3, z: 1 });
+      const rowCountDelta = fixture.hasMultipleScenarios ? 0 : -1;
+      t.same(model.lengths, fixture.expectedLengths(0, rowCountDelta, 0));
       model.undo();
-      t.same(model.lengths, { x: 10, y: 4, z: 1 });
+      t.same(model.lengths, fixture.expectedLengths());
       const post = comparableUnserialisedForm({ model, ignoreIndex: true });
       t.same(post, pre);
       t.end();

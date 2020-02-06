@@ -30,8 +30,8 @@ populatedScenarios((test, setUp, fixture) => {
       rowKey,
       scenarioKey: "defaultScenario"
     });
-    const expectedRows = fixture.hasMultipleScenarios ? 0 : -1;
-    t.same(model.lengths, fixture.expectedLengths(0, expectedRows, 0));
+    const expectedRowsDelta = fixture.hasMultipleScenarios ? 0 : -1;
+    t.same(model.lengths, fixture.expectedLengths(0, expectedRowsDelta, 0));
     t.throws(() => model.row({ rowKey }), new Error(`Unknown row '${rowKey}'`));
     t.end();
   });
@@ -43,8 +43,8 @@ populatedScenarios((test, setUp, fixture) => {
     model.deleteRow({
       rowKey
     });
-    const expectedRows = fixture.hasMultipleScenarios ? 0 : -1;
-    t.same(model.lengths, fixture.expectedLengths(0, expectedRows, 0));
+    const expectedRowsDelta = fixture.hasMultipleScenarios ? 0 : -1;
+    t.same(model.lengths, fixture.expectedLengths(0, expectedRowsDelta, 0));
     t.throws(() => model.row({ rowKey }), new Error(`Unknown row '${rowKey}'`));
     t.end();
   });
@@ -57,8 +57,8 @@ populatedScenarios((test, setUp, fixture) => {
       rowKey,
       scenarioKey: "defaultScenario"
     });
-    const expectedRows = fixture.hasMultipleScenarios ? 0 : -1;
-    t.same(model.lengths, fixture.expectedLengths(0, expectedRows, 0));
+    const expectedRowsDelta = fixture.hasMultipleScenarios ? 0 : -1;
+    t.same(model.lengths, fixture.expectedLengths(0, expectedRowsDelta, 0));
     t.throws(() => model.row({ rowKey }), new Error(`Unknown row '${rowKey}'`));
     t.end();
   });
@@ -79,8 +79,8 @@ populatedScenarios((test, setUp, fixture) => {
     const model = setUp();
     const rowKeys = ["first lookup row", "independent row"];
     model.deleteRows({ rowKeys });
-    const expectedRows = fixture.hasMultipleScenarios ? 0 : -2;
-    t.same(model.lengths, fixture.expectedLengths(0, expectedRows, 0));
+    const expectedRowsDelta = fixture.hasMultipleScenarios ? 0 : -2;
+    t.same(model.lengths, fixture.expectedLengths(0, expectedRowsDelta, 0));
     rowKeys.forEach(rowKey => {
       t.throws(
         () => model.row({ rowKey }),
@@ -96,8 +96,8 @@ populatedScenarios((test, setUp, fixture) => {
     rowKeys.forEach(rowKey => {
       model.deleteRow({ rowKey });
     });
-    const expectedRows = fixture.hasMultipleScenarios ? 0 : -3;
-    t.same(model.lengths, fixture.expectedLengths(0, expectedRows, 0));
+    const expectedRowsDelta = fixture.hasMultipleScenarios ? 0 : -3;
+    t.same(model.lengths, fixture.expectedLengths(0, expectedRowsDelta, 0));
     rowKeys.forEach(rowKey => {
       t.throws(
         () => model.row({ rowKey }),
@@ -113,8 +113,8 @@ populatedScenarios((test, setUp, fixture) => {
     rowKeys.forEach(rowKey => {
       model.deleteRow({ rowKey });
     });
-    const expectedRows = fixture.hasMultipleScenarios ? 0 : -3;
-    t.same(model.lengths, fixture.expectedLengths(0, expectedRows, 0));
+    const expectedRowsDelta = fixture.hasMultipleScenarios ? 0 : -3;
+    t.same(model.lengths, fixture.expectedLengths(0, expectedRowsDelta, 0));
     rowKeys.forEach(rowKey => {
       t.throws(
         () => model.row({ rowKey }),
@@ -128,8 +128,8 @@ populatedScenarios((test, setUp, fixture) => {
     const model = setUp();
     const rowKeys = ["increment row", "first lookup row", "second lookup row"];
     model.deleteRows({ rowKeys });
-    const expectedRows = fixture.hasMultipleScenarios ? 0 : -3;
-    t.same(model.lengths, fixture.expectedLengths(0, expectedRows, 0));
+    const expectedRowsDelta = fixture.hasMultipleScenarios ? 0 : -3;
+    t.same(model.lengths, fixture.expectedLengths(0, expectedRowsDelta, 0));
     rowKeys.forEach(rowKey => {
       t.throws(
         () => model.row({ rowKey }),

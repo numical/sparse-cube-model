@@ -1,7 +1,8 @@
 const { test } = require("tap");
 const {
   emptyScenarios,
-  populatedScenarios
+  populatedScenarios,
+  fixtureFilters
 } = require("../../test/testScaffold");
 const InteractiveModel = require("../InteractiveModel");
 const comparableUnserialisedForm = require("./comparableUnserialisedForm");
@@ -44,7 +45,7 @@ populatedScenarios(
       model.addRow({ rowKey: "test row", fn: interval });
       t.same(model.lengths, fixture.expectedLengths(0, 1, 0));
       model.undo();
-      t.same(model.lengths, fixture.expectedLengths());
+      t.same(model.lengths, fixture.expectedLengths(0, 0, 0));
       const post = comparableUnserialisedForm({ model });
       t.same(post, pre);
       t.end();

@@ -49,9 +49,9 @@ populatedScenarios(
       const model = setUp();
       const pre = comparableUnserialisedForm({ model });
       model.addRows({ rows });
-      t.same(model.lengths, { x: 10, y: 7, z: 1 });
+      t.same(model.lengths, fixture.expectedLengths(0, 3, 0));
       model.undo();
-      t.same(model.lengths, { x: 10, y: 4, z: 1 });
+      t.same(model.lengths, fixture.expectedLengths());
       const post = comparableUnserialisedForm({ model });
       t.same(post, pre);
       t.end();
@@ -63,7 +63,7 @@ populatedScenarios(
       const pre = comparableUnserialisedForm({ model });
       model.undo();
       model.redo();
-      t.same(model.lengths, { x: 10, y: 7, z: 1 });
+      t.same(model.lengths, fixture.expectedLengths(0, 3, 0));
       const post = comparableUnserialisedForm({ model });
       t.same(post, pre);
       t.end();

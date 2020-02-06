@@ -224,8 +224,8 @@ populatedScenarios((test, setupFn, fixture) => {
       t.same(model.row({ rowKey, scenarioKey }), expected[index]);
     });
     model.deleteRows({ rowKeys });
-    const expectedRows = fixture.hasMultipleScenarios ? 0 : -2;
-    t.same(model.lengths, fixture.expectedLengths(0, expectedRows, 1));
+    const expectedRowsDelta = fixture.hasMultipleScenarios ? 0 : -2;
+    t.same(model.lengths, fixture.expectedLengths(0, expectedRowsDelta, 1));
     rowKeys.forEach(rowKey => {
       t.throws(
         () => model.row({ rowKey }),

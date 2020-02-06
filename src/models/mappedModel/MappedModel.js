@@ -157,16 +157,16 @@ class MappedModel extends Model {
 
   deleteRow({ rowKey, scenarioKey = defaultScenario }) {
     return this.#fns.unmapError(callMappings => {
-      const { row, shadowRows } = super.deleteRow({
+      const { row, rowKeyStillInUse } = super.deleteRow({
         scenarioKey: this.#fns.fromScenarioKey(scenarioKey, callMappings),
         rowKey: this.#fns.fromRowKey(rowKey, callMappings)
       });
       const mapped = {
         row: this.#fns.mapRow(row),
-        shadowRows: shadowRows.map(this.#fns.mapRow)
+        rowKeyStillInUse
       };
       // has row been deleted from every scenario?
-      if (this.lengths.z === 1 + shadowRows.length) {
+      if (!rowKeyStillInUse) {
         this.#fns.removeRowKey(rowKey, callMappings);
       }
       return mapped;
@@ -175,19 +175,19 @@ class MappedModel extends Model {
 
   deleteRows({ rowKeys, scenarioKey = defaultScenario }) {
     return this.#fns.unmapError(callMappings => {
-      const { rows, shadowRows } = super.deleteRows({
+      const deletedRows = super.deleteRows({
         scenarioKey: this.#fns.fromScenarioKey(scenarioKey, callMappings),
         rowKeys: this.#fns.fromRowKey(rowKeys, callMappings)
       });
-      const mapped = {
-        rows: rows.map(this.#fns.mapRow),
-        shadowRows: shadowRows.map(this.#fns.mapRow)
-      };
-      // have rows been deleted from every scenario?
-      if (this.lengths.z * rowKeys.length === rows.length + shadowRows.length) {
-        this.#fns.removeRowKey(rowKeys, callMappings);
-      }
-      return mapped;
+      deletedRows.forEach(({ row, rowKeyStillInUse }) => {
+        if (!rowKeyStillInUse) {
+          this.#fns.removeRowKey(row.key, callMappings);
+        }
+      });
+      return deletedRows.map(({ row, rowKeyStillInUse }) => ({
+        row: this.#fns.mapRow(row),
+        rowKeyStillInUse
+      }));
     });
   }
 

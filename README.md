@@ -2,4 +2,5 @@
 * Shadow Scenario:
   * update shadow when row updated?
   * update shadow fn dependency after serialisation (addToAllRowDependents)
-  * scnerio and row with same name
+  * scenerio and row with same name
+  * can we shadow a shadow?

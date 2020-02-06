@@ -1,5 +1,8 @@
 const { test } = require("tap");
-const { populatedScenarios } = require("../../test/testScaffold");
+const {
+  populatedScenarios,
+  fixtureFilters
+} = require("../../test/testScaffold");
 const InteractiveModel = require("../InteractiveModel");
 const comparableUnserialisedForm = require("./comparableUnserialisedForm");
 const { increment, interval, lookup } = require("../../../fns/lookupFunctions");
@@ -13,8 +16,8 @@ populatedScenarios(
       const model = setUp();
       t.same(model.row({ rowKey }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
       const pre = comparableUnserialisedForm({ model });
-      model.patchRow({ rowKey, constants: [10], historyDescription });
-      t.same(model.row({ rowKey }), [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]);
+      model.patchRow({ rowKey, constants: [20], historyDescription });
+      t.same(model.row({ rowKey }), [20, 21, 22, 23, 24, 25, 26, 27, 28, 29]);
       model.undo();
       t.same(model.row({ rowKey }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
       const post = comparableUnserialisedForm({ model });

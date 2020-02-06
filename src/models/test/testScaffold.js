@@ -45,8 +45,11 @@ const typeFixtures = Object.entries(testFixtures).reduce(
   []
 );
 
-const populatedScenarios = (fn, Types = allTypes) => {
-  typeFixtures.forEach(({ name, setUp, ...rest }) => {
+const populatedScenarios = (fn, Types = allTypes, fixtureFilter) => {
+  const filterFn = fixtureFilter
+    ? ({ name }) => name === fixtureFilter
+    : () => true;
+  typeFixtures.filter(filterFn).forEach(({ name, setUp, ...rest }) => {
     Types.forEach(Type => {
       const description = `${Type.name} : ${name}`;
       tap.test(description, typeTests => {
@@ -59,4 +62,11 @@ const populatedScenarios = (fn, Types = allTypes) => {
   });
 };
 
-module.exports = { emptyScenarios, populatedScenarios };
+const fixtureFilters = {
+  withRows: "withRows : tests",
+  withScenarios: "withScenarios : tests",
+  withRowsSerialised: "withRows after serialisation : tests",
+  withScenariosSerialised: "withScenarios after serialisation : tests"
+};
+
+module.exports = { emptyScenarios, populatedScenarios, fixtureFilters };

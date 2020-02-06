@@ -5,7 +5,7 @@ const prepareRowConstants = require("./internal/row/prepareRowConstants");
 const calculateRow = require("./internal/row/calculateRow");
 const bindFnToRow = require("./internal/row/bindFnToRow");
 const editRow = require("./internal/row/editRow");
-const deleteRowAndShadows = require("./internal/row/deleteRowAndShadows");
+const indexOfRowKey = require("./internal/row/indexOfRowKey");
 const ensureAllConstantsDefined = require("./internal/validate/ensureAllConstantsDefined");
 const getDateFromInterval = require("./internal/date/getDateFromInterval");
 const getModelVersion = require("./internal/version/getModelVersion");
@@ -73,9 +73,23 @@ class Model extends Dense3DArray {
       ensureAllConstantsDefined(rowConstants, intervals);
     }
     addToRowDependents(scenario, rowKey, dependsOn);
+    // does rowKey exist in another scenario - if so check it has defaulted values here
+    const existingIndex = indexOfRowKey(rowKey, scenarios);
+    if (existingIndex > -1) {
+      const existingValues = this.range({
+        y: existingIndex,
+        z: scenario.index
+      });
+      if (existingValues.some(value => value !== defaultValue)) {
+        throw new Error(
+          `Adding previously deleted row '${rowKey}' to scenario '${scenarioKey}' would overwrite non-default values.`
+        );
+      }
+    }
+    const index = existingIndex > -1 ? existingIndex : this.lengths.y;
     const row = {
       key: rowKey,
-      index: this.lengths.y,
+      index,
       constants: rowConstants
     };
     bindFnToRow(
@@ -88,6 +102,7 @@ class Model extends Dense3DArray {
       dependsOn
     );
     scenario.rows[rowKey] = row;
+    // add row to shadows and add to array of rows to recalculate
     const rowsToCalculate = Object.entries(scenario.shadows || {}).reduce(
       (rowsToCalculate, [shadowScenarioName, shadow]) => {
         const shadowScenario = scenarios[shadowScenarioName];
@@ -203,7 +218,42 @@ class Model extends Dense3DArray {
     const scenario = validateScenario({ scenarioKey, scenarios });
     const row = validateRow({ rowKey, scenario });
     validateCanDeleteRow(row);
-    return deleteRowAndShadows(this, scenarios, scenario, row);
+
+    // delete row in scenario and its shadows
+    const affectedScenarios = scenario.shadows
+      ? [scenario, ...Object.keys(scenario.shadows).map(key => scenarios[key])]
+      : [scenario];
+    affectedScenarios.forEach(affectedScenario => {
+      if (!affectedScenario.rows) {
+        console.log();
+      }
+      const { index, dependsOn } = affectedScenario.rows[rowKey];
+      removeFromRowDependents(affectedScenario, rowKey, dependsOn);
+      delete affectedScenario.rows[rowKey];
+      for (let x = 0; x < this.lengths.x; x++) {
+        // note: do not delete row as might be used by other scenarios
+        this.set(x, index, affectedScenario.index, defaultValue);
+      }
+    });
+
+    const rowKeyStillInUse = Object.values(scenarios).some(
+      scenario => !!scenario.rows[rowKey]
+    );
+    // if rowKey does not exist anywhere else...
+    if (!rowKeyStillInUse) {
+      const { index } = row;
+      // ... delete whole row of Dense3DArray
+      this.delete({ y: index });
+      // ... and update rows metadata
+      affectedScenarios.forEach(affectedScenario => {
+        Object.values(affectedScenario.rows).forEach(row => {
+          if (row.index > index) {
+            row.index = row.index - 1;
+          }
+        });
+      });
+    }
+    return { row, rowKeyStillInUse };
   }
 
   deleteRows({ rowKeys, scenarioKey = defaultScenario }) {
@@ -211,23 +261,23 @@ class Model extends Dense3DArray {
     const scenario = validateScenario({ scenarioKey, scenarios });
     const rows = rowKeys.map(rowKey => validateRow({ rowKey, scenario }));
     validateCanDeleteAllRows(rows);
-    // delete from largest index downwards
-    return rows
-      .sort((r1, r2) => r2.index - r1.index)
-      .reduce(
-        (deletedRows, toDelete) => {
-          const { row, shadowRows } = deleteRowAndShadows(
-            this,
-            scenarios,
-            scenario,
-            toDelete
-          );
-          deletedRows.rows.unshift(row);
-          deletedRows.shadowRows.unshift(...shadowRows);
-          return deletedRows;
-        },
-        { rows: [], shadowRows: [] }
-      );
+    // ensure that values are not double-mapped by calling explicit Model method
+    // delete in reverse order but return in passed order
+    const deleteRow = Model.prototype.deleteRow.bind(this);
+    const deletedRows = rows
+      .sort((row1, row2) => row2.index - row1.index)
+      .reduce((deletedRows, row) => {
+        deletedRows.push(
+          deleteRow({
+            rowKey: row.key,
+            scenarioKey
+          })
+        );
+        return deletedRows;
+      }, []);
+    return deletedRows.sort(
+      ({ row: row1 }, { row: row2 }) => row1.index - row2.index
+    );
   }
 
   row({ rowKey, scenarioKey = defaultScenario }) {
@@ -276,9 +326,13 @@ class Model extends Dense3DArray {
     const copiedRows = Object.entries(baseScenario.rows).reduce(
       (copy, [rowKey, row]) => {
         const fn = shadow ? shadow.fn : row.fn.unbound;
+        const constants = shadow ? [] : row.constants;
+        const dependsOn = shadow ? undefined : row.dependsOn;
         copy[rowKey] = {
           ...row,
-          fn
+          fn,
+          constants,
+          dependsOn
         };
         return copy;
       },

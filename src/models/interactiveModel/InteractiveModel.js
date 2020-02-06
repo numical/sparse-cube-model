@@ -127,7 +127,7 @@ class InteractiveModel extends MappedModel {
   deleteRow(args) {
     const { historyDescription, ...rest } = args;
     const { rowKey, scenarioKey } = rest;
-    const { row, shadowRows } = super.deleteRow(rest);
+    const { row, rowKeyStillInUse } = super.deleteRow(rest);
     const description = historyDescription
       ? historyDescription
       : scenarioKey
@@ -144,13 +144,13 @@ class InteractiveModel extends MappedModel {
         args: { rowKey, scenarioKey, ...row }
       }
     });
-    return { row, shadowRows };
+    return { row, rowKeyStillInUse };
   }
 
   deleteRows(args) {
     const { historyDescription, ...rest } = args;
     const { rowKeys, scenarioKey } = rest;
-    const { rows } = super.deleteRows(rest);
+    const deletedRows = super.deleteRows(rest);
     const description = historyDescription
       ? historyDescription
       : scenarioKey
@@ -168,7 +168,7 @@ class InteractiveModel extends MappedModel {
             super.addRow({ rowKey: row.key, scenarioKey, ...row });
           });
         },
-        args: rows
+        args: deletedRows.map(({ row }) => row)
       }
     });
   }
