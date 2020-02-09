@@ -200,7 +200,7 @@ class Model extends Dense3DArray {
     validateFn({ fn });
     validateFnArgs({ fn: fn || row.fn, fnArgs });
     validateDependsOn({ dependsOn });
-    return editRow({
+    const ret = editRow({
       model: this,
       row,
       scenario,
@@ -211,6 +211,7 @@ class Model extends Dense3DArray {
       existingConstants: row.constants,
       dependsOn: dependsOn || row.dependsOn
     });
+    return ret;
   }
 
   deleteRow({ rowKey, scenarioKey = defaultScenario }) {

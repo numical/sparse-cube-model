@@ -136,7 +136,7 @@ const prepareRowConstants = ({
   let initial;
   let startInterval;
   if (existingConstants) {
-    initial = existingConstants;
+    initial = [...existingConstants];
     startInterval = lowestIndex(existingConstants);
   } else {
     initial = defaultValuesArray({ start, end, maxInterval });

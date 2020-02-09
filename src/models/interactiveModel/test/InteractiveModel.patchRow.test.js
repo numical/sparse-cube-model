@@ -1,8 +1,5 @@
 const { test } = require("tap");
-const {
-  populatedScenarios,
-  fixtureFilters
-} = require("../../test/testScaffold");
+const { populatedScenarios } = require("../../test/testScaffold");
 const InteractiveModel = require("../InteractiveModel");
 const comparableUnserialisedForm = require("./comparableUnserialisedForm");
 const { increment, interval, lookup } = require("../../../fns/lookupFunctions");
