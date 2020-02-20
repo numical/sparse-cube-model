@@ -1,31 +1,38 @@
 const functionsDictionary = require("../../../../fns/functionsDictionary");
-const keys = require("../keys");
 const { add, divide, power } = require("../../../../maths/coreOperations");
-const { lookup } = require("../../../../fns/lookupFunctions");
+const { lookup, intervalsPerYear } = require("../../../../fns/lookupFunctions");
+const keys = require("../keys");
 
 const cache = new Map();
 
-const annualInflationAdjustment = (rate, rowContext) => {
-  if (cache.has(rate)) {
-    return cache.get(rate);
+const annualInflationAdjustment = (inflationRate, rowContext) => {
+  if (cache.has(inflationRate)) {
+    return cache.get(inflationRate);
   } else {
-    const adj = divide(add(1, divide(rate, 100)), intervalsPerYear(rowContext));
-    cache.put(rate, adj);
+    const adj = divide(
+      add(1, divide(inflationRate, 100)),
+      intervalsPerYear(rowContext)
+    );
+    cache.set(inflationRate, adj);
     return adj;
   }
 };
 
 const adjustForInflation = (rowContext, interval, value) => {
-  const { fnArgs } = rowContext;
-  const { rateRowKey } = fnArgs;
-  const rate = lookup(
-    { dependsOn: { lookup: keys.inflation.row }, ...rowContext },
-    interval
-  );
-  return divide(
-    value,
-    power(annualInflationAdjustment(rate, rowContext), interval)
-  );
+  const { baseScenario, fnArgs } = rowContext;
+  if (fnArgs[keys.inflation.applyInflation]) {
+    const inflationRateContext = {
+      ...rowContext,
+      scenario: baseScenario
+    };
+    const inflationRate = lookup(inflationRateContext, interval);
+    return divide(
+      value,
+      power(annualInflationAdjustment(inflationRate, rowContext), interval)
+    );
+  } else {
+    return value;
+  }
 };
 adjustForInflation.key = keys.inflation.adjustShadowFn;
 

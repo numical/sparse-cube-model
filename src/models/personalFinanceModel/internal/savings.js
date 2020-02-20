@@ -33,6 +33,9 @@ const add = ({
     rowKey: contributionKey,
     constants: [regularContribution],
     fn: previous,
+    fnArgs: {
+      [keys.inflation.applyInflation]: true
+    },
     start: startDate,
     end: endDate
   });
@@ -40,6 +43,9 @@ const add = ({
     rowKey: `${keys.savings.row.amount}_${productIndex}`,
     constants: [startAmount],
     fn: applyAnnualisedInterest,
+    fnArgs: {
+      [keys.inflation.applyInflation]: true
+    },
     dependsOn: {
       interest: interestKey,
       increment: contributionKey

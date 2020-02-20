@@ -5,7 +5,7 @@ const { previous } = require("../../../../fns/lookupFunctions");
 
 const rowKey = keys.inflation.row;
 
-const setInflation = (model, rates = 0) => {
+const setInflation = ({ model, rates = 0 }) => {
   const args = {
     rowKey,
     constants: rates,
@@ -18,7 +18,10 @@ const setInflation = (model, rates = 0) => {
     model.addRow(args);
     model.addScenario({
       scenarioKey: `${defaultScenario}${keys.inflation.adjustedSuffix}`,
-      shadowFn: adjustForInflation
+      shadow: {
+        fn: adjustForInflation,
+        dependsOn: { lookup: keys.inflation.row }
+      }
     });
   }
 };
