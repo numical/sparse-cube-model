@@ -1,18 +1,15 @@
 const functionsDictionary = require("../../../../fns/functionsDictionary");
-const { add, divide, power } = require("../../../../maths/coreOperations");
 const { lookup, intervalsPerYear } = require("../../../../fns/lookupFunctions");
+const { calculateIntervalInflationRate, adjustValueForInflation } = require('./calculateForInflation');
 const keys = require("../keys");
 
 const cache = new Map();
 
-const annualInflationAdjustment = (inflationRate, rowContext) => {
+const getIntervalInflation = (inflationRate, rowContext) => {
   if (cache.has(inflationRate)) {
     return cache.get(inflationRate);
   } else {
-    const adj = divide(
-      add(1, divide(inflationRate, 100)),
-      intervalsPerYear(rowContext)
-    );
+    const adj = calculateIntervalInflationRate(inflationRate, intervalsPerYear(rowContext));
     cache.set(inflationRate, adj);
     return adj;
   }
@@ -26,10 +23,8 @@ const adjustForInflation = (rowContext, interval, value) => {
       scenario: baseScenario
     };
     const inflationRate = lookup(inflationRateContext, interval);
-    return divide(
-      value,
-      power(annualInflationAdjustment(inflationRate, rowContext), interval)
-    );
+    const intervalInflationRate = getIntervalInflation(inflationRate, rowContext);
+    return adjustValueForInflation(value, intervalInflationRate, interval);
   } else {
     return value;
   }
