@@ -8,38 +8,24 @@ const {
   power
 } = require("../maths/coreOperations");
 
-const getInterest = (rowContext, interval) => {
-  if (rowContext.dependsOn && rowContext.dependsOn.interest) {
+const getDependency = (key, isMandatory, rowContext, interval) => {
+  if (rowContext.dependsOn && rowContext.dependsOn[key]) {
     return lookup(
-      { ...rowContext, dependsOn: { lookup: rowContext.dependsOn.interest } },
+      { ...rowContext, dependsOn: { lookup: rowContext.dependsOn[key] } },
       interval
     );
+  } else if (isMandatory) {
+    throw new Error(`Missing '${key}' dependsOn value.`);
   } else {
-    throw new Error("Missing 'interest' dependsOn value.");
+    return 0;
   }
 };
 
-const getIncrement = (rowContext, interval) =>
-  rowContext.dependsOn.increment
-    ? lookup(
-        {
-          ...rowContext,
-          dependsOn: { lookup: rowContext.dependsOn.increment }
-        },
-        interval
-      )
-    : 0;
+const getInterest = getDependency.bind(null, "interest", true);
 
-const getDecrement = (rowContext, interval) =>
-  rowContext.dependsOn.decrement
-    ? lookup(
-        {
-          ...rowContext,
-          dependsOn: { lookup: rowContext.dependsOn.decrement }
-        },
-        interval
-      )
-    : 0;
+const getIncrement = getDependency.bind(null, "increment", false);
+
+const getDecrement = getDependency.bind(null, "decrement", false);
 
 const cacheKey = (annualPercent, { intervals }) =>
   String(annualPercent) + intervals.duration;

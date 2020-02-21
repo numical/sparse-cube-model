@@ -5,6 +5,7 @@ const { defaults } = require("../../model/modelMetadata");
 
 const threeHundredAndOneZeros = Array(defaults.intervals.count + 1).fill(0);
 
+/*
 test("Creates an inflationRow row", t => {
   const model = new PersonalFinanceModel();
   const inflationValues = model.row({ rowKey: keys.inflation.row });
@@ -20,6 +21,7 @@ test("Creates an inflation adjusted shadow scenario", t => {
   t.same(shadow, [threeHundredAndOneZeros]);
   t.end();
 });
+*/
 
 test("Savings account must have a name", t => {
   const model = new PersonalFinanceModel();

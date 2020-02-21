@@ -37,7 +37,7 @@ const tablePrint = (model, scenarioKey, printFn = console.log) => {
   const fixedLengthRowNames = rowKeys.map(rowKey =>
     rowKey.padStart(maxRowNameLength, " ")
   );
-  const rows = model.scenario({ includeDates: true });
+  const rows = model.scenario({ scenarioKey, includeDates: true });
   const s = asTable
     .configure(tableConfig)(rows)
     .split("\n")

@@ -14,6 +14,7 @@ console.log("Default:");
 tablePrint(model);
 
 model.setInflation(2);
+
 console.log();
 console.log("Inflation Adjusted:");
 tablePrint(model, "defaultScenario_pfm.inflationAdjusted");
