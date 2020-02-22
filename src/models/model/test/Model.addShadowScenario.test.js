@@ -5,9 +5,9 @@ const {
 const functionsDictionary = require("../../../fns/functionsDictionary");
 const { increment, lookup } = require("../../../fns/lookupFunctions");
 const { identity, multiplier } = require("../../../fns/shadowFunctions");
-const { add } = require("../../../maths/coreOperations");
+const { add } = require("../../../maths/arithmeticOperations");
 const { defaultScenario } = require("../modelMetadata");
-const { multiply } = require("../../../maths/coreOperations");
+const { multiply } = require("../../../maths/arithmeticOperations");
 
 const testLookupShadowFn = (rowContext, interval, value) => {
   const lookupRowContext = {

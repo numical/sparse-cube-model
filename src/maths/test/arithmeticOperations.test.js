@@ -1,5 +1,11 @@
 const { test } = require("tap");
-const { add, subtract, multiply, divide, power } = require("../coreOperations");
+const {
+  add,
+  subtract,
+  multiply,
+  divide,
+  power
+} = require("../arithmeticOperations");
 
 test("trivial add", t => {
   t.same(add(3, 2), 5);

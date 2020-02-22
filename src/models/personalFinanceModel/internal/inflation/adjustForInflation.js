@@ -3,7 +3,7 @@ const { lookup, intervalsPerYear } = require("../../../../fns/lookupFunctions");
 const {
   calculateIntervalInflationRate,
   adjustValueForInflation
-} = require("../../../../maths/calculateForInflation");
+} = require("../../../../maths/percentageOperations");
 const keys = require("../keys");
 
 const cache = new Map();

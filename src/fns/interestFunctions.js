@@ -6,7 +6,7 @@ const {
   multiply,
   subtract,
   power
-} = require("../maths/coreOperations");
+} = require("../maths/arithmeticOperations");
 
 const getDependency = (key, isMandatory, rowContext, interval) => {
   if (rowContext.dependsOn && rowContext.dependsOn[key]) {

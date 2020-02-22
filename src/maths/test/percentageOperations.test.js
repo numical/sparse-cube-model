@@ -3,7 +3,7 @@ const addAssertions = require("../../models/test/addAssertions");
 const {
   calculateIntervalInflationRate,
   adjustValueForInflation
-} = require("../calculateForInflation");
+} = require("../percentageOperations");
 
 const monthlyInflationRates = new Map(); // { annualInflation: monthly inflation }
 monthlyInflationRates.set(2, 0.16515813019202241);
