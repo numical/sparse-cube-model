@@ -13,8 +13,9 @@ model.addSavings({
 console.log("Default:");
 tablePrint(model);
 
-model.setInflation(2);
-
-console.log();
-console.log("Inflation Adjusted:");
-tablePrint(model, "defaultScenario_pfm.inflationAdjusted");
+[2, 3, 4, 5].forEach(inflationRate => {
+  model.setInflation(inflationRate);
+  console.log();
+  console.log(`Inflation Adjusted (${inflationRate}%):`);
+  tablePrint(model, "defaultScenario_pfm.inflationAdjusted");
+});

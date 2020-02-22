@@ -1,6 +1,5 @@
 # Next Steps
 * Shadow Scenario:
-  * update shadow when row updated?
-  * update shadow fn dependency after serialisation (addToAllRowDependents)
-  * scenerio and row with same name
-  * can we shadow a shadow?
+  * edit row which shadow function is dependent on  << test
+  * interestFunctions - look at again
+  * scenario and row with same name

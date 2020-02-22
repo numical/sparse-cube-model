@@ -6,6 +6,39 @@ const ensureAllConstantsDefined = require("../validate/ensureAllConstantsDefined
 const linkDependentRows = require("../dependent/addToRowDependents");
 const unlinkDependentRows = require("../dependent/removeFromRowDependents");
 
+const relinkDependencies = (scenario, row, dependsOn) => {
+  unlinkDependentRows(scenario, row.key, row.dependsOn);
+  linkDependentRows(scenario, row.key, dependsOn);
+};
+
+const collateRowsToRecalculate = (scenario, row) => {
+  const rowstoUpdate = [row];
+  if (row.dependents && row.dependents.rows) {
+    rowstoUpdate.push(
+      ...row.dependents.rows.map(
+        dependencyRowName => scenario.rows[dependencyRowName]
+      )
+    );
+  }
+  return rowstoUpdate;
+};
+
+const collateScenariosToRecalculate = (scenario, row) => {
+  const scenarioKeys = [];
+  if (scenario.shadows) {
+    Object.entries(scenario.shadows).forEach(
+      ([shadowScenarioKey, { dependsOn }]) => {
+        if (dependsOn) {
+          if (Object.values(dependsOn).includes(row.key)) {
+            scenarioKeys.push(shadowScenarioKey);
+          }
+        }
+      }
+    );
+  }
+  return scenarioKeys;
+};
+
 const editRow = ({
   model,
   scenario,
@@ -29,18 +62,12 @@ const editRow = ({
   }
   bindFnToRow(model, intervals, scenario, row, fn, fnArgs, dependsOn);
   row.constants = rowConstants;
-  unlinkDependentRows(scenario, row.key, row.dependsOn);
-  linkDependentRows(scenario, row.key, dependsOn);
-  const rowstoUpdate = [row];
-  if (row.dependents && row.dependents.rows) {
-    rowstoUpdate.push(
-      ...row.dependents.rows.map(
-        dependencyRowName => scenario.rows[dependencyRowName]
-      )
-    );
-  }
-  rowstoUpdate.forEach(row => {
+  relinkDependencies(scenario, row, dependsOn);
+  collateRowsToRecalculate(scenario, row).forEach(row => {
     calculateRow(row, scenario, startInterval, intervals.count, model.set);
+  });
+  collateScenariosToRecalculate(scenario, row).forEach(scenarioKey => {
+    model.recalculate({ scenarioKey });
   });
   return original;
 };

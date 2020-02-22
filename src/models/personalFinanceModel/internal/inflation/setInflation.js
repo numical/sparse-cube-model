@@ -12,9 +12,8 @@ const setInflation = ({ model, rates = 0 }) => {
     fn: previous
   };
   try {
-    model.row({ rowKey });
     model.updateRow(args);
-  } catch {
+  } catch (err) {
     model.addRow(args);
     model.addScenario({
       scenarioKey: `${defaultScenario}${keys.inflation.adjustedSuffix}`,
