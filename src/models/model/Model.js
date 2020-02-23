@@ -80,6 +80,7 @@ class Model extends Dense3DArray {
         y: existingIndex,
         z: scenario.index
       });
+      /* istanbul ignore if */
       if (existingValues.some(value => value !== defaultValue)) {
         throw new Error(
           `Adding previously deleted row '${rowKey}' to scenario '${scenarioKey}' would overwrite non-default values.`
@@ -225,9 +226,6 @@ class Model extends Dense3DArray {
       ? [scenario, ...Object.keys(scenario.shadows).map(key => scenarios[key])]
       : [scenario];
     affectedScenarios.forEach(affectedScenario => {
-      if (!affectedScenario.rows) {
-        console.log();
-      }
       const { index, dependsOn } = affectedScenario.rows[rowKey];
       removeFromRowDependents(affectedScenario, rowKey, dependsOn);
       delete affectedScenario.rows[rowKey];
@@ -281,17 +279,20 @@ class Model extends Dense3DArray {
     );
   }
 
-  hasRow({ rowKey, scenarioKey = defaultScenario }) {
+  hasRow({ rowKey, scenarioKey = defaultScenario } = {}) {
     const { scenarios } = this.#meta;
     const scenario = validateScenario({
       scenarioKey,
       scenarios,
       toEdit: false
     });
+    if (!rowKey) {
+      throw new Error("A row key is required.");
+    }
     return !!scenario.rows[rowKey];
   }
 
-  row({ rowKey, scenarioKey = defaultScenario }) {
+  row({ rowKey, scenarioKey = defaultScenario } = {}) {
     const { scenarios } = this.#meta;
     const scenario = validateScenario({
       scenarioKey,
@@ -305,7 +306,10 @@ class Model extends Dense3DArray {
     return this.range({ y: row.index, z: scenario.index });
   }
 
-  hasScenario({ scenarioKey = defaultScenario } = {}) {
+  hasScenario({ scenarioKey } = {}) {
+    if (!scenarioKey) {
+      throw new Error("A scenario key is required.");
+    }
     const { scenarios } = this.#meta;
     return !!scenarios[scenarioKey];
   }

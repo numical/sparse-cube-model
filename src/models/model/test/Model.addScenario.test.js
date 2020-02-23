@@ -251,6 +251,16 @@ populatedScenarios((test, setupFn, fixture) => {
 });
 
 emptyScenarios((test, setupFn) => {
+  test("hasScenario errors if no scenario key passed", t => {
+    const scenarioKey = "test scenario";
+    const model = setupFn();
+    t.throws(
+      () => model.hasScenario(),
+      new Error("A scenario key is required.")
+    );
+    t.end();
+  });
+
   test("Correctly reports no scenario", t => {
     const scenarioKey = "test scenario";
     const model = setupFn();

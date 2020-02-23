@@ -1,4 +1,4 @@
-const generateCalcFn = ({ epoch, duration, count }) => {
+const generateCalcFn = ({ epoch, duration }) => {
   const start = new Date(epoch);
   const startYear = start.getFullYear();
   const startMonth = start.getMonth();

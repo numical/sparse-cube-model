@@ -9,7 +9,7 @@ const mapRow = require("./internal/mapRow");
 const unmapError = require("./internal/unmapError");
 const { defaultScenario } = modelMetadata;
 
-const dependsOnErrorPrefix = "Depends on unknown row";
+const dependsOnErrorPrefix = "dependsOn invalid:";
 
 class MappedModel extends Model {
   static parse([model, map], fnsRepo) {
@@ -191,7 +191,10 @@ class MappedModel extends Model {
     });
   }
 
-  hasRow({ rowKey, scenarioKey = defaultScenario }) {
+  hasRow({ rowKey, scenarioKey = defaultScenario } = {}) {
+    if (!rowKey) {
+      throw new Error("A row key is required.");
+    }
     return this.#fns.unmapError(callMappings => {
       try {
         const mappedRowKey = this.#fns.fromRowKey(rowKey, callMappings);
@@ -205,7 +208,7 @@ class MappedModel extends Model {
     });
   }
 
-  row({ rowKey, scenarioKey = defaultScenario }) {
+  row({ rowKey, scenarioKey = defaultScenario } = {}) {
     return this.#fns.unmapError(callMappings => {
       return super.row({
         scenarioKey: this.#fns.fromScenarioKey(scenarioKey, callMappings),
@@ -214,7 +217,10 @@ class MappedModel extends Model {
     });
   }
 
-  hasScenario({ scenarioKey = defaultScenario } = {}) {
+  hasScenario({ scenarioKey } = {}) {
+    if (!scenarioKey) {
+      throw new Error("A scenario key is required.");
+    }
     return this.#fns.unmapError(callMappings => {
       try {
         const mappedScenarioKey = this.#fns.fromScenarioKey(

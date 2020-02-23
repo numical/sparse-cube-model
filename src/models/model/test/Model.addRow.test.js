@@ -5,6 +5,7 @@ const {
   interval,
   previous
 } = require("../../../fns/lookupFunctions");
+const MappedModel = require("../../mappedModel/MappedModel");
 
 emptyScenarios((test, setupFn) => {
   test("Add row with unknown scenario throws error", t => {
@@ -59,6 +60,21 @@ emptyScenarios((test, setupFn) => {
     t.end();
   });
 
+  test("Add row with fn and invalid dependsOn throws error", t => {
+    const rowKey = "test row";
+    const fn = () => () => {};
+    fn.key = "test fn";
+    const dependsOn = "should be an object";
+    const args = { rowKey, fn, dependsOn };
+
+    const model = setupFn();
+    t.throws(
+      () => model.addRow(args),
+      new Error("dependsOn invalid: 'should be an object'")
+    );
+    t.end();
+  });
+
   test("Add row with no function and smaller constants array than intervals throws error", t => {
     const model = setupFn();
     const args = { rowKey: "test row", constants: [0] };
@@ -104,6 +120,12 @@ emptyScenarios((test, setupFn) => {
     t.end();
   });
 
+  test("hasRow errors if no rowKey passed ", t => {
+    const model = setupFn();
+    t.throws(() => model.hasRow(), new Error("A row key is required."));
+    t.end();
+  });
+
   test("check existence of added row of constants", t => {
     const rowKey = "test row";
     const constants = sequence(test.meta.intervals.count + 1);
@@ -114,6 +136,18 @@ emptyScenarios((test, setupFn) => {
       constants
     });
     t.ok(model.hasRow({ rowKey }));
+    t.end();
+  });
+
+  test("retrieve errors if no row key passed", t => {
+    const rowKey = "test row";
+    const constants = sequence(test.meta.intervals.count + 1);
+    const model = setupFn();
+    model.addRow({
+      rowKey,
+      constants
+    });
+    t.throws(() => model.row(), new Error("A row key is required."));
     t.end();
   });
 
