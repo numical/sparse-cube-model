@@ -191,12 +191,42 @@ class MappedModel extends Model {
     });
   }
 
+  hasRow({ rowKey, scenarioKey = defaultScenario }) {
+    return this.#fns.unmapError(callMappings => {
+      try {
+        const mappedRowKey = this.#fns.fromRowKey(rowKey, callMappings);
+        return super.hasRow({
+          scenarioKey: this.#fns.fromScenarioKey(scenarioKey, callMappings),
+          rowKey: mappedRowKey
+        });
+      } catch {
+        return false;
+      }
+    });
+  }
+
   row({ rowKey, scenarioKey = defaultScenario }) {
     return this.#fns.unmapError(callMappings => {
       return super.row({
         scenarioKey: this.#fns.fromScenarioKey(scenarioKey, callMappings),
         rowKey: this.#fns.fromRowKey(rowKey, callMappings)
       });
+    });
+  }
+
+  hasScenario({ scenarioKey = defaultScenario } = {}) {
+    return this.#fns.unmapError(callMappings => {
+      try {
+        const mappedScenarioKey = this.#fns.fromScenarioKey(
+          scenarioKey,
+          callMappings
+        );
+        return super.hasScenario({
+          scenarioKey: mappedScenarioKey
+        });
+      } catch {
+        return false;
+      }
     });
   }
 

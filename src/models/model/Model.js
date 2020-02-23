@@ -281,6 +281,16 @@ class Model extends Dense3DArray {
     );
   }
 
+  hasRow({ rowKey, scenarioKey = defaultScenario }) {
+    const { scenarios } = this.#meta;
+    const scenario = validateScenario({
+      scenarioKey,
+      scenarios,
+      toEdit: false
+    });
+    return !!scenario.rows[rowKey];
+  }
+
   row({ rowKey, scenarioKey = defaultScenario }) {
     const { scenarios } = this.#meta;
     const scenario = validateScenario({
@@ -288,8 +298,16 @@ class Model extends Dense3DArray {
       scenarios,
       toEdit: false
     });
+    if (!rowKey) {
+      throw new Error("A row key is required.");
+    }
     const row = validateRow({ rowKey, scenario });
     return this.range({ y: row.index, z: scenario.index });
+  }
+
+  hasScenario({ scenarioKey = defaultScenario } = {}) {
+    const { scenarios } = this.#meta;
+    return !!scenarios[scenarioKey];
   }
 
   scenario({ scenarioKey = defaultScenario, includeDates = false } = {}) {

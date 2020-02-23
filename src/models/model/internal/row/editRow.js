@@ -6,6 +6,13 @@ const ensureAllConstantsDefined = require("../validate/ensureAllConstantsDefined
 const linkDependentRows = require("../dependent/addToRowDependents");
 const unlinkDependentRows = require("../dependent/removeFromRowDependents");
 
+const intersects = (array1, array2) => {
+  for (const element of array1) {
+    if (array2.includes(element)) return true;
+  }
+  return false;
+};
+
 const relinkDependencies = (scenario, row, dependsOn) => {
   unlinkDependentRows(scenario, row.key, row.dependsOn);
   linkDependentRows(scenario, row.key, dependsOn);
@@ -23,13 +30,14 @@ const collateRowsToRecalculate = (scenario, row) => {
   return rowstoUpdate;
 };
 
-const collateScenariosToRecalculate = (scenario, row) => {
+const collateScenariosToRecalculate = (scenario, rows) => {
+  const rowKeys = rows.map(row => row.key);
   const scenarioKeys = [];
   if (scenario.shadows) {
     Object.entries(scenario.shadows).forEach(
       ([shadowScenarioKey, { dependsOn }]) => {
         if (dependsOn) {
-          if (Object.values(dependsOn).includes(row.key)) {
+          if (intersects(Object.values(dependsOn), rowKeys)) {
             scenarioKeys.push(shadowScenarioKey);
           }
         }
@@ -63,12 +71,15 @@ const editRow = ({
   bindFnToRow(model, intervals, scenario, row, fn, fnArgs, dependsOn);
   row.constants = rowConstants;
   relinkDependencies(scenario, row, dependsOn);
-  collateRowsToRecalculate(scenario, row).forEach(row => {
+  const rowsToRecalculate = collateRowsToRecalculate(scenario, row);
+  rowsToRecalculate.forEach(row => {
     calculateRow(row, scenario, startInterval, intervals.count, model.set);
   });
-  collateScenariosToRecalculate(scenario, row).forEach(scenarioKey => {
-    model.recalculate({ scenarioKey });
-  });
+  collateScenariosToRecalculate(scenario, rowsToRecalculate).forEach(
+    scenarioKey => {
+      model.recalculate({ scenarioKey });
+    }
+  );
   return original;
 };
 

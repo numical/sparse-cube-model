@@ -104,6 +104,19 @@ emptyScenarios((test, setupFn) => {
     t.end();
   });
 
+  test("check existence of added row of constants", t => {
+    const rowKey = "test row";
+    const constants = sequence(test.meta.intervals.count + 1);
+    const model = setupFn();
+    t.notOk(model.hasRow({ rowKey }));
+    model.addRow({
+      rowKey,
+      constants
+    });
+    t.ok(model.hasRow({ rowKey }));
+    t.end();
+  });
+
   test("retrieve added row of constants", t => {
     const rowKey = "test row";
     const constants = sequence(test.meta.intervals.count + 1);

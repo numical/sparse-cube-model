@@ -34,7 +34,7 @@ const add = ({
     constants: [regularContribution],
     fn: previous,
     fnArgs: {
-      [keys.inflation.applyInflation]: true
+      [keys.inflation.fnArgs.adjustForInflation]: true
     },
     start: startDate,
     end: endDate
@@ -44,7 +44,7 @@ const add = ({
     constants: [startAmount],
     fn: applyAnnualisedInterest,
     fnArgs: {
-      [keys.inflation.applyInflation]: true
+      [keys.inflation.fnArgs.adjustForInflation]: true
     },
     dependsOn: {
       interest: interestKey,

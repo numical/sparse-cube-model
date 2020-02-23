@@ -9,6 +9,7 @@ const {
   previous
 } = require("../../../fns/lookupFunctions");
 const iterate2D = require("../../../data-structures/iterate2D");
+// const MappedModel = require("../../mappedModel/MappedModel");
 
 populatedScenarios((test, setupFn, fixture) => {
   test("Add scenario with no args throws error", t => {
@@ -250,10 +251,18 @@ populatedScenarios((test, setupFn, fixture) => {
 });
 
 emptyScenarios((test, setupFn) => {
+  test("Correctly reports no scenario", t => {
+    const scenarioKey = "test scenario";
+    const model = setupFn();
+    t.notOk(model.hasScenario({ scenarioKey }));
+    t.end();
+  });
+
   test("Add scenario based on empty default", t => {
     const scenarioKey = "test scenario";
     const model = setupFn();
     model.addScenario({ scenarioKey });
+    t.ok(model.hasScenario({ scenarioKey }));
     t.end();
   });
 

@@ -5,7 +5,7 @@ const model = new PersonalFinanceModel();
 
 model.addSavings({
   name: "Savings Account",
-  startDate: new Date(2020, 5, 1),
+  startDate: new Date(2020, 0, 1),
   startAmount: 1000,
   interestRate: 2
 });
@@ -13,7 +13,7 @@ model.addSavings({
 console.log("Default:");
 tablePrint(model);
 
-[2, 3, 4, 5].forEach(inflationRate => {
+[2, 3].forEach(inflationRate => {
   model.setInflation(inflationRate);
   console.log();
   console.log(`Inflation Adjusted (${inflationRate}%):`);

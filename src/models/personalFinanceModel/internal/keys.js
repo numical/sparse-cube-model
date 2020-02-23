@@ -1,9 +1,19 @@
 module.exports = {
   inflation: {
-    adjustShadowFn: "pfm.adjustShadowFn",
-    row: "pfm.inflation.row",
-    adjustedSuffix: "_pfm.inflationAdjusted",
-    applyInflation: "pfm.applyInflation"
+    row: {
+      rate: "pfm.inflation.row.rate",
+      multiplier: "pfm.inflation.row.multiplier"
+    },
+    fn: {
+      calculateMultiplier: "pfm.inflation.fn.calculate.multiplier",
+      applyInflation: "pfm.inflation.fn.apply.inflation"
+    },
+    fnArgs: {
+      adjustForInflation: "pfm.inflation.fnArgs.adjust.for.inflation"
+    },
+    scenario: {
+      suffix: "_pfm.inflationAdjusted"
+    }
   },
   savings: {
     row: {
