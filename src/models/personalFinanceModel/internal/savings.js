@@ -2,12 +2,15 @@ const { previous } = require("../../../fns/lookupFunctions");
 const { applyAnnualisedInterest } = require("../../../fns/interestFunctions");
 const keys = require("./keys");
 
-const checkMandatoryFields = ({ name, startDate }) => {
+const checkMandatoryFields = ({ name, startDate }, existingProducts) => {
   if (name === undefined) {
     throw new Error("Savings must have a name.");
   }
   if (startDate === undefined) {
     throw new Error("Savings must have a start date.");
+  }
+  if (existingProducts.includes(name)) {
+    throw new Error(`Savings account '${name}' already exists.`);
   }
 };
 

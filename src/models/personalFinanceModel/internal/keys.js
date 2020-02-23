@@ -12,7 +12,7 @@ module.exports = {
       adjustForInflation: "pfm.inflation.fnArgs.adjust.for.inflation"
     },
     scenario: {
-      suffix: "_pfm.inflationAdjusted"
+      suffix: "pfm.inflationAdjusted"
     }
   },
   savings: {

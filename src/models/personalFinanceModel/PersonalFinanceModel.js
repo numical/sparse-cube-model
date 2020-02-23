@@ -23,7 +23,7 @@ class PersonalFinanceModel extends InteractiveModel {
   }
 
   addSavings(args = {}) {
-    savings.checkMandatoryFields(args);
+    savings.checkMandatoryFields(args, this.#products);
     const { name } = args;
     const productIndex = this.#products.push(name) - 1;
     savings.add({ model: this, productIndex, ...args });
