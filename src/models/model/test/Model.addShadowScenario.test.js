@@ -366,6 +366,68 @@ populatedScenarios((test, setupFn, fixture) => {
     t.end();
   });
 
+  test("shadow scenario updated if lookup args of transform are updated", t => {
+    const scenarioKey = "shadow scenario";
+    const rowKey = "increment row";
+    const model = setupFn();
+    model.addScenario({
+      scenarioKey,
+      shadow: {
+        fn: testLookupShadowFn,
+        dependsOn: { lookup: "increment row" }
+      }
+    });
+    model.patchRow({
+      rowKey,
+      constants: [2]
+    });
+    t.same(model.row({ rowKey }), [2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+    t.same(model.row({ rowKey, scenarioKey }), [
+      4,
+      9,
+      16,
+      25,
+      36,
+      49,
+      64,
+      81,
+      100,
+      121
+    ]);
+    t.end();
+  });
+
+  test("shadow scenario not updated if non lookup args of transform are updated", t => {
+    const scenarioKey = "shadow scenario";
+    const rowKey = "increment row";
+    const model = setupFn();
+    model.addScenario({
+      scenarioKey,
+      shadow: {
+        fn: testLookupShadowFn,
+        dependsOn: { lookup: "increment row" }
+      }
+    });
+    model.patchRow({
+      rowKey: "independent row",
+      constants: [2]
+    });
+    t.same(model.row({ rowKey }), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    t.same(model.row({ rowKey, scenarioKey }), [
+      0,
+      1,
+      4,
+      9,
+      16,
+      25,
+      36,
+      49,
+      64,
+      81
+    ]);
+    t.end();
+  });
+
   test("Populated shadow scenario serializes consistently", t => {
     const scenarioKey = "test scenario";
     const shadow = { fn: multiplier, fnArgs: { multiple: 2 } };
@@ -433,7 +495,22 @@ populatedScenarios((test, setupFn, fixture) => {
     t.throws(
       () => model.deleteRow({ rowKey }),
       new Error(
-        "Cannot delete row 'independent row' as 'defaultScenario' depends on it."
+        "Cannot delete row 'independent row' as 'defaultScenario' depend on it."
+      )
+    );
+    t.end();
+  });
+
+  test("cannot delete multiple rows if one is used by a shadow fn", t => {
+    const scenarioKey = "shadow scenario";
+    const rowKey = "independent row";
+    const shadow = { fn: lookup, dependsOn: { lookup: rowKey } };
+    const model = setupFn();
+    model.addScenario({ scenarioKey, shadow });
+    t.throws(
+      () => model.deleteRows({ rowKeys: [rowKey, "second lookup row"] }),
+      new Error(
+        "Cannot delete row 'independent row' as 'defaultScenario' depend on it."
       )
     );
     t.end();

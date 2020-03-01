@@ -5,7 +5,6 @@ const {
   interval,
   previous
 } = require("../../../fns/lookupFunctions");
-const MappedModel = require("../../mappedModel/MappedModel");
 
 emptyScenarios((test, setupFn) => {
   test("Add row with unknown scenario throws error", t => {

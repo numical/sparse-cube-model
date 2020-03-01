@@ -145,7 +145,7 @@ populatedScenarios((test, setUp, fixture) => {
     t.throws(
       () => model.deleteRows({ rowKeys }),
       new Error(
-        "Cannot delete row 'increment row' as row 'first lookup row' depends on it."
+        "Cannot delete row 'increment row' as row 'first lookup row' depend on it."
       )
     );
     t.end();

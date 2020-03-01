@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 const Model = require("../models/model/Model");
 const { interval, previous } = require("../fns/lookupFunctions");
 const {

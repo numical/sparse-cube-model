@@ -1,9 +1,7 @@
 const createErrorMessage = (key, dependents) => {
   const { rows = [], scenarios = [] } = dependents;
   const all = [...rows, ...scenarios];
-  return `Cannot delete row '${key}' as '${all.join(", ")}' depend${
-    all.length > 1 ? "" : "s"
-  } on it.`;
+  return `Cannot delete row '${key}' as '${all.join(", ")}' depend on it.`;
 };
 
 const validateCanDeleteRow = row => {

@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 const PersonalFinanceModel = require("../models/personalFinanceModel/PersonalFinanceModel");
 const tablePrint = require("./tablePrint");
 

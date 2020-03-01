@@ -1,5 +1,6 @@
 const { previous } = require("../../../fns/lookupFunctions");
 const { applyAnnualisedInterest } = require("../../../fns/interestFunctions");
+const adjustForInflation = require("./inflation/adjustForInflation");
 const keys = require("./keys");
 
 const checkMandatoryFields = ({ name, startDate }, existingProducts) => {
@@ -32,30 +33,28 @@ const add = ({
     start: startDate,
     end: endDate
   });
-  model.addRow({
-    rowKey: contributionKey,
-    constants: [regularContribution],
-    fn: previous,
-    fnArgs: {
-      [keys.inflation.fnArgs.adjustForInflation]: true
-    },
-    start: startDate,
-    end: endDate
-  });
-  model.addRow({
-    rowKey: `${keys.savings.row.amount}_${productIndex}`,
-    constants: [startAmount],
-    fn: applyAnnualisedInterest,
-    fnArgs: {
-      [keys.inflation.fnArgs.adjustForInflation]: true
-    },
-    dependsOn: {
-      interest: interestKey,
-      increment: contributionKey
-    },
-    start: startDate,
-    end: endDate
-  });
+  model.addRow(
+    adjustForInflation({
+      rowKey: contributionKey,
+      constants: [regularContribution],
+      fn: previous,
+      start: startDate,
+      end: endDate
+    })
+  );
+  model.addRow(
+    adjustForInflation({
+      rowKey: `${keys.savings.row.amount}_${productIndex}`,
+      constants: [startAmount],
+      fn: applyAnnualisedInterest,
+      dependsOn: {
+        interest: interestKey,
+        increment: contributionKey
+      },
+      start: startDate,
+      end: endDate
+    })
+  );
 };
 
 module.exports = {

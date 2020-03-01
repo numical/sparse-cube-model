@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 /*
  Note: uses internal knowledge of Model serialization and metadata structure.
  */

@@ -1,7 +1,7 @@
 const adjustForInflation = require("./applyInflation");
 const calculateMultiplier = require("./calculateMultiplier");
+const inflationAdjustedScenarioKey = require("./inflationAdjustedScenarioKey");
 const keys = require("../keys");
-const { defaultScenario } = require("../../../model/modelMetadata");
 const { previous } = require("../../../../fns/lookupFunctions");
 
 const setInflation = ({ model, rates = 0 }) => {
@@ -20,7 +20,7 @@ const setInflation = ({ model, rates = 0 }) => {
       dependsOn: { lookup: keys.inflation.row.rate }
     });
     model.addScenario({
-      scenarioKey: `${defaultScenario}_${keys.inflation.scenario.suffix}`,
+      scenarioKey: inflationAdjustedScenarioKey(),
       shadow: {
         fn: adjustForInflation,
         dependsOn: { lookup: keys.inflation.row.multiplier }
