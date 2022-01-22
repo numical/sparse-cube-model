@@ -5,7 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "as-table": "1.0.55",
-    "nanoid": "2.1.8",
+    "nanoid": "3.1.31",
     "ramda": "0.26.1"
   },
   "devDependencies": {
