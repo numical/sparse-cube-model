@@ -28,25 +28,25 @@ const testFn = (setupFn, test) => t => {
 
 test("ensure withRows setup fn works", t => {
   const model = withRows.setUp(Model);
-  t.isA(model, Model);
+  t.type(model, Model);
   t.end();
 });
 
 test("ensure withRows setup fn works with default", t => {
   const model = withRows.setUp();
-  t.isA(model, Model);
+  t.type(model, Model);
   t.end();
 });
 
 test("ensure withScenarios setup fn works", t => {
   const model = withScenarios.setUp(Model);
-  t.isA(model, Model);
+  t.type(model, Model);
   t.end();
 });
 
 test("ensure withScenarios setup fn works with default", t => {
   const model = withScenarios.setUp();
-  t.isA(model, Model);
+  t.type(model, Model);
   t.end();
 });
 

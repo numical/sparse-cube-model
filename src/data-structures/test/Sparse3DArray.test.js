@@ -133,7 +133,7 @@ test("clone", t => {
   s3a.set(8, 6, 5, 3);
   const clone = s3a.clone();
   t.type(clone, Sparse3DArray);
-  t.notEqual(clone, s3a);
+  t.not(clone, s3a);
   t.same(clone, s3a);
   t.end();
 });
