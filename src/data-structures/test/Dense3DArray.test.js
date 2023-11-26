@@ -27,12 +27,12 @@ test("get throws RangeError when indices exceeded", t => {
   const d3a = new Dense3DArray();
   const { get, set } = d3a;
   set(1, 2, 3, value);
-  t.equals(get(1, 2, 3), value);
-  t.equals(get(0, 2, 3), 0);
+  t.equal(get(1, 2, 3), value);
+  t.equal(get(0, 2, 3), 0);
   t.throws(get.bind(null, 2, 2, 3), RangeError);
-  t.equals(get(1, 1, 3), 0);
+  t.equal(get(1, 1, 3), 0);
   t.throws(get.bind(null, 1, 3, 3), RangeError);
-  t.equals(get(1, 2, 2), 0);
+  t.equal(get(1, 2, 2), 0);
   t.throws(get.bind(null, 1, 2, 4), RangeError);
   t.end();
 });
@@ -56,7 +56,7 @@ test("clone", t => {
   iterate3D(size, size, size, (x, y, z) => d3a.set(x, y, z, `${x},${y},${z}`));
   const clone = d3a.clone();
   t.type(clone, Dense3DArray);
-  t.notEqual(clone, d3a);
+  t.not(clone, d3a);
   t.same(clone, d3a);
   t.end();
 });
